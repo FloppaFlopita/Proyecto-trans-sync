@@ -1,0 +1,34 @@
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: trans-sync-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: trans_sync_db
+    ports:
+      - "8543:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trans-sync-prometheus
+    ports:
+      - "8900:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: trans-sync-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "8300:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  pg-data:

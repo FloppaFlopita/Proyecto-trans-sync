@@ -1,0 +1,28 @@
+server:
+  port: 8100
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: ms-rutas
+          uri: http://localhost:8101
+          predicates:
+            - Path=/api/rutas/**
+          filters:
+            - StripPrefix=1
+
+        - id: ms-flota
+          uri: http://localhost:8102
+          predicates:
+            - Path=/api/buses/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
