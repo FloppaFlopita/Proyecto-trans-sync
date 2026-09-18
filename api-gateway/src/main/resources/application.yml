@@ -21,6 +21,20 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: ms-reservas
+          uri: http://localhost:8103
+          predicates:
+            - Path=/api/reservas/**
+          filters:
+            - StripPrefix=1
+
+        - id: ms-pagos
+          uri: http://localhost:8104
+          predicates:
+            - Path=/api/pagos/**
+          filters:
+            - StripPrefix=1
+
 eureka:
   client:
     service-url:
