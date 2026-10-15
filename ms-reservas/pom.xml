@@ -57,6 +57,12 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
+        <!-- OpenFeign para comunicación con ms-flota -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
         <!-- DevTools para recarga automática (no hay que reiniciar PowerShell) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
