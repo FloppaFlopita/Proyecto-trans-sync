@@ -14,8 +14,9 @@ public class Reserva {
     private String nombrePasajero;
     private String dniPasajero;
     private Long rutaId;
+    private Long busId;          // ID del bus asignado (consultado a ms-flota)
     private LocalDate fechaViaje;
-    private String estado; // PENDIENTE, CONFIRMADA, CANCELADA
+    private String estado;       // PENDIENTE, CONFIRMADA, CANCELADA
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -29,6 +30,9 @@ public class Reserva {
 
     public Long getRutaId() { return rutaId; }
     public void setRutaId(Long rutaId) { this.rutaId = rutaId; }
+
+    public Long getBusId() { return busId; }
+    public void setBusId(Long busId) { this.busId = busId; }
 
     public LocalDate getFechaViaje() { return fechaViaje; }
     public void setFechaViaje(LocalDate fechaViaje) { this.fechaViaje = fechaViaje; }

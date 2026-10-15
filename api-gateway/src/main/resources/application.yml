@@ -35,6 +35,20 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: ms-promociones
+          uri: http://localhost:8105
+          predicates:
+            - Path=/api/promociones/**
+          filters:
+            - StripPrefix=1
+
+        - id: ms-fidelizacion
+          uri: http://localhost:8106
+          predicates:
+            - Path=/api/fidelizacion/**
+          filters:
+            - StripPrefix=1
+
 eureka:
   client:
     service-url:

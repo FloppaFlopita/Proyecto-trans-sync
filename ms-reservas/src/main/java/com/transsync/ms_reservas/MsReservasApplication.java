@@ -3,11 +3,13 @@ package com.transsync.ms_reservas;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
 
 @SpringBootApplication
+@EnableFeignClients
 public class MsReservasApplication {
 
     public static void main(String[] args) {
