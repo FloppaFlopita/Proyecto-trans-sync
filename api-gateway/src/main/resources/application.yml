@@ -6,7 +6,26 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+              - "http://127.0.0.1:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
       routes:
+        - id: ms-auth
+          uri: http://localhost:8107
+          predicates:
+            - Path=/api/auth/**
+
         - id: ms-rutas
           uri: http://localhost:8101
           predicates:
@@ -39,18 +58,18 @@ spring:
           uri: http://localhost:8105
           predicates:
             - Path=/api/promociones/**
-          filters:
-            - StripPrefix=1
 
         - id: ms-fidelizacion
           uri: http://localhost:8106
           predicates:
             - Path=/api/fidelizacion/**
-          filters:
-            - StripPrefix=1
+
+        - id: ms-facturacion
+          uri: http://localhost:8108
+          predicates:
+            - Path=/api/facturacion/**
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-

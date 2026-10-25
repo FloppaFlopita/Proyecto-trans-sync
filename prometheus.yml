@@ -36,3 +36,8 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['host.docker.internal:8106']
+
+  - job_name: 'ms-facturacion'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8108']

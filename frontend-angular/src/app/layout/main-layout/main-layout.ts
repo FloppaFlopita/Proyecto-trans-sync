@@ -7,22 +7,19 @@ import { NavbarComponent } from '../../components/navbar/navbar';
   standalone: true,
   imports: [RouterOutlet, NavbarComponent],
   template: `
-    <div class="min-h-screen" style="background: #09090f;">
+    <div class="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       <app-navbar></app-navbar>
-      <!-- Fondo con gradiente ambiental -->
-      <div class="fixed inset-0 pointer-events-none overflow-hidden" style="z-index:0;">
-        <div class="absolute rounded-full"
-             style="width:600px;height:600px;top:-200px;left:-100px;
-                    background:radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);"></div>
-        <div class="absolute rounded-full"
-             style="width:500px;height:500px;bottom:-100px;right:-100px;
-                    background:radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 70%);"></div>
-      </div>
-      <main class="relative pt-14 min-h-screen" style="z-index:1;">
-        <div class="max-w-screen-xl mx-auto px-6 py-8">
+      <main class="flex-1 pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <router-outlet></router-outlet>
         </div>
       </main>
+      <footer class="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p>© 2026 TransSync Transportes del Perú S.A.C. Todos los derechos reservados.</p>
+          <p class="font-medium text-slate-600">Sistema Empresarial de Transporte Interprovincial · UPeU</p>
+        </div>
+      </footer>
     </div>
   `
 })

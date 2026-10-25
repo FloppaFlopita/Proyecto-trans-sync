@@ -12,6 +12,10 @@ import java.util.Map;
 @FeignClient(name = "ms-flota", url = "http://localhost:8102")
 public interface FlotaClient {
 
+    // Consulta datos completos del bus
+    @GetMapping("/buses/{id}")
+    ResponseEntity<Map<String, Object>> obtenerBus(@PathVariable("id") Long busId);
+
     // Consulta si un bus tiene asientos disponibles
     @GetMapping("/buses/{id}/disponibilidad")
     ResponseEntity<Map<String, Object>> verificarDisponibilidad(@PathVariable("id") Long busId);
@@ -23,4 +27,8 @@ public interface FlotaClient {
     // Libera 1 asiento al cancelar una reserva
     @PutMapping("/buses/{id}/liberar-asiento")
     ResponseEntity<Map<String, Object>> liberarAsiento(@PathVariable("id") Long busId);
+
+    // Reinicia asientos del bus
+    @PutMapping("/buses/{id}/reiniciar")
+    ResponseEntity<Map<String, Object>> reiniciarBus(@PathVariable("id") Long busId);
 }
