@@ -21,6 +21,9 @@ public class ReservaService {
     @Autowired(required = false)
     private FidelizacionClient fidelizacionClient;
 
+    @Autowired(required = false)
+    private ReservaEventProducer reservaEventProducer;
+
     @Transactional(readOnly = true)
     public List<Reserva> listarReservas() {
         return reservaRepository.findAll();
@@ -382,6 +385,33 @@ public class ReservaService {
         resultado.put("totalPagar", totalPagar);
         resultado.put("puntosFidelizacionGanados", puntosGanados);
         resultado.put("estado", "CONFIRMADA");
+
+        // 5. Publicación asíncrona desacoplada a Kafka (S8 & S9)
+        if (reservaEventProducer != null && !creadas.isEmpty()) {
+            try {
+                Reserva primer = creadas.get(0);
+                ReservaCreadaEvento evento = new ReservaCreadaEvento();
+                evento.setReservaId(primer.getId());
+                evento.setNumeroBoleta(primer.getNumeroBoleta());
+                evento.setNombrePasajero(primer.getNombrePasajero());
+                evento.setDniPasajero(primer.getDniPasajero());
+                evento.setTelefonoPasajero(primer.getTelefonoPasajero());
+                evento.setEmailPasajero(primer.getEmailPasajero());
+                evento.setRutaId(primer.getRutaId());
+                evento.setRutaNombre(primer.getRutaNombre());
+                evento.setBusId(primer.getBusId());
+                evento.setAsientos(req.getAsientos());
+                evento.setTotalPagar(totalPagar);
+                evento.setMetodoPago(primer.getMetodoPago());
+                evento.setIdCliente(req.getIdCliente());
+                evento.setFechaHora(primer.getFechaHoraVenta() != null ? primer.getFechaHoraVenta().toString() : java.time.LocalDateTime.now().toString());
+                evento.setCorrelationId(org.slf4j.MDC.get("correlationId") != null ? org.slf4j.MDC.get("correlationId") : UUID.randomUUID().toString());
+
+                reservaEventProducer.publicarReservaCreada(evento);
+            } catch (Exception ex) {
+                System.err.println(">>> Advertencia al emitir evento Kafka: " + ex.getMessage());
+            }
+        }
 
         return resultado;
     }

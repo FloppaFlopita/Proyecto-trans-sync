@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.Map;
 
-// Se conecta a ms-flota usando su nombre registrado en Eureka
-@FeignClient(name = "ms-flota", url = "http://localhost:8102")
+// Se conecta a ms-flota usando su nombre registrado en Eureka con Fallback resiliente (S6)
+@FeignClient(name = "ms-flota", url = "http://localhost:8102", fallback = FlotaClientFallback.class)
 public interface FlotaClient {
 
     // Consulta datos completos del bus

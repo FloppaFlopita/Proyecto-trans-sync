@@ -57,6 +57,12 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
+        <!-- Kafka Messaging Asíncrono (S8 Rúbrica) -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
         <!-- DevTools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -94,4 +100,3 @@
         </plugins>
     </build>
 </project>
-

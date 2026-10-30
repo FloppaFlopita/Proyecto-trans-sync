@@ -7,5 +7,6 @@ import java.util.List;
 @Repository
 public interface MovimientoFidelizacionRepository extends JpaRepository<MovimientoFidelizacion, Long> {
     List<MovimientoFidelizacion> findByPasajeroIdOrderByFechaDesc(Long pasajeroId);
+    boolean existsByDescripcionContaining(String fragmento);
 }
 

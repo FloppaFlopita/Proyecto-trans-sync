@@ -63,7 +63,19 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- DevTools para recarga automática (no hay que reiniciar PowerShell) -->
+        <!-- Resilience4j Circuit Breaker, Timeout, Retry y Fallback (S6 Rúbrica) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+        </dependency>
+
+        <!-- Kafka Messaging Asíncrono (S8 Rúbrica) -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- DevTools para recarga automática -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
