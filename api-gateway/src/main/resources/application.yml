@@ -69,6 +69,75 @@ spring:
           predicates:
             - Path=/api/facturacion/**
 
+        # Enrutamiento de OpenAPI / Swagger Docs para el Swagger General
+        - id: ms-auth-docs
+          uri: http://localhost:8107
+          predicates:
+            - Path=/v3/api-docs/ms-auth
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: ms-reservas-docs
+          uri: http://localhost:8103
+          predicates:
+            - Path=/v3/api-docs/ms-reservas
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: ms-flota-docs
+          uri: http://localhost:8102
+          predicates:
+            - Path=/v3/api-docs/ms-flota
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: ms-pagos-docs
+          uri: http://localhost:8104
+          predicates:
+            - Path=/v3/api-docs/ms-pagos
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: ms-facturacion-docs
+          uri: http://localhost:8108
+          predicates:
+            - Path=/v3/api-docs/ms-facturacion
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: ms-rutas-docs
+          uri: http://localhost:8101
+          predicates:
+            - Path=/v3/api-docs/ms-rutas
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: ms-fidelizacion-docs
+          uri: http://localhost:8106
+          predicates:
+            - Path=/v3/api-docs/ms-fidelizacion
+          filters:
+            - SetPath=/v3/api-docs
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: 1. MS-Auth (Autenticacion y Roles)
+        url: /v3/api-docs/ms-auth
+      - name: 2. MS-Reservas (Compras y Fallback)
+        url: /v3/api-docs/ms-reservas
+      - name: 3. MS-Flota (Buses y Capacidad)
+        url: /v3/api-docs/ms-flota
+      - name: 4. MS-Pagos (Registro de Transacciones)
+        url: /v3/api-docs/ms-pagos
+      - name: 5. MS-Facturacion (Boletas SUNAT)
+        url: /v3/api-docs/ms-facturacion
+      - name: 6. MS-Rutas (Catalogo de Rutas)
+        url: /v3/api-docs/ms-rutas
+      - name: 7. MS-Fidelizacion (Puntos y Recompensas)
+        url: /v3/api-docs/ms-fidelizacion
+
 eureka:
   client:
     service-url:

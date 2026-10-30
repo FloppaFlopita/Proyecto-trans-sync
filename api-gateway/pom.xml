@@ -61,6 +61,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Swagger UI unificado en el API Gateway -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+            <version>2.6.0</version>
+        </dependency>
         <!-- DevTools para reinicio automático al guardar -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
