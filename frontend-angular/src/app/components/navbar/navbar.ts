@@ -15,7 +15,7 @@ import { AuthService, UserSession } from '../../services/auth.service';
         <!-- Logo e Identidad Corporativa -->
         <div class="flex items-center gap-8">
           <a routerLink="/reservas" class="flex items-center gap-3 group">
-            <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:bg-blue-700 transition-colors">
+            <div class="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-500/20 group-hover:bg-teal-700 transition-colors">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
@@ -23,7 +23,7 @@ import { AuthService, UserSession } from '../../services/auth.service';
             </div>
             <div>
               <span class="text-lg font-black text-slate-900 tracking-tight block leading-tight">TransSync</span>
-              <span class="text-[10px] font-semibold text-blue-600 uppercase tracking-wider block">Transporte Interprovincial</span>
+              <span class="text-[10px] font-semibold text-teal-600 uppercase tracking-wider block">Transporte Interprovincial</span>
             </div>
           </a>
 
@@ -32,11 +32,11 @@ import { AuthService, UserSession } from '../../services/auth.service';
 
             <!-- Para Pasajero / Cliente o Invitado -->
             <ng-container *ngIf="!usuario || esCliente()">
-              <a routerLink="/reservas" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+              <a routerLink="/reservas" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
                  class="px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 Comprar Pasajes
               </a>
-              <a routerLink="/rutas" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+              <a routerLink="/rutas" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
                  class="px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 Rutas y Horarios
               </a>
@@ -44,12 +44,12 @@ import { AuthService, UserSession } from '../../services/auth.service';
 
             <!-- Para Conductor -->
             <ng-container *ngIf="esConductor()">
-              <a routerLink="/reservas" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
-                 class="px-3.5 py-2 rounded-lg text-blue-700 font-bold bg-blue-50 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+              <a routerLink="/reservas" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
+                 class="px-3.5 py-2 rounded-lg text-teal-700 font-bold bg-teal-50 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-teal-600"></span>
                 Panel del Conductor (Manifiesto)
               </a>
-              <a routerLink="/flota" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+              <a routerLink="/flota" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
                  class="px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 Mi Vehiculo Asignado
               </a>
@@ -57,23 +57,23 @@ import { AuthService, UserSession } from '../../services/auth.service';
 
             <!-- Para Administrador -->
             <ng-container *ngIf="esAdmin()">
-              <a routerLink="/dashboard" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+              <a routerLink="/dashboard" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
                  class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 Dashboard
               </a>
-              <a routerLink="/rutas" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+              <a routerLink="/rutas" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
                  class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 Rutas
               </a>
-              <a routerLink="/flota" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+              <a routerLink="/flota" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
                  class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 Flota
               </a>
-              <a routerLink="/reservas" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+              <a routerLink="/reservas" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
                  class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 Reservas y Ventas
               </a>
-              <a routerLink="/pagos" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+              <a routerLink="/pagos" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
                  class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 Pagos
               </a>
@@ -94,14 +94,14 @@ import { AuthService, UserSession } from '../../services/auth.service';
           <button (click)="mostrarModalPerfil = true"
                   class="flex items-center gap-2.5 p-1.5 pr-3 rounded-full hover:bg-slate-100 transition-all border border-slate-200 shadow-sm"
                   title="Abrir Mi Perfil y Cuenta">
-            <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm shadow-inner">
+            <div class="w-8 h-8 rounded-full bg-teal-600 text-white font-bold flex items-center justify-center text-sm shadow-inner">
               {{ usuario ? usuario.nombre.charAt(0) : 'P' }}
             </div>
             <div class="text-left hidden sm:block">
               <p class="text-xs font-bold text-slate-800 leading-tight">
                 {{ usuario ? usuario.nombre.split(' ')[0] : 'Pasajero' }}
               </p>
-              <p class="text-[10px] font-semibold text-blue-600 uppercase">
+              <p class="text-[10px] font-semibold text-teal-600 uppercase">
                 {{ usuario ? (usuario.roles[0] || 'Cliente') : 'Invitado' }}
               </p>
             </div>
@@ -121,14 +121,14 @@ import { AuthService, UserSession } from '../../services/auth.service';
         <!-- Cabecera del modal -->
         <div class="flex items-center justify-between pb-4 border-b border-slate-100">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white font-black text-xl flex items-center justify-center shadow-md shadow-blue-500/20">
+            <div class="w-12 h-12 rounded-2xl bg-teal-600 text-white font-black text-xl flex items-center justify-center shadow-md shadow-teal-500/20">
               {{ usuario ? usuario.nombre.charAt(0) : 'P' }}
             </div>
             <div>
               <h3 class="text-base font-bold text-slate-900">
                 {{ usuario ? usuario.nombre : 'Pasajero Invitado' }}
               </h3>
-              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800">
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-teal-100 text-teal-800">
                 {{ usuario ? usuario.roles.join(', ') : 'ROL: CLIENTE / PASAJERO' }}
               </span>
             </div>
@@ -140,13 +140,13 @@ import { AuthService, UserSession } from '../../services/auth.service';
         <div class="py-4 space-y-4">
 
           <!-- Tarjeta de Puntos de Fidelizacion (Para clientes) -->
-          <div class="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-center justify-between">
+          <div class="p-4 rounded-xl bg-gradient-to-br from-teal-50 to-indigo-50 border border-teal-100 flex items-center justify-between">
             <div>
-              <p class="text-xs font-semibold text-blue-900">Programa TransSync Rewards</p>
-              <p class="text-2xl font-black text-blue-700 mt-0.5">140 <span class="text-xs font-bold text-blue-600">Puntos</span></p>
-              <p class="text-[11px] text-blue-800/80 mt-0.5">Equivalente a S/ 14.00 de descuento en tu proximo viaje.</p>
+              <p class="text-xs font-semibold text-teal-900">Programa TransSync Rewards</p>
+              <p class="text-2xl font-black text-teal-700 mt-0.5">140 <span class="text-xs font-bold text-teal-600">Puntos</span></p>
+              <p class="text-[11px] text-teal-800/80 mt-0.5">Equivalente a S/ 14.00 de descuento en tu proximo viaje.</p>
             </div>
-            <div class="w-10 h-10 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-700 font-bold text-lg">
+            <div class="w-10 h-10 rounded-full bg-teal-600/10 flex items-center justify-center text-teal-700 font-bold text-lg">
               ★
             </div>
           </div>
@@ -170,7 +170,7 @@ import { AuthService, UserSession } from '../../services/auth.service';
           <!-- Seccion: Cambiar Contraseña Rapido -->
           <div class="pt-2">
             <button (click)="mostrarCambioClave = !mostrarCambioClave"
-                    class="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                    class="text-xs font-semibold text-teal-600 hover:text-teal-800 flex items-center gap-1">
               <span>{{ mostrarCambioClave ? '− Cancelar' : '+ Cambiar Contraseña' }}</span>
             </button>
 
@@ -178,10 +178,10 @@ import { AuthService, UserSession } from '../../services/auth.service';
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">Nueva Contraseña</label>
                 <input [(ngModel)]="nuevaClave" type="password" placeholder="Minimo 6 caracteres"
-                       class="w-full rounded-lg px-3 py-1.5 text-xs bg-white border border-slate-300 text-slate-800 outline-none focus:border-blue-500"/>
+                       class="w-full rounded-lg px-3 py-1.5 text-xs bg-white border border-slate-300 text-slate-800 outline-none focus:border-teal-500"/>
               </div>
               <button (click)="guardarNuevaClave()"
-                      class="w-full py-1.5 rounded-lg bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors">
+                      class="w-full py-1.5 rounded-lg bg-teal-600 text-white font-semibold text-xs hover:bg-teal-700 transition-colors">
                 Actualizar Contraseña
               </button>
               <p *ngIf="mensajeClave" class="text-[11px] text-emerald-600 font-medium text-center">{{ mensajeClave }}</p>
@@ -193,15 +193,15 @@ import { AuthService, UserSession } from '../../services/auth.service';
             <p class="text-[11px] font-semibold text-slate-500 mb-2">Cambiar rol para demostracion:</p>
             <div class="grid grid-cols-3 gap-2">
               <button (click)="cambiarRol('cliente@transsync.com', 'cliente123')"
-                      class="py-2 px-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 text-xs font-semibold text-slate-700 text-center transition-colors">
+                      class="py-2 px-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-xs font-semibold text-slate-700 text-center transition-colors">
                 Cliente
               </button>
               <button (click)="cambiarRol('conductor@transsync.com', 'chofer123')"
-                      class="py-2 px-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 text-xs font-semibold text-slate-700 text-center transition-colors">
+                      class="py-2 px-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-xs font-semibold text-slate-700 text-center transition-colors">
                 Conductor
               </button>
               <button (click)="cambiarRol('admin@transsync.com', 'admin123')"
-                      class="py-2 px-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 text-xs font-semibold text-slate-700 text-center transition-colors">
+                      class="py-2 px-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-xs font-semibold text-slate-700 text-center transition-colors">
                 Admin
               </button>
             </div>

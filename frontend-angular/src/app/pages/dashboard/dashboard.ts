@@ -17,7 +17,7 @@ import { RutasService } from '../../services/rutas.service';
       <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div class="flex items-center gap-2 mb-1.5">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-100 text-teal-800">
               Panel de Control Principal
             </span>
             <span class="text-xs text-slate-500 font-medium">TransSync · Sistema Integrado 2026</span>
@@ -32,7 +32,7 @@ import { RutasService } from '../../services/rutas.service';
 
         <div class="flex items-center gap-2">
           <a routerLink="/reservas"
-             class="flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-md shadow-blue-600/20">
+             class="flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition-all shadow-md shadow-teal-600/20">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
             </svg>
@@ -112,7 +112,7 @@ import { RutasService } from '../../services/rutas.service';
               <h3 class="text-sm font-black text-slate-900">Últimas Reservas de Boletos</h3>
               <p class="text-xs text-slate-500">Pasajeros registrados en el sistema</p>
             </div>
-            <a routerLink="/reservas" class="text-xs font-bold text-blue-600 hover:text-blue-800">
+            <a routerLink="/reservas" class="text-xs font-bold text-teal-600 hover:text-teal-800">
               Ver todas →
             </a>
           </div>
@@ -121,7 +121,7 @@ import { RutasService } from '../../services/rutas.service';
             <div *ngFor="let r of ultimasReservas"
                  class="p-3 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between hover:bg-slate-100/80 transition-colors">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-black text-xs flex items-center justify-center">
+                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-800 font-black text-xs flex items-center justify-center">
                   {{ r.nombrePasajero?.charAt(0) || 'P' }}
                 </div>
                 <div>

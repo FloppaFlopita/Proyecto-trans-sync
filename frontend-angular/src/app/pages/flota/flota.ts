@@ -65,7 +65,7 @@ interface BusItem {
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Capacidad Total</p>
           <p class="text-2xl font-black text-slate-900 mt-1">{{ calcularCapacidadTotal() }}</p>
-          <span class="inline-block mt-1 text-[11px] text-blue-600 font-medium">Asientos instalados</span>
+          <span class="inline-block mt-1 text-[11px] text-teal-600 font-medium">Asientos instalados</span>
         </div>
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Asientos Libres</p>

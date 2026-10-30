@@ -37,7 +37,7 @@ interface FilaAsiento {
       <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div class="flex items-center gap-2 mb-1.5">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-100 text-teal-800">
               Terminal de Venta y Embarque
             </span>
             <span class="text-xs text-slate-500 font-medium">Sistema Integrado de Microservicios · TransSync</span>
@@ -54,17 +54,17 @@ interface FilaAsiento {
         <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
           <span class="text-[11px] font-bold text-slate-500 px-2 uppercase">Perfil:</span>
           <button (click)="cambiarRol('cliente@transsync.com', 'cliente123')"
-                  [class]="esCliente() ? 'bg-blue-600 text-white font-bold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100'"
+                  [class]="esCliente() ? 'bg-teal-600 text-white font-bold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100'"
                   class="px-3 py-1.5 rounded-lg text-xs transition-all border border-slate-200">
             Pasajero / Cliente
           </button>
           <button (click)="cambiarRol('conductor@transsync.com', 'chofer123')"
-                  [class]="esConductor() ? 'bg-blue-600 text-white font-bold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100'"
+                  [class]="esConductor() ? 'bg-teal-600 text-white font-bold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100'"
                   class="px-3 py-1.5 rounded-lg text-xs transition-all border border-slate-200">
             Conductor
           </button>
           <button (click)="cambiarRol('admin@transsync.com', 'admin123')"
-                  [class]="esAdmin() ? 'bg-blue-600 text-white font-bold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100'"
+                  [class]="esAdmin() ? 'bg-teal-600 text-white font-bold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100'"
                   class="px-3 py-1.5 rounded-lg text-xs transition-all border border-slate-200">
             Administrador
           </button>
@@ -75,21 +75,21 @@ interface FilaAsiento {
       <div class="flex items-center gap-2 border-b border-slate-200 pb-1 text-sm font-medium">
         <button *ngIf="esCliente() || esAdmin()"
                 (click)="tabActiva = 'reserva'"
-                [class]="tabActiva === 'reserva' ? 'text-blue-700 border-b-2 border-blue-600 font-bold bg-blue-50/50' : 'text-slate-600 hover:text-slate-900'"
+                [class]="tabActiva === 'reserva' ? 'text-teal-700 border-b-2 border-teal-600 font-bold bg-teal-50/50' : 'text-slate-600 hover:text-slate-900'"
                 class="px-4 py-2.5 rounded-t-xl transition-all">
           Comprar Boletos
         </button>
 
         <button *ngIf="esConductor() || esAdmin()"
                 (click)="tabActiva = 'conductor'; cargarManifiesto()"
-                [class]="tabActiva === 'conductor' ? 'text-blue-700 border-b-2 border-blue-600 font-bold bg-blue-50/50' : 'text-slate-600 hover:text-slate-900'"
+                [class]="tabActiva === 'conductor' ? 'text-teal-700 border-b-2 border-teal-600 font-bold bg-teal-50/50' : 'text-slate-600 hover:text-slate-900'"
                 class="px-4 py-2.5 rounded-t-xl transition-all">
           Vista del Conductor (Plano y Pasajeros)
         </button>
 
         <button *ngIf="esAdmin()"
                 (click)="tabActiva = 'ventas'; cargarVentas()"
-                [class]="tabActiva === 'ventas' ? 'text-blue-700 border-b-2 border-blue-600 font-bold bg-blue-50/50' : 'text-slate-600 hover:text-slate-900'"
+                [class]="tabActiva === 'ventas' ? 'text-teal-700 border-b-2 border-teal-600 font-bold bg-teal-50/50' : 'text-slate-600 hover:text-slate-900'"
                 class="px-4 py-2.5 rounded-t-xl transition-all">
           Auditoría de Ventas por Fecha
         </button>
@@ -106,7 +106,7 @@ interface FilaAsiento {
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Seleccionar Ruta y Horario:</label>
               <select [(ngModel)]="rutaSeleccionadaId" (change)="alCambiarRuta()"
-                      class="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 bg-slate-50 text-slate-900 outline-none focus:bg-white focus:border-blue-500">
+                      class="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 bg-slate-50 text-slate-900 outline-none focus:bg-white focus:border-teal-500">
                 <option *ngFor="let r of rutasDisponibles" [value]="r.id">
                   {{ r.nombre }} · S/ {{ r.precio.toFixed(2) }} ({{ r.horario }})
                 </option>
@@ -115,13 +115,13 @@ interface FilaAsiento {
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Fecha de Salida:</label>
               <input [(ngModel)]="fechaSeleccionada" (change)="cargarAsientosOcupados()" type="date"
-                     class="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 bg-slate-50 text-slate-900 outline-none focus:bg-white focus:border-blue-500"/>
+                     class="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 bg-slate-50 text-slate-900 outline-none focus:bg-white focus:border-teal-500"/>
             </div>
           </div>
 
           <!-- Información del Servicio Seleccionado -->
-          <div class="flex items-center justify-between text-xs mb-4 px-3 py-2 bg-blue-50/60 rounded-xl border border-blue-100">
-            <span class="font-bold text-blue-900">Unidad Asignada: Bus #{{ rutaActual.busId }}</span>
+          <div class="flex items-center justify-between text-xs mb-4 px-3 py-2 bg-teal-50/60 rounded-xl border border-teal-100">
+            <span class="font-bold text-teal-900">Unidad Asignada: Bus #{{ rutaActual.busId }}</span>
             <span class="text-slate-600">Tarifa por Pasaje: <strong class="text-slate-900 font-bold">S/ {{ rutaActual.precio.toFixed(2) }}</strong></span>
             <span class="text-slate-600">Salida: <strong class="text-slate-900 font-bold">{{ rutaActual.horario }}</strong></span>
           </div>
@@ -222,7 +222,7 @@ interface FilaAsiento {
               <span class="font-medium text-slate-700">Disponible</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-4 h-4 rounded-md bg-blue-600 border-2 border-blue-700 shadow-xs"></span>
+              <span class="w-4 h-4 rounded-md bg-teal-600 border-2 border-teal-700 shadow-xs"></span>
               <span class="font-medium text-slate-700">Seleccionado</span>
             </div>
             <div class="flex items-center gap-2">
@@ -347,7 +347,7 @@ interface FilaAsiento {
                   Nombre y Apellidos Completos <span class="text-red-500">*</span>
                 </label>
                 <input [(ngModel)]="formulario.nombrePasajero" placeholder="Ingrese nombre y apellido"
-                       class="w-full rounded-xl px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 text-slate-900 outline-none focus:bg-white focus:border-blue-600 transition-all"/>
+                       class="w-full rounded-xl px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 text-slate-900 outline-none focus:bg-white focus:border-teal-600 transition-all"/>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
@@ -356,14 +356,14 @@ interface FilaAsiento {
                     DNI / Documento <span class="text-red-500">*</span>
                   </label>
                   <input [(ngModel)]="formulario.dniPasajero" placeholder="8 dígitos" maxlength="10"
-                         class="w-full rounded-xl px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 text-slate-900 outline-none focus:bg-white focus:border-blue-600 transition-all font-mono"/>
+                         class="w-full rounded-xl px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 text-slate-900 outline-none focus:bg-white focus:border-teal-600 transition-all font-mono"/>
                 </div>
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-1">
                     Teléfono Celular <span class="text-red-500">*</span>
                   </label>
                   <input [(ngModel)]="formulario.telefonoPasajero" placeholder="Ej: 987654321"
-                         class="w-full rounded-xl px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 text-slate-900 outline-none focus:bg-white focus:border-blue-600 transition-all"/>
+                         class="w-full rounded-xl px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 text-slate-900 outline-none focus:bg-white focus:border-teal-600 transition-all"/>
                 </div>
               </div>
 
@@ -372,7 +372,7 @@ interface FilaAsiento {
                   Correo Electrónico <span class="text-slate-400 font-normal">(Opcional para recibir comprobante)</span>
                 </label>
                 <input [(ngModel)]="formulario.emailPasajero" placeholder="ejemplo@correo.com"
-                       class="w-full rounded-xl px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 text-slate-900 outline-none focus:bg-white focus:border-blue-600 transition-all"/>
+                       class="w-full rounded-xl px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 text-slate-900 outline-none focus:bg-white focus:border-teal-600 transition-all"/>
               </div>
             </div>
 
@@ -384,7 +384,7 @@ interface FilaAsiento {
               </div>
               <div class="flex justify-between text-xs text-slate-600">
                 <span>Asientos seleccionados:</span>
-                <span class="font-bold text-blue-700 text-sm">
+                <span class="font-bold text-teal-700 text-sm">
                   {{ asientosSeleccionados.length > 0 ? asientosSeleccionados.join(', ') : 'Ninguno' }}
                 </span>
               </div>
@@ -411,7 +411,7 @@ interface FilaAsiento {
                     [disabled]="asientosSeleccionados.length === 0"
                     class="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all shadow-md flex items-center justify-center gap-2"
                     [class]="asientosSeleccionados.length > 0
-                      ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20 cursor-pointer active:scale-[0.98]'
+                      ? 'bg-teal-600 hover:bg-teal-700 shadow-teal-500/20 cursor-pointer active:scale-[0.98]'
                       : 'bg-slate-200 text-slate-400 cursor-not-allowed'">
               <span>Continuar al Pago (S/ {{ (asientosSeleccionados.length * rutaActual.precio).toFixed(2) }})</span>
             </button>
@@ -461,7 +461,7 @@ interface FilaAsiento {
             <div>
               <p class="text-slate-500 font-medium">Titular: <strong class="text-slate-900">{{ formulario.nombrePasajero }}</strong></p>
               <p class="text-slate-500 font-medium">Ruta: <strong class="text-slate-900">{{ rutaActual.nombre }}</strong></p>
-              <p class="text-slate-500 font-medium">Asiento(s): <strong class="text-blue-700">{{ asientosSeleccionados.join(', ') }}</strong></p>
+              <p class="text-slate-500 font-medium">Asiento(s): <strong class="text-teal-700">{{ asientosSeleccionados.join(', ') }}</strong></p>
             </div>
             <div class="text-right">
               <p class="text-[10px] text-slate-400 uppercase font-bold">Total a Pagar</p>
@@ -478,7 +478,7 @@ interface FilaAsiento {
               Yape / Plin
             </button>
             <button (click)="metodoPagoElegido = 'TARJETA'"
-                    [class]="metodoPagoElegido === 'TARJETA' ? 'border-blue-600 bg-blue-50 text-blue-900 font-bold' : 'border-slate-200 bg-white text-slate-600'"
+                    [class]="metodoPagoElegido === 'TARJETA' ? 'border-teal-600 bg-teal-50 text-teal-900 font-bold' : 'border-slate-200 bg-white text-slate-600'"
                     class="py-2.5 px-2 rounded-xl border text-xs transition-all text-center">
               Tarjeta Déb/Créd
             </button>
@@ -555,7 +555,7 @@ interface FilaAsiento {
           <!-- Botón de Confirmación -->
           <button (click)="ejecutarPagoYBloquearAsientos()"
                   [disabled]="procesandoPago"
-                  class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2">
+                  class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md shadow-teal-500/20 transition-all flex items-center justify-center gap-2">
             <span *ngIf="!procesandoPago">Confirmar y Emitir Boletos (S/ {{ totalAPagar.toFixed(2) }})</span>
             <span *ngIf="procesandoPago" class="flex items-center gap-2">
               <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -595,7 +595,7 @@ interface FilaAsiento {
             </div>
             <div class="flex justify-between">
               <span class="text-slate-500">Ruta de Embarque:</span>
-              <strong class="text-blue-700">{{ boletaEmitida.ruta }}</strong>
+              <strong class="text-teal-700">{{ boletaEmitida.ruta }}</strong>
             </div>
             <div class="flex justify-between">
               <span class="text-slate-500">Fecha de Viaje:</span>
@@ -603,7 +603,7 @@ interface FilaAsiento {
             </div>
             <div class="flex justify-between">
               <span class="text-slate-500">Bus / Asiento(s):</span>
-              <strong class="text-blue-700 font-bold">Bus #{{ boletaEmitida.busId }} · Asiento(s): {{ boletaEmitida.asientos.join(', ') }}</strong>
+              <strong class="text-teal-700 font-bold">Bus #{{ boletaEmitida.busId }} · Asiento(s): {{ boletaEmitida.asientos.join(', ') }}</strong>
             </div>
             <div class="flex justify-between">
               <span class="text-slate-500">Medio de Pago:</span>
@@ -637,7 +637,7 @@ interface FilaAsiento {
               Descargar / Imprimir
             </button>
             <button (click)="cerrarBoletaExito()"
-                    class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold text-xs text-white transition-colors">
+                    class="flex-1 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 font-bold text-xs text-white transition-colors">
               Aceptar y Volver
             </button>
           </div>
@@ -651,7 +651,7 @@ interface FilaAsiento {
         <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-200 gap-4">
           <div>
             <div class="flex items-center gap-2 mb-1">
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-100 text-teal-800">
                 Panel Oficial del Conductor
               </span>
               <span class="text-xs text-slate-500 font-medium">Conductor: Mario Quispe Choque (ID #1)</span>
@@ -667,7 +667,7 @@ interface FilaAsiento {
             <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
               <span class="text-xs font-bold text-slate-600 pl-1.5">Unidad:</span>
               <select [(ngModel)]="conductorIdConsulta" (change)="cambiarBusConductor()"
-                      class="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs">
+                      class="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-xs">
                 <option [value]="5">Bus #5 · T3C-104 (Volvo 9700 Grand - Compras en vivo)</option>
                 <option [value]="1">Bus #1 · BUS-TS-01 (Scania Touring HD)</option>
                 <option [value]="2">Bus #2 · BUS-TS-02 (Volvo B430R)</option>
@@ -743,11 +743,11 @@ interface FilaAsiento {
           </div>
 
           <div class="p-3.5 rounded-xl border"
-               [ngClass]="contarAbordados() === (manifiesto.totalPasajeros || 0) && (manifiesto.totalPasajeros || 0) > 0 ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-blue-50 border-blue-200 text-blue-900'">
+               [ngClass]="contarAbordados() === (manifiesto.totalPasajeros || 0) && (manifiesto.totalPasajeros || 0) > 0 ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-teal-50 border-teal-200 text-teal-900'">
             <p class="text-xs font-bold">Pasajeros a Bordo</p>
             <p class="text-xl font-black">{{ contarAbordados() }} / {{ manifiesto.totalPasajeros || 0 }}</p>
             <p class="text-[11px] font-semibold"
-               [ngClass]="contarAbordados() === (manifiesto.totalPasajeros || 0) && (manifiesto.totalPasajeros || 0) > 0 ? 'text-emerald-700 font-black' : 'text-blue-600'">
+               [ngClass]="contarAbordados() === (manifiesto.totalPasajeros || 0) && (manifiesto.totalPasajeros || 0) > 0 ? 'text-emerald-700 font-black' : 'text-teal-600'">
               {{ contarAbordados() === (manifiesto.totalPasajeros || 0) && (manifiesto.totalPasajeros || 0) > 0 ? '✓ Embarque Completo' : 'En proceso de subida' }}
             </p>
           </div>
@@ -840,7 +840,7 @@ interface FilaAsiento {
                 <div class="relative flex-1">
                   <input [(ngModel)]="filtroConductorTexto"
                          placeholder="Buscar por DNI, Nombre o Asiento (#31)..."
-                         class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white text-slate-900 outline-none focus:border-blue-500 shadow-xs"/>
+                         class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white text-slate-900 outline-none focus:border-teal-500 shadow-xs"/>
                   <span class="absolute left-2.5 top-1.5 text-xs text-slate-400">🔍</span>
                 </div>
                 <button *ngIf="filtroConductorTexto"
@@ -869,7 +869,7 @@ interface FilaAsiento {
                       class="hover:bg-slate-50 transition-colors"
                       [class.bg-emerald-50/50]="estaAbordado(p.reservaId)">
                     
-                    <td class="px-3.5 py-2.5 font-mono font-black text-blue-700 text-xs">
+                    <td class="px-3.5 py-2.5 font-mono font-black text-teal-700 text-xs">
                       #{{ p.asiento }}
                     </td>
                     <td class="px-3.5 py-2.5 font-bold text-slate-900">
@@ -927,7 +927,7 @@ interface FilaAsiento {
           <div class="flex items-center gap-2">
             <label class="text-xs font-bold text-slate-700">Filtrar por Día:</label>
             <input [(ngModel)]="fechaFiltroVentas" (change)="cargarVentas()" type="date"
-                   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 bg-slate-50 outline-none focus:bg-white focus:border-blue-500"/>
+                   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 bg-slate-50 outline-none focus:bg-white focus:border-teal-500"/>
             <button (click)="fechaFiltroVentas = ''; cargarVentas()"
                     class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition-colors">
               Ver Todas
@@ -945,9 +945,9 @@ interface FilaAsiento {
             <p class="text-xs text-slate-500 font-medium">Op. Gravadas (Sin IGV)</p>
             <p class="text-xl font-black text-slate-700 mt-1">S/ {{ subtotalGravadoVentas.toFixed(2) }}</p>
           </div>
-          <div class="p-4 rounded-xl bg-blue-50 border border-blue-200">
-            <p class="text-xs text-blue-800 font-medium">Total I.G.V. (18%)</p>
-            <p class="text-xl font-black text-blue-900 mt-1">S/ {{ igvTotalVentas.toFixed(2) }}</p>
+          <div class="p-4 rounded-xl bg-teal-50 border border-teal-200">
+            <p class="text-xs text-teal-800 font-medium">Total I.G.V. (18%)</p>
+            <p class="text-xl font-black text-teal-900 mt-1">S/ {{ igvTotalVentas.toFixed(2) }}</p>
           </div>
           <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
             <p class="text-xs text-emerald-800 font-medium">Recaudación Total</p>
@@ -972,7 +972,7 @@ interface FilaAsiento {
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr *ngFor="let v of listaVentas" class="hover:bg-slate-50 transition-colors">
-                <td class="px-4 py-3 font-mono font-bold text-blue-700">{{ v.numeroBoleta || ('B001-' + v.id) }}</td>
+                <td class="px-4 py-3 font-mono font-bold text-teal-700">{{ v.numeroBoleta || ('B001-' + v.id) }}</td>
                 <td class="px-4 py-3 text-slate-600 font-mono">{{ v.fechaHoraVenta ? (v.fechaHoraVenta | date:'dd/MM/yyyy HH:mm') : (v.fechaViaje + ' 20:30') }}</td>
                 <td class="px-4 py-3 font-bold text-slate-900">{{ v.nombrePasajero }}</td>
                 <td class="px-4 py-3 font-mono text-slate-600">{{ v.dniPasajero }}</td>
@@ -1449,12 +1449,12 @@ export class ReservasComponent implements OnInit, OnDestroy {
       return 'bg-rose-50 border-2 border-rose-300 text-rose-700 cursor-not-allowed opacity-90';
     }
     if (this.asientosSeleccionados.includes(num)) {
-      return 'bg-blue-600 border-2 border-blue-700 text-white font-black shadow-md scale-105 ring-2 ring-blue-300';
+      return 'bg-teal-600 border-2 border-teal-700 text-white font-black shadow-md scale-105 ring-2 ring-teal-300';
     }
     if (this.esAsientoEnReserva(num)) {
       return 'bg-amber-100 border-2 border-amber-500 text-amber-950 font-black cursor-not-allowed shadow-xs ring-2 ring-amber-300 animate-pulse';
     }
-    return 'bg-white border-2 border-emerald-300 text-slate-800 hover:border-blue-500 hover:bg-blue-50';
+    return 'bg-white border-2 border-emerald-300 text-slate-800 hover:border-teal-500 hover:bg-teal-50';
   }
 
   obtenerTooltipAsientoCliente(num: number): string {

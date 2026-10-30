@@ -66,7 +66,7 @@ interface PagoItem {
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Transacciones</p>
           <p class="text-2xl font-black text-slate-900 mt-1">{{ pagos.length }}</p>
-          <span class="inline-block mt-1 text-[11px] text-blue-600 font-medium">Operaciones registradas</span>
+          <span class="inline-block mt-1 text-[11px] text-teal-600 font-medium">Operaciones registradas</span>
         </div>
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Cobros Exitosos</p>
@@ -110,7 +110,7 @@ interface PagoItem {
               Plin
             </button>
             <button (click)="filtroMetodo = 'TARJETA'"
-                    [class]="filtroMetodo === 'TARJETA' ? 'bg-blue-600 text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                    [class]="filtroMetodo === 'TARJETA' ? 'bg-teal-600 text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
                     class="px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap">
               Tarjeta
             </button>
@@ -165,7 +165,7 @@ interface PagoItem {
                   #TRX-{{ p.id }}
                 </td>
                 <td class="px-5 py-3.5 font-medium text-slate-700">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-blue-50 text-blue-700 border border-blue-100">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-teal-50 text-teal-700 border border-teal-100">
                     Reserva #{{ p.reservaId }}
                   </span>
                 </td>
@@ -345,7 +345,7 @@ export class PagosComponent implements OnInit {
     switch ((metodo || '').toUpperCase()) {
       case 'YAPE': return 'bg-purple-100 text-purple-800';
       case 'PLIN': return 'bg-cyan-100 text-cyan-800';
-      case 'TARJETA': return 'bg-blue-100 text-blue-800';
+      case 'TARJETA': return 'bg-teal-100 text-teal-800';
       case 'EFECTIVO': return 'bg-emerald-100 text-emerald-800';
       default: return 'bg-slate-100 text-slate-700';
     }

@@ -1,11 +1,16 @@
 global:
-  scrape_interval: 15s
+  scrape_interval: 5s
 
 scrape_configs:
   - job_name: 'api-gateway'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['host.docker.internal:8100']
+
+  - job_name: 'ms-auth'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8107']
 
   - job_name: 'ms-rutas'
     metrics_path: '/actuator/prometheus'
@@ -21,16 +26,6 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['host.docker.internal:8103']
-
-  - job_name: 'ms-pagos'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:8104']
-
-  - job_name: 'ms-promociones'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:8105']
 
   - job_name: 'ms-fidelizacion'
     metrics_path: '/actuator/prometheus'

@@ -23,6 +23,6 @@ html, body {
 /* Input focus ring profesional */
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.18) !important;
 }
