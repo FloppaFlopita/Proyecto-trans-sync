@@ -46,3 +46,4 @@ Write-Host "  - Eureka Dashboard:    http://localhost:8761" -ForegroundColor Whi
 Write-Host "  - Grafana Dashboard:   http://localhost:8300 (admin/admin)" -ForegroundColor White
 Write-Host "  - Prometheus Metrics:  http://localhost:8900" -ForegroundColor White
 Write-Host "  - API Gateway:         http://localhost:8100/api" -ForegroundColor White
+

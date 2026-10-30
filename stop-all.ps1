@@ -5,3 +5,4 @@ Get-Process -Name java, node -ErrorAction SilentlyContinue | Stop-Process -Force
 
 Write-Host "Procesos Java y Node terminados." -ForegroundColor Green
 Write-Host "Para apagar contenedores docker ejecuta: docker compose stop" -ForegroundColor Cyan
+

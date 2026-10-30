@@ -24,6 +24,9 @@ public class ReservaService {
     @Autowired(required = false)
     private ReservaEventProducer reservaEventProducer;
 
+    @Autowired(required = false)
+    private io.micrometer.core.instrument.MeterRegistry meterRegistry;
+
     @Transactional(readOnly = true)
     public List<Reserva> listarReservas() {
         return reservaRepository.findAll();
@@ -408,6 +411,12 @@ public class ReservaService {
                 evento.setCorrelationId(org.slf4j.MDC.get("correlationId") != null ? org.slf4j.MDC.get("correlationId") : UUID.randomUUID().toString());
 
                 reservaEventProducer.publicarReservaCreada(evento);
+
+                // Métrica de Negocio para Prometheus (S10)
+                if (meterRegistry != null) {
+                    meterRegistry.counter("transsync_reservas_confirmadas_total", "ruta", primer.getRutaNombre() != null ? primer.getRutaNombre() : "General").increment(creadas.size());
+                    meterRegistry.counter("transsync_ventas_monto_soles_total", "metodo", primer.getMetodoPago() != null ? primer.getMetodoPago() : "TARJETA").increment(totalPagar);
+                }
             } catch (Exception ex) {
                 System.err.println(">>> Advertencia al emitir evento Kafka: " + ex.getMessage());
             }
@@ -501,6 +510,11 @@ public class ReservaService {
         }
 
         reserva.setEstado("CANCELADA");
+        if (meterRegistry != null) {
+            try {
+                meterRegistry.counter("transsync_reservas_canceladas_total").increment();
+            } catch (Exception ignored) {}
+        }
         return reservaRepository.save(reserva);
     }
 

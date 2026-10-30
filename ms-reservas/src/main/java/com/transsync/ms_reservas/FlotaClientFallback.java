@@ -79,3 +79,4 @@ public class FlotaClientFallback implements FlotaClient {
         return ResponseEntity.ok(fallback);
     }
 }
+
