@@ -393,8 +393,8 @@ interface FilaAsiento {
                 <span class="font-semibold text-slate-800">S/ {{ rutaActual.precio.toFixed(2) }}</span>
               </div>
               <div class="flex justify-between text-xs text-slate-600">
-                <span>Puntos de recompensa:</span>
-                <span class="font-bold text-emerald-700">+{{ asientosSeleccionados.length * 10 }} Puntos</span>
+                <span *ngIf="sesionActual">Puntos a recibir (Sesión activa):</span>
+                <span *ngIf="sesionActual" class="font-bold text-teal-700">+{{ calcularPuntosFidelizacion() }} {{ calcularPuntosFidelizacion() === 1 ? 'Punto' : 'Puntos' }}</span>
               </div>
               <div class="pt-3 border-t border-slate-200 flex justify-between items-center">
                 <span class="text-sm font-bold text-slate-800">Total a Pagar (inc. IGV):</span>
@@ -405,7 +405,18 @@ interface FilaAsiento {
             </div>
           </div>
 
-          <!-- Botón de Continuar -->
+          <!-- Mensaje discreto de beneficios para pasajeros no autenticados -->
+            <div *ngIf="!sesionActual" class="mt-4 p-3.5 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-xs flex items-center justify-between gap-3 shadow-sm">
+              <div class="space-y-0.5">
+                <p class="font-bold text-teal-900 text-xs">Recibe puntos al iniciar sesión</p>
+                <p class="text-[11px] text-teal-700">1 pasaje = 1 pto · 2 pasajes = 2 ptos · 3 a más = 5 ptos</p>
+              </div>
+              <button (click)="abrirModalPerfil()" type="button" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs whitespace-nowrap transition-colors shadow-sm">
+                Iniciar sesión
+              </button>
+            </div>
+
+            <!-- Botón de Continuar -->
           <div class="mt-6 space-y-2">
             <button (click)="abrirPasarelaPago()"
                     [disabled]="asientosSeleccionados.length === 0"
@@ -1000,6 +1011,18 @@ interface FilaAsiento {
   `
 })
 export class ReservasComponent implements OnInit, OnDestroy {
+  calcularPuntosFidelizacion(): number {
+    const cant = this.asientosSeleccionados.length;
+    if (cant === 0) return 0;
+    if (cant === 1) return 1;
+    if (cant === 2) return 2;
+    return 5; // 3 o más pasajes = 5 puntos
+  }
+
+  abrirModalPerfil(): void {
+    const btn = document.querySelector('button[title*="Perfil"]') as HTMLElement;
+    if (btn) btn.click();
+  }
   tabActiva: 'reserva' | 'conductor' | 'ventas' = 'reserva';
   private pollingSub?: Subscription;
 
@@ -1544,6 +1567,10 @@ export class ReservasComponent implements OnInit, OnDestroy {
         const subtotal = total / 1.18;
         const igv = total - subtotal;
         const fechaHora = new Date().toLocaleString('es-PE');
+        const puntosGanados = this.sesionActual ? this.calcularPuntosFidelizacion() : 0;
+        if (puntosGanados > 0) {
+          this.authService.sumarPuntos(puntosGanados);
+        }
 
         this.boletaEmitida = {
           numeroBoleta: 'B001-' + String(Math.floor(100000 + Math.random() * 900000)),
@@ -1558,7 +1585,9 @@ export class ReservasComponent implements OnInit, OnDestroy {
           metodoPago: this.metodoPagoElegido,
           subtotal: Math.round(subtotal * 100) / 100,
           igv: Math.round(igv * 100) / 100,
-          total: total
+          total: total,
+          puntosGanados: puntosGanados,
+          saldoTotalPuntos: this.authService.obtenerPuntos()
         };
 
         this.asientosSeleccionados = [];

@@ -40,6 +40,10 @@ import { AuthService, UserSession } from '../../services/auth.service';
                  class="px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 Rutas y Horarios
               </a>
+              <a routerLink="/promociones" routerLinkActive="bg-teal-50 text-teal-700 font-semibold"
+                 class="px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+                Promociones
+              </a>
             </ng-container>
 
             <!-- Para Conductor -->
@@ -143,7 +147,7 @@ import { AuthService, UserSession } from '../../services/auth.service';
           <div class="p-4 rounded-xl bg-gradient-to-br from-teal-50 to-indigo-50 border border-teal-100 flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold text-teal-900">Programa TransSync Rewards</p>
-              <p class="text-2xl font-black text-teal-700 mt-0.5">140 <span class="text-xs font-bold text-teal-600">Puntos</span></p>
+              <p class="text-2xl font-black text-teal-700 mt-0.5">{{ usuario ? authService.obtenerPuntos() : 0 }} <span class="text-xs font-bold text-teal-600">Puntos</span></p>
               <p class="text-[11px] text-teal-800/80 mt-0.5">Equivalente a S/ 14.00 de descuento en tu proximo viaje.</p>
             </div>
             <div class="w-10 h-10 rounded-full bg-teal-600/10 flex items-center justify-center text-teal-700 font-bold text-lg">
@@ -232,7 +236,7 @@ export class NavbarComponent implements OnInit {
   nuevaClave = '';
   mensajeClave = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(public authService: AuthService) {}
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(u => this.usuario = u);

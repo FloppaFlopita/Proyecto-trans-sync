@@ -9,6 +9,7 @@ export interface UserSession {
   roles: string[];
   idCliente?: number;
   idConductor?: number;
+  puntosFidelizacion?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -33,7 +34,8 @@ export class AuthService {
             nombre: resp.datos.nombre,
             roles: resp.datos.roles || [],
             idCliente: resp.datos.idCliente,
-            idConductor: resp.datos.idConductor
+            idConductor: resp.datos.idConductor,
+            puntosFidelizacion: 15 // Puntos base iniciales del programa
           };
           localStorage.setItem('transync_user', JSON.stringify(user));
           this.currentUserSubject.next(user);
@@ -68,6 +70,20 @@ export class AuthService {
     return this.hasRole('CLIENTE');
   }
 
+  sumarPuntos(puntos: number): void {
+    const user = this.currentUserSubject.value;
+    if (user) {
+      user.puntosFidelizacion = (user.puntosFidelizacion || 0) + puntos;
+      localStorage.setItem('transync_user', JSON.stringify(user));
+      this.currentUserSubject.next({ ...user });
+    }
+  }
+
+  obtenerPuntos(): number {
+    const user = this.currentUserSubject.value;
+    return user ? (user.puntosFidelizacion ?? 15) : 0;
+  }
+
   private obtenerSesionGuardada(): UserSession | null {
     try {
       const data = localStorage.getItem('transync_user');
@@ -77,4 +93,3 @@ export class AuthService {
     }
   }
 }
-
