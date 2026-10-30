@@ -243,3 +243,4 @@ export class PromocionesComponent implements OnInit {
     this.router.navigate(['/reservas']);
   }
 }
+

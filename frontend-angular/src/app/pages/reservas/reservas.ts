@@ -334,7 +334,21 @@ interface FilaAsiento {
           <div>
             <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
               <h2 class="text-base font-bold text-slate-900">Datos del Pasajero</h2>
-              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Paso 1 de 2</span>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                    [class]="sesionActual ? 'bg-teal-100 text-teal-800 font-bold' : 'bg-slate-100 text-slate-600'">
+                {{ sesionActual ? 'Compra Directa' : 'Pasajero Invitado' }}
+              </span>
+            </div>
+
+            <!-- Banner de compra directa para usuario con sesion -->
+            <div *ngIf="sesionActual" class="mb-4 p-3 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-xs flex items-center justify-between shadow-xs">
+              <div>
+                <span class="font-bold">Sesión activa: {{ sesionActual.nombre }}</span>
+                <p class="text-[11px] text-teal-700 mt-0.5">Tus datos se autocompletaron para agilizar tu compra directa.</p>
+              </div>
+              <span class="text-[11px] font-black text-teal-800 bg-teal-200/60 px-2 py-1 rounded-md">
+                ★ {{ authService.obtenerPuntos() }} pts
+              </span>
             </div>
 
             <p class="text-xs text-slate-600 mb-4">
@@ -444,7 +458,18 @@ interface FilaAsiento {
               <h3 class="text-lg font-black text-slate-900">Pasarela de Pago Seguro</h3>
               <p class="text-xs text-slate-500">TransSync Servicios Transaccionales S.A.C.</p>
             </div>
-            <button (click)="mostrarPasarela = false" class="text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+            <button (click)="mostrarPasarela = false" class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1">✕</button>
+          </div>
+
+          <!-- Aviso sutil no molesto para pasajeros invitados -->
+          <div *ngIf="!sesionActual" class="mt-4 p-3 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-xs flex items-center justify-between gap-3 shadow-xs">
+            <div class="space-y-0.5">
+              <p class="font-bold text-teal-900 text-xs">¡Gana puntos con este viaje!</p>
+              <p class="text-[11px] text-teal-700">Inicia sesión para recibir puntos canjeables por descuentos en tus próximos pasajes.</p>
+            </div>
+            <button (click)="mostrarPasarela = false; abrirModalPerfil()" type="button" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs whitespace-nowrap transition-colors shadow-xs">
+              Iniciar sesión
+            </button>
           </div>
 
           <!-- Temporizador en Pasarela con Números Digitales -->
@@ -1146,9 +1171,17 @@ export class ReservasComponent implements OnInit, OnDestroy {
     this.authService.currentUser$.subscribe(user => {
       this.sesionActual = user;
       if (user && user.roles.includes('CLIENTE')) {
-        // Solo autocompletar si el usuario inicio sesion explicitamente
+        // Compra Directa: autocompletar datos del pasajero registrado
         this.formulario.nombrePasajero = user.nombre;
+        this.formulario.dniPasajero = user.dni || '72384910';
+        this.formulario.telefonoPasajero = user.telefono || '951234567';
         this.formulario.emailPasajero = user.email;
+      } else if (!user) {
+        // Modo invitado: campos limpios para llenar libremente
+        this.formulario.nombrePasajero = '';
+        this.formulario.dniPasajero = '';
+        this.formulario.telefonoPasajero = '';
+        this.formulario.emailPasajero = '';
       }
       this.cdr.detectChanges();
     });

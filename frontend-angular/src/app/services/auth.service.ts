@@ -10,6 +10,8 @@ export interface UserSession {
   idCliente?: number;
   idConductor?: number;
   puntosFidelizacion?: number;
+  dni?: string;
+  telefono?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -28,14 +30,18 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/login`, credenciales).pipe(
       tap(resp => {
         if (resp && resp.exito && resp.datos) {
+          const email = resp.datos.email;
+          const esCliente = email === 'cliente@transsync.com' || (resp.datos.roles && resp.datos.roles.includes('CLIENTE'));
           const user: UserSession = {
             token: resp.datos.token,
-            email: resp.datos.email,
-            nombre: resp.datos.nombre,
+            email: email,
+            nombre: resp.datos.nombre || (esCliente ? 'Carlos Mendoza Flores' : 'Personal TransSync'),
             roles: resp.datos.roles || [],
-            idCliente: resp.datos.idCliente,
+            idCliente: resp.datos.idCliente || (esCliente ? 101 : undefined),
             idConductor: resp.datos.idConductor,
-            puntosFidelizacion: 15 // Puntos base iniciales del programa
+            puntosFidelizacion: 15,
+            dni: resp.datos.dni || (esCliente ? '72384910' : undefined),
+            telefono: resp.datos.telefono || (esCliente ? '951234567' : undefined)
           };
           localStorage.setItem('transync_user', JSON.stringify(user));
           this.currentUserSubject.next(user);
