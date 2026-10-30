@@ -37,13 +37,13 @@ public class ReservaService {
     }
 
     /**
-     * Devuelve la lista de números de asientos ocupados/bloqueados para un bus y fecha.
+     * Devuelve la lista de números de asientos ocupados/confirmados para un bus y fecha.
      */
     @Transactional(readOnly = true)
     public List<Integer> obtenerAsientosOcupados(Long busId, LocalDate fechaViaje) {
         LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
-        List<Reserva> activas = reservaRepository.findByBusIdAndFechaViajeAndEstadoIn(
-                busId, fecha, List.of("CONFIRMADA", "PENDIENTE")
+        List<Reserva> activas = reservaRepository.findByBusIdAndFechaViajeAndEstado(
+                busId, fecha, "CONFIRMADA"
         );
         return activas.stream()
                 .map(Reserva::getAsientoNumero)
@@ -51,6 +51,115 @@ public class ReservaService {
                 .distinct()
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Map<String, Object> obtenerDetalleAsientos(Long busId, LocalDate fechaViaje) {
+        LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
+        java.time.LocalDateTime limite = java.time.LocalDateTime.now().minusMinutes(5);
+
+        // Limpiar automáticamente reservas temporales PENDIENTE que hayan superado los 5 minutos
+        try {
+            List<Reserva> pendientes = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "PENDIENTE");
+            for (Reserva p : pendientes) {
+                if (p.getFechaHoraVenta() != null && p.getFechaHoraVenta().isBefore(limite)) {
+                    reservaRepository.delete(p);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println(">>> Aviso al limpiar reservas expiradas: " + e.getMessage());
+        }
+
+        List<Reserva> confirmadas = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "CONFIRMADA");
+        List<Integer> ocupados = confirmadas.stream()
+                .map(Reserva::getAsientoNumero)
+                .filter(Objects::nonNull)
+                .distinct().sorted().collect(Collectors.toList());
+
+        List<Reserva> enReserva = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "PENDIENTE");
+        List<Integer> reservados = enReserva.stream()
+                .map(Reserva::getAsientoNumero)
+                .filter(Objects::nonNull)
+                .distinct().sorted().collect(Collectors.toList());
+
+        List<Integer> todosBloqueados = new ArrayList<>(ocupados);
+        for (Integer r : reservados) {
+            if (!todosBloqueados.contains(r)) {
+                todosBloqueados.add(r);
+            }
+        }
+        Collections.sort(todosBloqueados);
+
+        Map<String, Object> detalle = new HashMap<>();
+        detalle.put("ocupados", ocupados);
+        detalle.put("enReserva", reservados);
+        detalle.put("todosBloqueados", todosBloqueados);
+        return detalle;
+    }
+
+    @Transactional
+    public List<Integer> bloquearAsientosTemporal(Long busId, LocalDate fechaViaje, List<Integer> asientos, String token) {
+        LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
+        java.time.LocalDateTime limite = java.time.LocalDateTime.now().minusMinutes(5);
+
+        // Limpiar reservas expiradas
+        List<Reserva> pendientes = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "PENDIENTE");
+        for (Reserva p : pendientes) {
+            if (p.getFechaHoraVenta() != null && p.getFechaHoraVenta().isBefore(limite)) {
+                reservaRepository.delete(p);
+            }
+        }
+
+        // Validar que ninguno esté confirmado
+        List<Reserva> confirmadas = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "CONFIRMADA");
+        List<Integer> ocupados = confirmadas.stream().map(Reserva::getAsientoNumero).filter(Objects::nonNull).toList();
+        for (Integer a : asientos) {
+            if (ocupados.contains(a)) {
+                throw new IllegalStateException("El asiento #" + a + " ya ha sido comprado y confirmado.");
+            }
+        }
+
+        // Crear/renovar reservas PENDIENTE
+        List<Integer> bloqueados = new ArrayList<>();
+        for (Integer a : asientos) {
+            List<Reserva> existentes = reservaRepository.findByBusIdAndFechaViajeAndAsientoNumeroAndEstadoIn(
+                    busId, fecha, a, List.of("PENDIENTE")
+            );
+            if (existentes.isEmpty()) {
+                Reserva r = new Reserva();
+                r.setBusId(busId);
+                r.setFechaViaje(fecha);
+                r.setAsientoNumero(a);
+                r.setEstado("PENDIENTE");
+                r.setFechaHoraVenta(java.time.LocalDateTime.now());
+                r.setNombrePasajero("En Reserva Temporal");
+                r.setNumeroBoleta("HOLD-" + a);
+                reservaRepository.save(r);
+            } else {
+                Reserva r = existentes.get(0);
+                r.setFechaHoraVenta(java.time.LocalDateTime.now());
+                reservaRepository.save(r);
+            }
+            bloqueados.add(a);
+        }
+        return bloqueados;
+    }
+
+    @Transactional
+    public void liberarAsientosTemporal(Long busId, LocalDate fechaViaje, List<Integer> asientos) {
+        LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
+        if (asientos != null && !asientos.isEmpty()) {
+            try {
+                reservaRepository.deleteByBusIdAndFechaViajeAndAsientoNumeroInAndEstado(busId, fecha, asientos, "PENDIENTE");
+            } catch (Exception e) {
+                for (Integer a : asientos) {
+                    List<Reserva> list = reservaRepository.findByBusIdAndFechaViajeAndAsientoNumeroAndEstadoIn(
+                            busId, fecha, a, List.of("PENDIENTE")
+                    );
+                    reservaRepository.deleteAll(list);
+                }
+            }
+        }
     }
 
     /**
@@ -123,6 +232,8 @@ public class ReservaService {
         // Ordenar pasajeros por número de asiento
         listaPasajeros.sort(Comparator.comparingInt(p -> (Integer) p.get("asiento")));
 
+        List<Reserva> completadas = reservaRepository.findByBusIdAndEstado(busId, "COMPLETADA");
+
         // 4. Armar el resumen del conductor
         manifiesto.put("busId", busId);
         manifiesto.put("placa", placa);
@@ -131,6 +242,7 @@ public class ReservaService {
         manifiesto.put("asientosOcupados", asientosOcupados);
         manifiesto.put("asientosDisponibles", Math.max(0, capacidadTotal - asientosOcupados));
         manifiesto.put("totalPasajeros", listaPasajeros.size());
+        manifiesto.put("viajesCompletadosAnteriores", completadas.size());
         manifiesto.put("pasajeros", listaPasajeros);
 
         return manifiesto;
@@ -164,11 +276,24 @@ public class ReservaService {
         LocalDate fecha = (req.getFechaViaje() != null) ? req.getFechaViaje() : LocalDate.now();
         double precioUnitario = (req.getPrecioUnitario() != null && req.getPrecioUnitario() > 0) ? req.getPrecioUnitario() : 45.00;
 
-        // 1. Validar si alguno de los asientos ya está ocupado para esa fecha
-        List<Integer> yaOcupados = obtenerAsientosOcupados(req.getBusId(), fecha);
+        // 1. Validar si alguno de los asientos ya está comprado y confirmado para esa fecha
+        List<Reserva> yaConfirmadas = reservaRepository.findByBusIdAndFechaViajeAndEstado(req.getBusId(), fecha, "CONFIRMADA");
+        List<Integer> ocupados = yaConfirmadas.stream().map(Reserva::getAsientoNumero).filter(Objects::nonNull).toList();
         for (Integer asiento : req.getAsientos()) {
-            if (yaOcupados.contains(asiento)) {
-                throw new IllegalStateException("El asiento número " + asiento + " ya se encuentra reservado/bloqueado para la fecha " + fecha);
+            if (ocupados.contains(asiento)) {
+                throw new IllegalStateException("El asiento número " + asiento + " ya fue comprado y confirmado por otro cliente.");
+            }
+        }
+
+        // Limpiar bloqueo temporal previo PENDIENTE de estos mismos asientos para convertirlos limpiamente a CONFIRMADA
+        try {
+            reservaRepository.deleteByBusIdAndFechaViajeAndAsientoNumeroInAndEstado(req.getBusId(), fecha, req.getAsientos(), "PENDIENTE");
+        } catch (Exception e) {
+            for (Integer a : req.getAsientos()) {
+                List<Reserva> pendientes = reservaRepository.findByBusIdAndFechaViajeAndAsientoNumeroAndEstadoIn(
+                        req.getBusId(), fecha, a, List.of("PENDIENTE")
+                );
+                reservaRepository.deleteAll(pendientes);
             }
         }
 
@@ -392,10 +517,50 @@ public class ReservaService {
         return reservaRepository.findByEmailPasajeroOrderByFechaViajeDesc(email);
     }
 
+    // Finalizar viaje: pasa las reservas CONFIRMADAS a COMPLETADAS, elimina PENDIENTES y reinicia asientos en ms-flota
+    @Transactional
+    public Map<String, Object> finalizarViaje(Long busId, LocalDate fechaViaje) {
+        LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
+
+        // 1. Buscar todas las reservas de este bus (por fecha o generales si no coinciden)
+        List<Reserva> confirmadas = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "CONFIRMADA");
+        if (confirmadas.isEmpty()) {
+            confirmadas = reservaRepository.findByBusIdAndEstado(busId, "CONFIRMADA");
+        }
+
+        int totalCompletadas = 0;
+        for (Reserva r : confirmadas) {
+            r.setEstado("COMPLETADA");
+            reservaRepository.save(r);
+            totalCompletadas++;
+        }
+
+        // 2. Limpiar reservas temporales PENDIENTE si las hubiera
+        List<Reserva> pendientes = reservaRepository.findByBusIdAndEstado(busId, "PENDIENTE");
+        if (!pendientes.isEmpty()) {
+            reservaRepository.deleteAll(pendientes);
+        }
+
+        // 3. Reiniciar aforo en ms-flota
+        try {
+            flotaClient.reiniciarBus(busId);
+        } catch (Exception e) {
+            System.err.println(">>> Advertencia al reiniciar bus en ms-flota: " + e.getMessage());
+        }
+
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("exito", true);
+        resp.put("mensaje", "Viaje finalizado con éxito. Se completaron " + totalCompletadas + " boletos y los asientos han quedado 100% libres para la siguiente salida.");
+        resp.put("busId", busId);
+        resp.put("fechaViaje", fecha);
+        resp.put("asientosLiberados", totalCompletadas);
+        return resp;
+    }
+
     // Historial global de ventas para Administrador con cálculo de IGV y filtro por fecha
     @Transactional(readOnly = true)
     public Map<String, Object> obtenerResumenVentas(LocalDate fechaFiltro) {
-        List<Reserva> ventasConfirmadas = reservaRepository.findByEstadoOrderByFechaViajeDesc("CONFIRMADA");
+        List<Reserva> ventasConfirmadas = reservaRepository.findByEstadoInOrderByFechaViajeDesc(List.of("CONFIRMADA", "COMPLETADA"));
         if (fechaFiltro != null) {
             ventasConfirmadas = ventasConfirmadas.stream()
                     .filter(r -> fechaFiltro.equals(r.getFechaViaje()))

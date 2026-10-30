@@ -24,6 +24,14 @@ export class ReservasService {
     return this.http.post(`${this.apiUrl}/multiple`, datos);
   }
 
+  bloquearAsientosTemporal(busId: number, fechaViaje: string, asientos: number[], token?: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/bloquear-temporal`, { busId, fechaViaje, asientos, token });
+  }
+
+  liberarAsientosTemporal(busId: number, fechaViaje: string, asientos: number[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/liberar-temporal`, { busId, fechaViaje, asientos });
+  }
+
   getAsientosOcupados(busId: number, fechaViaje?: string): Observable<any> {
     const params = fechaViaje ? `?fechaViaje=${fechaViaje}` : '';
     return this.http.get(`${this.apiUrl}/bus/${busId}/asientos-ocupados${params}`);
@@ -48,6 +56,10 @@ export class ReservasService {
 
   reiniciarBus(busId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/bus/${busId}/reiniciar`);
+  }
+
+  finalizarViaje(busId: number, fechaViaje?: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/finalizar-viaje`, { busId, fechaViaje });
   }
 
   updateReserva(id: number, reserva: any): Observable<any> {

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,15 +53,82 @@ public class ReservaController {
             @PathVariable Long busId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaViaje) {
         LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
-        List<Integer> asientosOcupados = reservaService.obtenerAsientosOcupados(busId, fecha);
+        Map<String, Object> detalle = reservaService.obtenerDetalleAsientos(busId, fecha);
 
         Map<String, Object> respuesta = new HashMap<>();
         respuesta.put("exito", true);
         respuesta.put("busId", busId);
         respuesta.put("fechaViaje", fecha);
-        respuesta.put("asientosOcupados", asientosOcupados);
-        respuesta.put("totalOcupados", asientosOcupados.size());
+        respuesta.put("asientosOcupados", detalle.get("ocupados"));
+        respuesta.put("asientosEnReserva", detalle.get("enReserva"));
+        respuesta.put("todosBloqueados", detalle.get("todosBloqueados"));
+        respuesta.put("totalOcupados", ((List<?>) detalle.get("ocupados")).size());
+        respuesta.put("totalEnReserva", ((List<?>) detalle.get("enReserva")).size());
         return ResponseEntity.ok(respuesta);
+    }
+
+    // POST /reservas/bloquear-temporal - Bloqueo temporal de asientos para que otros clientes los vean en ámbar
+    @PostMapping("/bloquear-temporal")
+    public ResponseEntity<Map<String, Object>> bloquearAsientosTemporal(@RequestBody Map<String, Object> body) {
+        Map<String, Object> respuesta = new HashMap<>();
+        try {
+            Long busId = Long.valueOf(String.valueOf(body.get("busId")));
+            String fechaStr = (String) body.get("fechaViaje");
+            LocalDate fecha = (fechaStr != null && !fechaStr.isBlank()) ? LocalDate.parse(fechaStr) : LocalDate.now();
+            List<?> rawAsientos = (List<?>) body.get("asientos");
+            List<Integer> asientos = rawAsientos != null ? rawAsientos.stream().map(a -> Integer.valueOf(String.valueOf(a))).toList() : Collections.emptyList();
+            String token = (String) body.get("token");
+
+            List<Integer> bloqueados = reservaService.bloquearAsientosTemporal(busId, fecha, asientos, token);
+            respuesta.put("exito", true);
+            respuesta.put("mensaje", "Asientos bloqueados en reserva temporal exitosamente");
+            respuesta.put("asientosBloqueados", bloqueados);
+            return ResponseEntity.ok(respuesta);
+        } catch (Exception e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", e.getMessage());
+            return ResponseEntity.badRequest().body(respuesta);
+        }
+    }
+
+    // POST /reservas/liberar-temporal - Liberar bloqueo temporal al cancelar o expirar timer
+    @PostMapping("/liberar-temporal")
+    public ResponseEntity<Map<String, Object>> liberarAsientosTemporal(@RequestBody Map<String, Object> body) {
+        Map<String, Object> respuesta = new HashMap<>();
+        try {
+            Long busId = Long.valueOf(String.valueOf(body.get("busId")));
+            String fechaStr = (String) body.get("fechaViaje");
+            LocalDate fecha = (fechaStr != null && !fechaStr.isBlank()) ? LocalDate.parse(fechaStr) : LocalDate.now();
+            List<?> rawAsientos = (List<?>) body.get("asientos");
+            List<Integer> asientos = rawAsientos != null ? rawAsientos.stream().map(a -> Integer.valueOf(String.valueOf(a))).toList() : Collections.emptyList();
+
+            reservaService.liberarAsientosTemporal(busId, fecha, asientos);
+            respuesta.put("exito", true);
+            respuesta.put("mensaje", "Asientos liberados de reserva temporal");
+            return ResponseEntity.ok(respuesta);
+        } catch (Exception e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", e.getMessage());
+            return ResponseEntity.badRequest().body(respuesta);
+        }
+    }
+
+    // POST /reservas/finalizar-viaje - Conductor finaliza el viaje, marca pasajes completados y libera asientos
+    @PostMapping("/finalizar-viaje")
+    public ResponseEntity<Map<String, Object>> finalizarViaje(@RequestBody Map<String, Object> body) {
+        Map<String, Object> respuesta = new HashMap<>();
+        try {
+            Long busId = Long.valueOf(String.valueOf(body.get("busId")));
+            String fechaStr = (String) body.get("fechaViaje");
+            LocalDate fecha = (fechaStr != null && !fechaStr.isBlank()) ? LocalDate.parse(fechaStr) : LocalDate.now();
+
+            Map<String, Object> resultado = reservaService.finalizarViaje(busId, fecha);
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", "Error al finalizar el viaje: " + e.getMessage());
+            return ResponseEntity.badRequest().body(respuesta);
+        }
     }
 
     // POST /reservas/multiple - Reserva de uno o más asientos seleccionados en el bus

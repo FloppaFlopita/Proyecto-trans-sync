@@ -27,7 +27,7 @@ import { AuthService, UserSession } from '../../services/auth.service';
             </div>
           </a>
 
-          <!-- Enlaces de Navegación según Rol -->
+          <!-- Enlaces de Navegacion segun Rol -->
           <div class="hidden md:flex items-center gap-1 text-sm font-medium">
 
             <!-- Para Pasajero / Cliente o Invitado -->
@@ -51,7 +51,7 @@ import { AuthService, UserSession } from '../../services/auth.service';
               </a>
               <a routerLink="/flota" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
                  class="px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
-                Mi Vehículo Asignado
+                Mi Vehiculo Asignado
               </a>
             </ng-container>
 
@@ -82,15 +82,15 @@ import { AuthService, UserSession } from '../../services/auth.service';
           </div>
         </div>
 
-        <!-- Derecha: Estado de Conexión y Avatar Clickeable -->
+        <!-- Derecha: Estado de Conexion y Avatar Clickeable -->
         <div class="flex items-center gap-3">
-          <!-- Indicador de Sistema en Línea -->
+          <!-- Indicador de Sistema en Linea -->
           <div class="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             Servicio Activo
           </div>
 
-          <!-- Botón de Avatar / Perfil -->
+          <!-- Boton de Avatar / Perfil -->
           <button (click)="mostrarModalPerfil = true"
                   class="flex items-center gap-2.5 p-1.5 pr-3 rounded-full hover:bg-slate-100 transition-all border border-slate-200 shadow-sm"
                   title="Abrir Mi Perfil y Cuenta">
@@ -139,22 +139,22 @@ import { AuthService, UserSession } from '../../services/auth.service';
         <!-- Cuerpo del Perfil -->
         <div class="py-4 space-y-4">
 
-          <!-- Tarjeta de Puntos de Fidelización (Para clientes) -->
+          <!-- Tarjeta de Puntos de Fidelizacion (Para clientes) -->
           <div class="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold text-blue-900">Programa TransSync Rewards</p>
               <p class="text-2xl font-black text-blue-700 mt-0.5">140 <span class="text-xs font-bold text-blue-600">Puntos</span></p>
-              <p class="text-[11px] text-blue-800/80 mt-0.5">Equivalente a S/ 14.00 de descuento en tu próximo viaje.</p>
+              <p class="text-[11px] text-blue-800/80 mt-0.5">Equivalente a S/ 14.00 de descuento en tu proximo viaje.</p>
             </div>
             <div class="w-10 h-10 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-700 font-bold text-lg">
               ★
             </div>
           </div>
 
-          <!-- Información del Usuario -->
+          <!-- Informacion del Usuario -->
           <div class="space-y-2.5 text-xs">
             <div class="flex justify-between py-1.5 border-b border-slate-100">
-              <span class="text-slate-500">Correo Electrónico:</span>
+              <span class="text-slate-500">Correo Electronico:</span>
               <span class="font-semibold text-slate-800">{{ usuario ? usuario.email : 'cliente@transsync.com' }}</span>
             </div>
             <div class="flex justify-between py-1.5 border-b border-slate-100">
@@ -167,7 +167,7 @@ import { AuthService, UserSession } from '../../services/auth.service';
             </div>
           </div>
 
-          <!-- Sección: Cambiar Contraseña Rápido -->
+          <!-- Seccion: Cambiar Contraseña Rapido -->
           <div class="pt-2">
             <button (click)="mostrarCambioClave = !mostrarCambioClave"
                     class="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
@@ -177,7 +177,7 @@ import { AuthService, UserSession } from '../../services/auth.service';
             <div *ngIf="mostrarCambioClave" class="mt-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">Nueva Contraseña</label>
-                <input [(ngModel)]="nuevaClave" type="password" placeholder="Mínimo 6 caracteres"
+                <input [(ngModel)]="nuevaClave" type="password" placeholder="Minimo 6 caracteres"
                        class="w-full rounded-lg px-3 py-1.5 text-xs bg-white border border-slate-300 text-slate-800 outline-none focus:border-blue-500"/>
               </div>
               <button (click)="guardarNuevaClave()"
@@ -188,9 +188,9 @@ import { AuthService, UserSession } from '../../services/auth.service';
             </div>
           </div>
 
-          <!-- Acceso Rápido a Cambiar de Rol (Demostración) -->
+          <!-- Acceso Rapido a Cambiar de Rol (Demostracion) -->
           <div class="pt-2 border-t border-slate-100">
-            <p class="text-[11px] font-semibold text-slate-500 mb-2">Cambiar rol para demostración:</p>
+            <p class="text-[11px] font-semibold text-slate-500 mb-2">Cambiar rol para demostracion:</p>
             <div class="grid grid-cols-3 gap-2">
               <button (click)="cambiarRol('cliente@transsync.com', 'cliente123')"
                       class="py-2 px-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 text-xs font-semibold text-slate-700 text-center transition-colors">
@@ -212,9 +212,9 @@ import { AuthService, UserSession } from '../../services/auth.service';
         <!-- Pie del Modal -->
         <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
           <button *ngIf="usuario" (click)="cerrarSesion()" class="text-xs font-semibold text-red-600 hover:text-red-700">
-            Cerrar Sesión
+            Cerrar Sesion
           </button>
-          <span *ngIf="!usuario" class="text-xs text-slate-400">Sin sesión iniciada</span>
+          <span *ngIf="!usuario" class="text-xs text-slate-400">Sin sesion iniciada</span>
 
           <button (click)="mostrarModalPerfil = false" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-colors">
             Cerrar

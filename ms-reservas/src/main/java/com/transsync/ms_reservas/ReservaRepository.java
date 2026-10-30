@@ -14,6 +14,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     // Búsqueda de asientos ocupados para un bus y fecha
     List<Reserva> findByBusIdAndFechaViajeAndEstadoIn(Long busId, LocalDate fechaViaje, List<String> estados);
+    List<Reserva> findByBusIdAndFechaViajeAndEstado(Long busId, LocalDate fechaViaje, String estado);
+    void deleteByBusIdAndFechaViajeAndAsientoNumeroInAndEstado(Long busId, LocalDate fechaViaje, List<Integer> asientos, String estado);
 
     // Verificar si un asiento específico ya está reservado en esa fecha
     List<Reserva> findByBusIdAndFechaViajeAndAsientoNumeroAndEstadoIn(Long busId, LocalDate fechaViaje, Integer asientoNumero, List<String> estados);
@@ -24,4 +26,5 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     // Historial global de ventas para Admin
     List<Reserva> findByEstadoOrderByFechaViajeDesc(String estado);
+    List<Reserva> findByEstadoInOrderByFechaViajeDesc(List<String> estados);
 }
