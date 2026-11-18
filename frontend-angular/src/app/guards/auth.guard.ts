@@ -13,12 +13,8 @@ export const adminGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Si no es admin (ej: link copiado en otro navegador o invitado)
-  authService.abrirModalLogin(
-    'Acceso restringido: Esta sección requiere inicio de sesión con perfil de Administrador.',
-    state.url
-  );
-  return router.createUrlTree(['/reservas'], {
+  // Si no es admin (ej: link copiado en otro navegador o invitado), redirige a login
+  return router.createUrlTree(['/login'], {
     queryParams: { auth_required: 'ADMIN', returnUrl: state.url }
   });
 };
@@ -34,11 +30,7 @@ export const conductorGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  authService.abrirModalLogin(
-    'Acceso restringido: Esta sección requiere credenciales de Conductor.',
-    state.url
-  );
-  return router.createUrlTree(['/reservas'], {
+  return router.createUrlTree(['/login'], {
     queryParams: { auth_required: 'CONDUCTOR', returnUrl: state.url }
   });
 };
@@ -54,11 +46,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  authService.abrirModalLogin(
-    'Por favor inicia sesión para acceder a esta sección.',
-    state.url
-  );
-  return router.createUrlTree(['/reservas'], {
+  return router.createUrlTree(['/login'], {
     queryParams: { auth_required: 'LOGIN', returnUrl: state.url }
   });
 };
