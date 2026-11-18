@@ -465,9 +465,9 @@ interface FilaAsiento {
                   </div>
                   <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">
-                      Correo de Facturación <span class="text-red-500">*</span>
+                      Correo Electrónico (opcional o Gmail)
                     </label>
-                    <input [(ngModel)]="formulario.emailPasajero" placeholder="facturacion@empresa.com"
+                    <input [(ngModel)]="formulario.emailPasajero" placeholder="ejemplo@gmail.com"
                            class="w-full rounded-xl px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 text-slate-900 outline-none focus:bg-white focus:border-teal-600 transition-all"/>
                   </div>
                 </div>
@@ -1242,7 +1242,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
         this.formulario.nombrePasajero = user.nombre;
         this.formulario.dniPasajero = user.dni || '72384910';
         this.formulario.telefonoPasajero = user.telefono || '951234567';
-        this.formulario.emailPasajero = user.email;
+        this.formulario.emailPasajero = (user.email && !user.email.includes('transsync.com')) ? user.email : '';
       } else if (!user) {
         this.formulario.nombrePasajero = '';
         this.formulario.dniPasajero = '';
@@ -1660,12 +1660,16 @@ export class ReservasComponent implements OnInit, OnDestroy {
     };
     localStorage.setItem('transsync_mp_pending_purchase', JSON.stringify(compraPendiente));
 
+    const emailValido = (this.formulario.emailPasajero && !this.formulario.emailPasajero.includes('transsync.com'))
+      ? this.formulario.emailPasajero.trim()
+      : '';
+
     const payload = {
       rutaNombre: `${this.rutaActual.nombre} (${this.rutaActual.origen} - ${this.rutaActual.destino})`,
       montoTotal: this.totalAPagar,
       cantidadPasajes: this.asientosSeleccionados.length,
       nombreComprador: this.formulario.nombrePasajero || 'Pasajero TransSync',
-      emailComprador: this.formulario.emailPasajero || 'cliente@transsync.com',
+      emailComprador: emailValido,
       frontendUrl: window.location.origin + window.location.pathname
     };
 

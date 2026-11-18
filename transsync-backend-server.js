@@ -372,16 +372,20 @@ const server = http.createServer((req, res) => {
             currency_id: 'PEN'
           }
         ],
-        payer: {
-          name: body.nombreComprador || 'Pasajero TransSync',
-          email: body.emailComprador || 'cliente@transsync.com'
-        },
         back_urls: {
           success: (body.frontendUrl || 'http://localhost:4200/reservas') + '?mp_status=approved',
           pending: (body.frontendUrl || 'http://localhost:4200/reservas') + '?mp_status=pending',
           failure: (body.frontendUrl || 'http://localhost:4200/reservas') + '?mp_status=failure'
         }
       };
+
+      // Solo incluir payer si se ingresó un correo real válido (evitar correos ficticios que bloqueen Yape/antifraude)
+      if (body.emailComprador && !body.emailComprador.includes('transsync.com') && body.emailComprador.includes('@')) {
+        postDataObj.payer = {
+          name: body.nombreComprador || 'Pasajero TransSync',
+          email: body.emailComprador
+        };
+      }
       const postData = JSON.stringify(postDataObj);
 
       const options = {
