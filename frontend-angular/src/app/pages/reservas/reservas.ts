@@ -1083,6 +1083,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
   // Rutas Interprovinciales
   rutasDisponibles: RutaOpcion[] = [
+    { id: 99, nombre: 'Juliaca ➔ Puno (Test Pago Real S/ 3.00)', origen: 'Juliaca', destino: 'Puno', busId: 1, precio: 3.00, horario: '10:00 hrs' },
     { id: 19, nombre: 'Juliaca → Cusco', origen: 'Juliaca', destino: 'Cusco', busId: 3, precio: 35.00, horario: '07:30 hrs' },
     { id: 20, nombre: 'Cusco → Juliaca', origen: 'Cusco', destino: 'Juliaca', busId: 4, precio: 35.00, horario: '14:00 hrs' },
     { id: 21, nombre: 'Cusco → Arequipa', origen: 'Cusco', destino: 'Arequipa', busId: 5, precio: 40.00, horario: '21:00 hrs' },
@@ -1090,7 +1091,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
     { id: 23, nombre: 'Lima → Arequipa', origen: 'Lima', destino: 'Arequipa', busId: 1, precio: 55.00, horario: '18:30 hrs' },
     { id: 24, nombre: 'Arequipa → Lima', origen: 'Arequipa', destino: 'Lima', busId: 1, precio: 55.00, horario: '19:00 hrs' }
   ];
-  rutaSeleccionadaId = 19; // Juliaca - Cusco por defecto
+  rutaSeleccionadaId = 99; // Ruta de prueba S/ 3.00 por defecto para validación de pago real
 
   get rutaActual(): RutaOpcion {
     return this.rutasDisponibles.find(r => r.id === Number(this.rutaSeleccionadaId)) || this.rutasDisponibles[0];
@@ -1236,7 +1237,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
       next: (resp: any) => {
         const datos = Array.isArray(resp) ? resp : (resp?.datos || []);
         if (datos && datos.length > 0) {
-          this.rutasDisponibles = datos.map((r: any, idx: number) => ({
+          const rutasMapeadas = datos.map((r: any, idx: number) => ({
             id: r.id,
             nombre: `${r.origen} ➔ ${r.destino}`,
             origen: r.origen,
@@ -1245,6 +1246,18 @@ export class ReservasComponent implements OnInit, OnDestroy {
             precio: r.precio || 35.00,
             horario: r.horario || '08:00 hrs'
           }));
+
+          const rutaTest: RutaOpcion = {
+            id: 99,
+            nombre: 'Juliaca ➔ Puno (Test Pago Real S/ 3.00)',
+            origen: 'Juliaca',
+            destino: 'Puno',
+            busId: 1,
+            precio: 3.00,
+            horario: '10:00 hrs'
+          };
+
+          this.rutasDisponibles = [rutaTest, ...rutasMapeadas];
 
           // Verificar si hay parametro de ruta desde el catalogo de rutas
           const rutaIdParam = this.route.snapshot.queryParamMap.get('rutaId');

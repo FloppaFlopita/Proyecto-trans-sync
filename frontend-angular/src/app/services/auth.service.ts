@@ -20,7 +20,36 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserSession | null>(this.obtenerSesionGuardada());
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  // Control global de acceso / modal de bienvenida y login
+  private modalLoginSubject = new BehaviorSubject<{ abierto: boolean; mensaje: string; returnUrl?: string }>({
+    abierto: false,
+    mensaje: ''
+  });
+  public modalLogin$ = this.modalLoginSubject.asObservable();
+
+  constructor(private http: HttpClient) {
+    // Si no ha iniciado sesión y es la primera vez que abre la web en este navegador, invitarlo a iniciar sesión
+    if (!this.isLoggedIn() && !sessionStorage.getItem('transsync_invitado_activo')) {
+      this.abrirModalLogin('Bienvenido a TransSync. Por favor inicia sesión con tu cuenta o continúa como pasajero invitado.');
+    }
+  }
+
+  abrirModalLogin(mensaje: string = 'Inicia sesión para continuar.', returnUrl?: string): void {
+    this.modalLoginSubject.next({
+      abierto: true,
+      mensaje,
+      returnUrl
+    });
+  }
+
+  cerrarModalLogin(): void {
+    this.modalLoginSubject.next({ abierto: false, mensaje: '' });
+  }
+
+  continuarComoInvitado(): void {
+    sessionStorage.setItem('transsync_invitado_activo', 'true');
+    this.cerrarModalLogin();
+  }
 
   public get currentUserValue(): UserSession | null {
     return this.currentUserSubject.value;

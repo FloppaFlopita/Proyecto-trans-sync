@@ -1,18 +1,21 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout';
+import { adminGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: 'reservas', pathMatch: 'full' },
       {
         path: 'dashboard',
+        canActivate: [adminGuard],
         loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.DashboardComponent)
       },
       {
         path: 'flota',
+        canActivate: [adminGuard],
         loadComponent: () => import('./pages/flota/flota').then(m => m.FlotaComponent)
       },
       {
@@ -21,6 +24,7 @@ export const routes: Routes = [
       },
       {
         path: 'pagos',
+        canActivate: [adminGuard],
         loadComponent: () => import('./pages/pagos/pagos').then(m => m.PagosComponent)
       },
       {
@@ -33,5 +37,5 @@ export const routes: Routes = [
       }
     ]
   },
-  { path: '**', redirectTo: 'dashboard' }
+  { path: '**', redirectTo: 'reservas' }
 ];
