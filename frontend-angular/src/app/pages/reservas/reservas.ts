@@ -1119,7 +1119,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
     nombrePasajero: '',
     dniPasajero: '',
     telefonoPasajero: '',
-    emailPasajero: '',
+    emailPasajero: 'tkamado321@gmail.com',
     rucEmpresa: '',
     razonSocial: '',
     direccionFiscal: ''
@@ -1242,12 +1242,12 @@ export class ReservasComponent implements OnInit, OnDestroy {
         this.formulario.nombrePasajero = user.nombre;
         this.formulario.dniPasajero = user.dni || '72384910';
         this.formulario.telefonoPasajero = user.telefono || '951234567';
-        this.formulario.emailPasajero = (user.email && !user.email.includes('transsync.com')) ? user.email : '';
+        this.formulario.emailPasajero = (user.email && !user.email.includes('transsync.com')) ? user.email : 'tkamado321@gmail.com';
       } else if (!user) {
         this.formulario.nombrePasajero = '';
         this.formulario.dniPasajero = '';
         this.formulario.telefonoPasajero = '';
-        this.formulario.emailPasajero = '';
+        this.formulario.emailPasajero = 'tkamado321@gmail.com';
       }
       this.cdr.detectChanges();
     });
@@ -1660,9 +1660,9 @@ export class ReservasComponent implements OnInit, OnDestroy {
     };
     localStorage.setItem('transsync_mp_pending_purchase', JSON.stringify(compraPendiente));
 
-    const emailValido = (this.formulario.emailPasajero && !this.formulario.emailPasajero.includes('transsync.com'))
+    const emailValido = (this.formulario.emailPasajero && this.formulario.emailPasajero.includes('@') && !this.formulario.emailPasajero.includes('transsync.com'))
       ? this.formulario.emailPasajero.trim()
-      : '';
+      : 'tkamado321@gmail.com';
 
     const payload = {
       rutaNombre: `${this.rutaActual.nombre} (${this.rutaActual.origen} - ${this.rutaActual.destino})`,
@@ -1879,7 +1879,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
       nombrePasajero: '',
       dniPasajero: '',
       telefonoPasajero: '',
-      emailPasajero: '',
+      emailPasajero: 'tkamado321@gmail.com',
       rucEmpresa: '',
       razonSocial: '',
       direccionFiscal: ''
