@@ -57,18 +57,15 @@ import { AuthService } from '../../services/auth.service';
             </div>
 
             <button type="submit" [disabled]="cargando"
-                    class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-500/25 transition-all flex items-center justify-center gap-2">
+                    class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-500/25 transition-all flex items-center justify-center">
               <span *ngIf="!cargando">Iniciar Sesión</span>
-              <span *ngIf="cargando" class="flex items-center gap-2">
-                <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                Autenticando en MS-Auth...
-              </span>
+              <span *ngIf="cargando" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
             </button>
           </form>
 
-          <!-- Relleno rápido para demostración académica -->
+          <!-- Relleno rápido para demostración -->
           <div class="mt-6 pt-5 border-t border-slate-100">
-            <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2.5 text-center">Acceso Rápido por Rol (Demostración):</p>
+            <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2.5 text-center">Acceso Rápido</p>
             <div class="grid grid-cols-3 gap-2">
               <button (click)="cargarCredenciales('admin@transsync.com', 'admin123')" type="button"
                       class="py-2 px-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-xs font-bold text-slate-700 transition-colors text-center">
@@ -89,7 +86,7 @@ import { AuthService } from '../../services/auth.service';
           <div class="mt-6 pt-5 border-t border-slate-200">
             <button (click)="continuarComoInvitado()" type="button"
                     class="w-full py-3 px-4 rounded-xl border-2 border-dashed border-slate-300 hover:border-teal-500 hover:bg-teal-50/50 bg-slate-50 text-slate-700 font-bold text-xs transition-all flex items-center justify-center gap-2">
-              <span>Continuar sin iniciar sesión (Modo Pasajero / Invitado)</span>
+              <span>Continuar sin cuenta (Modo Invitado)</span>
               <span>➔</span>
             </button>
             <p class="text-[10px] text-slate-400 text-center mt-2 leading-relaxed">
