@@ -23,4 +23,8 @@ export class PagosService {
   updatePago(id: number, pago: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, pago);
   }
+
+  crearPreferenciaMercadoPago(datos: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/crear-preferencia`, datos);
+  }
 }

@@ -1,0 +1,88 @@
+{
+  "realm": "transsync",
+  "enabled": true,
+  "displayName": "TransSync Transporte Interprovincial",
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "roles": {
+    "realm": [
+      { "name": "CLIENTE", "description": "Pasajero / Cliente" },
+      { "name": "CONDUCTOR", "description": "Conductor de bus" },
+      { "name": "ADMIN", "description": "Administrador del sistema" }
+    ]
+  },
+  "groups": [],
+  "clients": [
+    {
+      "clientId": "transsync-frontend",
+      "name": "TransSync Frontend Web",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "rootUrl": "http://localhost:4200",
+      "baseUrl": "http://localhost:4200",
+      "redirectUris": [
+        "http://localhost:4200/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200",
+        "+"
+      ]
+    },
+    {
+      "clientId": "transsync-gateway",
+      "name": "TransSync API Gateway",
+      "enabled": true,
+      "bearerOnly": true
+    }
+  ],
+  "users": [
+    {
+      "username": "cliente@transsync.com",
+      "email": "cliente@transsync.com",
+      "firstName": "Carlos",
+      "lastName": "Mendoza",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "cliente123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CLIENTE"]
+    },
+    {
+      "username": "conductor@transsync.com",
+      "email": "conductor@transsync.com",
+      "firstName": "Mario",
+      "lastName": "Chofer",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "chofer123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CONDUCTOR"]
+    },
+    {
+      "username": "admin@transsync.com",
+      "email": "admin@transsync.com",
+      "firstName": "Admin",
+      "lastName": "TransSync",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN"]
+    }
+  ]
+}
+

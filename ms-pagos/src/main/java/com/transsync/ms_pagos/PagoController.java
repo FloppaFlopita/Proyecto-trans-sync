@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +14,34 @@ import java.util.Optional;
 public class PagoController {
 
     @Autowired
-    private PagoRepository pagoRepository;
+    private PagoService pagoService;
+
+    @Autowired
+    private MercadoPagoService mercadoPagoService;
+
+    // POST /pagos/crear-preferencia - Crear preferencia de Checkout Pro con Mercado Pago
+    @PostMapping("/crear-preferencia")
+    public ResponseEntity<Map<String, Object>> crearPreferenciaMercadoPago(@RequestBody Map<String, Object> datos) {
+        Map<String, Object> respuesta = new HashMap<>();
+        try {
+            Map<String, Object> preferencia = mercadoPagoService.crearPreferencia(datos);
+            respuesta.put("exito", true);
+            respuesta.put("mensaje", "Preferencia de Mercado Pago creada con éxito");
+            respuesta.put("id", preferencia.get("id"));
+            respuesta.put("init_point", preferencia.get("init_point"));
+            respuesta.put("sandbox_init_point", preferencia.get("sandbox_init_point"));
+            return ResponseEntity.ok(respuesta);
+        } catch (Exception e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", "Error al crear preferencia con Mercado Pago: " + e.getMessage());
+            return ResponseEntity.status(500).body(respuesta);
+        }
+    }
 
     // GET /pagos - Listar todos los pagos
     @GetMapping
     public ResponseEntity<Map<String, Object>> listarPagos() {
-        List<Pago> pagos = pagoRepository.findAll();
+        List<Pago> pagos = pagoService.listarPagos();
         Map<String, Object> respuesta = new HashMap<>();
         respuesta.put("exito", true);
         respuesta.put("mensaje", "Pagos obtenidos correctamente");
@@ -32,7 +53,7 @@ public class PagoController {
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> obtenerPago(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
-        Optional<Pago> pago = pagoRepository.findById(id);
+        Optional<Pago> pago = pagoService.obtenerPago(id);
         if (pago.isPresent()) {
             respuesta.put("exito", true);
             respuesta.put("mensaje", "Pago encontrado");
@@ -41,50 +62,40 @@ public class PagoController {
         } else {
             respuesta.put("exito", false);
             respuesta.put("mensaje", "Pago no encontrado con id: " + id);
-            respuesta.put("datos", null);
             return ResponseEntity.status(404).body(respuesta);
         }
     }
 
-    // POST /pagos - Registrar un nuevo pago
+    // POST /pagos - Registrar un nuevo pago (transaccional)
     @PostMapping
     public ResponseEntity<Map<String, Object>> crearPago(@RequestBody Pago pago) {
-        if (pago.getEstado() == null || pago.getEstado().isBlank()) {
-            pago.setEstado("PENDIENTE");
-        }
-        if (pago.getFechaPago() == null) {
-            pago.setFechaPago(LocalDateTime.now());
-        }
-        Pago guardado = pagoRepository.save(pago);
         Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("exito", true);
-        respuesta.put("mensaje", "Pago registrado correctamente");
-        respuesta.put("datos", guardado);
-        return ResponseEntity.status(201).body(respuesta);
+        try {
+            Pago guardado = pagoService.crearPago(pago);
+            respuesta.put("exito", true);
+            respuesta.put("mensaje", "Pago registrado correctamente");
+            respuesta.put("datos", guardado);
+            return ResponseEntity.status(201).body(respuesta);
+        } catch (IllegalArgumentException e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", e.getMessage());
+            return ResponseEntity.badRequest().body(respuesta);
+        }
     }
 
     // PUT /pagos/{id} - Actualizar estado de un pago
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> actualizarPago(@PathVariable Long id,
-                                                               @RequestBody Pago datosActualizados) {
+    public ResponseEntity<Map<String, Object>> actualizarPago(@PathVariable Long id, @RequestBody Pago datosActualizados) {
         Map<String, Object> respuesta = new HashMap<>();
-        Optional<Pago> opcional = pagoRepository.findById(id);
-        if (opcional.isPresent()) {
-            Pago pago = opcional.get();
-            if (datosActualizados.getReservaId() != null) pago.setReservaId(datosActualizados.getReservaId());
-            if (datosActualizados.getMonto() != null) pago.setMonto(datosActualizados.getMonto());
-            if (datosActualizados.getMetodoPago() != null) pago.setMetodoPago(datosActualizados.getMetodoPago());
-            if (datosActualizados.getEstado() != null) pago.setEstado(datosActualizados.getEstado());
-            if (datosActualizados.getFechaPago() != null) pago.setFechaPago(datosActualizados.getFechaPago());
-            pagoRepository.save(pago);
+        try {
+            Pago pago = pagoService.actualizarPago(id, datosActualizados);
             respuesta.put("exito", true);
             respuesta.put("mensaje", "Pago actualizado correctamente");
             respuesta.put("datos", pago);
             return ResponseEntity.ok(respuesta);
-        } else {
+        } catch (IllegalArgumentException e) {
             respuesta.put("exito", false);
-            respuesta.put("mensaje", "Pago no encontrado con id: " + id);
-            respuesta.put("datos", null);
+            respuesta.put("mensaje", e.getMessage());
             return ResponseEntity.status(404).body(respuesta);
         }
     }
@@ -93,19 +104,15 @@ public class PagoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> rechazarPago(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
-        Optional<Pago> opcional = pagoRepository.findById(id);
-        if (opcional.isPresent()) {
-            Pago pago = opcional.get();
-            pago.setEstado("RECHAZADO");
-            pagoRepository.save(pago);
+        try {
+            Pago pago = pagoService.rechazarPago(id);
             respuesta.put("exito", true);
             respuesta.put("mensaje", "Pago marcado como rechazado");
             respuesta.put("datos", pago);
             return ResponseEntity.ok(respuesta);
-        } else {
+        } catch (IllegalArgumentException e) {
             respuesta.put("exito", false);
-            respuesta.put("mensaje", "Pago no encontrado con id: " + id);
-            respuesta.put("datos", null);
+            respuesta.put("mensaje", e.getMessage());
             return ResponseEntity.status(404).body(respuesta);
         }
     }

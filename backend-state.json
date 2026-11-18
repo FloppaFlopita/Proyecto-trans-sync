@@ -1,0 +1,47 @@
+{
+  "asientosOcupadosPorBus": {
+    "1": [
+      8
+    ],
+    "2": [
+      1,
+      2
+    ],
+    "5": [
+      15,
+      16
+    ]
+  },
+  "reservasTemporales": {
+    "1_2026-11-18": [],
+    "1_2026-10-25": [
+      {
+        "asientos": [
+          1
+        ],
+        "expira": 1794973535639
+      }
+    ]
+  },
+  "reservas": [
+    {
+      "id": 1794972552624,
+      "busId": 1,
+      "fechaViaje": "2026-10-25",
+      "asiento": 8,
+      "tipoComprobante": "BOLETA",
+      "numeroComprobante": "B001-408151",
+      "numeroBoleta": "B001-408151",
+      "nombrePasajero": "Carlos Mendoza Ramos",
+      "dniPasajero": "72384910",
+      "telefonoPasajero": "951234567",
+      "ruc": "",
+      "razonSocial": "",
+      "direccionFiscal": "",
+      "precio": 3,
+      "metodoPago": "YAPE (Cel: 951234567 · Aprobación: 849201)",
+      "fechaHora": "17/11/2026, 9:29:12 p. m.",
+      "abordado": false
+    }
+  ]
+}
