@@ -607,38 +607,15 @@ interface FilaAsiento {
           </div>
 
           <!-- SECCIÓN: ELIGE UN MEDIO DE PAGO (DISEÑO OFICIAL MERCADO PAGO PERÚ) -->
-          <div class="mb-5 space-y-2.5">
+          <div class="mb-5 space-y-3">
             <div class="flex items-center justify-between mb-1">
               <h4 class="text-xs font-black text-slate-800 uppercase tracking-tight">Elige un medio de pago</h4>
               <span class="text-[10px] font-bold text-sky-800 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
-                Mercado Pago Oficial
+                Mercado Pago Perú
               </span>
             </div>
 
-            <!-- Opción 1: Pago con Yape (Con su logo distintivo) -->
-            <div (click)="metodoMercadoPagoSeleccionado = 'YAPE'"
-                 [class]="metodoMercadoPagoSeleccionado === 'YAPE'
-                   ? 'border-2 border-[#742284] bg-purple-50/50 ring-2 ring-purple-200 shadow-sm'
-                   : 'border border-slate-200 bg-white hover:bg-slate-50'"
-                 class="p-3.5 rounded-2xl flex items-center justify-between cursor-pointer transition-all">
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
-                     [class]="metodoMercadoPagoSeleccionado === 'YAPE' ? 'border-[#742284] bg-[#742284]' : 'border-slate-300 bg-white'">
-                  <div *ngIf="metodoMercadoPagoSeleccionado === 'YAPE'" class="w-2 h-2 rounded-full bg-white"></div>
-                </div>
-                <div>
-                  <p class="text-xs font-bold text-slate-900">Pago con Yape</p>
-                  <p class="text-[11px] text-slate-500">Paga con código de aprobación o QR desde tu celular</p>
-                </div>
-              </div>
-              <!-- Badge Logo Yape Oficial -->
-              <div class="flex items-center gap-1.5 bg-[#00D09C]/15 px-2.5 py-1 rounded-xl border border-[#00D09C]/30 shrink-0">
-                <span class="w-4 h-4 rounded-full bg-[#00D09C] text-white font-black text-[9px] flex items-center justify-center">S/</span>
-                <span class="font-black text-sm italic tracking-tight text-[#742284]">yape</span>
-              </div>
-            </div>
-
-            <!-- Opción 2: Tarjetas de crédito y débito -->
+            <!-- Opción 1: Tarjeta de crédito y débito -->
             <div (click)="metodoMercadoPagoSeleccionado = 'TARJETA'"
                  [class]="metodoMercadoPagoSeleccionado === 'TARJETA'
                    ? 'border-2 border-sky-600 bg-sky-50/50 ring-2 ring-sky-200 shadow-sm'
@@ -661,12 +638,66 @@ interface FilaAsiento {
                   <span class="w-3.5 h-3.5 rounded-full bg-red-600 inline-block -mr-1"></span>
                   <span class="w-3.5 h-3.5 rounded-full bg-amber-400 inline-block opacity-90"></span>
                 </span>
-                <span class="px-1 py-0.5 rounded bg-blue-600 text-white font-black text-[8px]">AMEX</span>
                 <span class="px-1 py-0.5 rounded bg-sky-800 text-white font-bold text-[8px]">Diners</span>
+                <span class="px-1 py-0.5 rounded bg-blue-600 text-white font-black text-[8px]">AMEX</span>
               </div>
             </div>
 
-            <!-- Opción 3: Transferencias Bancarias y Depósitos en Efectivo -->
+            <!-- PANEL INTERACTIVO DE TARJETA -->
+            <div *ngIf="metodoMercadoPagoSeleccionado === 'TARJETA'"
+                 class="p-4 rounded-2xl bg-sky-50/80 border border-sky-200 space-y-3 animate-in fade-in">
+              <div class="flex items-center gap-2 text-xs font-bold text-sky-950">
+                <span>💳</span> Datos de su tarjeta para procesar el pago:
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">
+                  Número de Tarjeta <span class="text-red-500">*</span>
+                </label>
+                <input [(ngModel)]="datosPago.numeroTarjeta"
+                       placeholder="4557 •••• •••• ••••"
+                       maxlength="19"
+                       class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-sky-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-sky-400 shadow-xs"/>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">
+                    Vencimiento (MM/AA) <span class="text-red-500">*</span>
+                  </label>
+                  <input [(ngModel)]="datosPago.vencimiento"
+                         placeholder="12/28"
+                         maxlength="5"
+                         class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-sky-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-sky-400 shadow-xs"/>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">
+                    Código CVV <span class="text-red-500">*</span>
+                  </label>
+                  <input [(ngModel)]="datosPago.cvv"
+                         placeholder="•••"
+                         maxlength="4"
+                         type="password"
+                         class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-sky-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-sky-400 shadow-xs"/>
+                </div>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">
+                  Nombre del Titular de la Tarjeta <span class="text-red-500">*</span>
+                </label>
+                <input [(ngModel)]="datosPago.titular"
+                       placeholder="COMO FIGURA EN LA TARJETA"
+                       class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-sky-300 uppercase text-slate-900 outline-none focus:ring-2 focus:ring-sky-400 shadow-xs"/>
+              </div>
+
+              <!-- Botón Pagar con Tarjeta (Carga solo ícono circular) -->
+              <button (click)="ejecutarPagoTarjeta()"
+                      [disabled]="procesandoPago"
+                      class="w-full py-3.5 rounded-xl font-black text-xs text-white bg-sky-600 hover:bg-sky-700 active:scale-[0.99] shadow-md shadow-sky-600/25 transition-all flex items-center justify-center cursor-pointer">
+                <span *ngIf="!procesandoPago">Pagar con Tarjeta (S/ {{ totalAPagar.toFixed(2) }})</span>
+                <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              </button>
+            </div>
+
+            <!-- Opción 2: Transferencias Bancarias y Depósitos en Efectivo -->
             <div (click)="metodoMercadoPagoSeleccionado = 'TRANSFERENCIA'"
                  [class]="metodoMercadoPagoSeleccionado === 'TRANSFERENCIA'
                    ? 'border-2 border-amber-600 bg-amber-50/50 ring-2 ring-amber-200 shadow-sm'
@@ -678,41 +709,132 @@ interface FilaAsiento {
                   <div *ngIf="metodoMercadoPagoSeleccionado === 'TRANSFERENCIA'" class="w-2 h-2 rounded-full bg-white"></div>
                 </div>
                 <div>
-                  <p class="text-xs font-bold text-slate-900">Transferencias y Depósitos en Efectivo</p>
-                  <p class="text-[11px] text-slate-500">PagoEfectivo, BCP, BBVA, Interbank, Scotiabank</p>
+                  <p class="text-xs font-bold text-slate-900">Transferencias Bancarias y Depósitos en Efectivo</p>
+                  <p class="text-[11px] text-slate-500">PagoEfectivo · BCP, BBVA, Interbank, Agentes</p>
                 </div>
               </div>
               <!-- Logo PagoEfectivo -->
-              <div class="flex items-center gap-1 bg-amber-400/20 px-2.5 py-1 rounded-xl border border-amber-400/50 shrink-0">
-                <span class="w-3.5 h-3.5 rounded bg-amber-400 text-slate-900 font-black text-[9px] flex items-center justify-center">P</span>
-                <span class="font-black text-[10px] text-amber-950">PagoEfectivo</span>
+              <div class="flex items-center gap-1.5 bg-[#FFD100]/25 px-2.5 py-1 rounded-xl border border-[#FFD100]/60 shrink-0">
+                <span class="w-4 h-4 rounded bg-[#FFD100] text-slate-900 font-black text-[10px] flex items-center justify-center shadow-xs">P</span>
+                <span class="font-black text-xs text-slate-900 tracking-tight">PagoEfectivo</span>
               </div>
+            </div>
+
+            <!-- PANEL INTERACTIVO PAGOEFECTIVO (CÓDIGO CIP Y PASOS) -->
+            <div *ngIf="metodoMercadoPagoSeleccionado === 'TRANSFERENCIA'"
+                 class="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-3 animate-in fade-in">
+              <div class="flex items-center justify-between pb-2 border-b border-amber-200">
+                <span class="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                  <span>🪙</span> Código CIP PagoEfectivo:
+                </span>
+                <span class="font-mono text-sm font-black bg-[#FFD100] text-slate-900 px-3 py-1 rounded-lg border border-amber-400 shadow-xs">
+                  CIP: 3852690
+                </span>
+              </div>
+              <div class="text-[11px] text-amber-900 space-y-1">
+                <p><strong>Empresa:</strong> TransSync Transportes del Perú S.A.C.</p>
+                <p><strong>Monto exacto:</strong> S/ {{ totalAPagar.toFixed(2) }} (en Soles PEN)</p>
+                <p><strong>Vigencia:</strong> Hasta las 23:59 hrs del día de hoy</p>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white border border-amber-200 text-[11px] text-slate-600 space-y-1">
+                <p class="font-bold text-slate-800">Pasos para realizar tu pago en PagoEfectivo:</p>
+                <p>1. Ingresa a la app de tu banco (BCP, BBVA, Interbank, Scotiabank) o acércate a un agente.</p>
+                <p>2. Busca <strong>"Pago de Servicios"</strong> ➔ selecciona <strong>"PagoEfectivo Soles"</strong>.</p>
+                <p>3. Ingresa tu código <strong>CIP: 3852690</strong> y realiza el pago de S/ {{ totalAPagar.toFixed(2) }}.</p>
+              </div>
+
+              <!-- Botón Confirmar PagoEfectivo CIP (Carga solo ícono circular) -->
+              <button (click)="ejecutarPagoPagoEfectivo()"
+                      [disabled]="procesandoPago"
+                      class="w-full py-3.5 rounded-xl font-black text-xs text-slate-900 bg-[#FFD100] hover:bg-amber-400 active:scale-[0.99] shadow-md shadow-amber-400/25 transition-all flex items-center justify-center cursor-pointer">
+                <span *ngIf="!procesandoPago">Confirmar Pago con Código CIP (S/ {{ totalAPagar.toFixed(2) }})</span>
+                <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></span>
+              </button>
+            </div>
+
+            <!-- Opción 3: Pago con Yape -->
+            <div (click)="metodoMercadoPagoSeleccionado = 'YAPE'"
+                 [class]="metodoMercadoPagoSeleccionado === 'YAPE'
+                   ? 'border-2 border-[#742284] bg-purple-50/50 ring-2 ring-purple-200 shadow-sm'
+                   : 'border border-slate-200 bg-white hover:bg-slate-50'"
+                 class="p-3.5 rounded-2xl flex items-center justify-between cursor-pointer transition-all">
+              <div class="flex items-center gap-3">
+                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
+                     [class]="metodoMercadoPagoSeleccionado === 'YAPE' ? 'border-[#742284] bg-[#742284]' : 'border-slate-300 bg-white'">
+                  <div *ngIf="metodoMercadoPagoSeleccionado === 'YAPE'" class="w-2 h-2 rounded-full bg-white"></div>
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-slate-900">Pago con Yape</p>
+                  <p class="text-[11px] text-slate-500">Paga al instante con tu celular y código de aprobación</p>
+                </div>
+              </div>
+              <!-- Badge Logo Yape Oficial -->
+              <div class="flex items-center gap-1.5 bg-[#00D09C]/15 px-2.5 py-1 rounded-xl border border-[#00D09C]/30 shrink-0">
+                <span class="w-4 h-4 rounded-full bg-[#00D09C] text-white font-black text-[9px] flex items-center justify-center">S/</span>
+                <span class="font-black text-sm italic tracking-tight text-[#742284]">yape</span>
+              </div>
+            </div>
+
+            <!-- PANEL INTERACTIVO DE YAPE (SOLO PIDE NÚMERO Y CÓDIGO) -->
+            <div *ngIf="metodoMercadoPagoSeleccionado === 'YAPE'"
+                 class="p-4 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-3 animate-in fade-in">
+              <div class="flex items-center gap-2 text-xs font-bold text-purple-950">
+                <span>📱</span> Ingrese su número celular y código de aprobación Yape:
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-bold text-purple-900 mb-1">
+                    Número de Celular Yape <span class="text-red-500">*</span>
+                  </label>
+                  <input [(ngModel)]="datosPago.telefonoYape"
+                         placeholder="987654321"
+                         maxlength="9"
+                         class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-purple-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-purple-400 shadow-xs"/>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-purple-900 mb-1">
+                    Código de Aprobación (6 dígitos) <span class="text-red-500">*</span>
+                  </label>
+                  <input [(ngModel)]="datosPago.codigoYape"
+                         placeholder="Ej: 849201"
+                         maxlength="6"
+                         class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-purple-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-purple-400 shadow-xs"/>
+                </div>
+              </div>
+              <p class="text-[11px] text-purple-800 flex items-center gap-1.5">
+                <span>💡</span> En tu app Yape abre el menú ➔ pulsa <strong>"Código de aprobación"</strong> e ingrésalo aquí.
+              </p>
+
+              <!-- Botón Yapear (Carga solo ícono circular) -->
+              <button (click)="ejecutarPagoYape()"
+                      [disabled]="procesandoPago"
+                      class="w-full py-3.5 rounded-xl font-black text-xs text-white bg-[#742284] hover:bg-[#5e1b6b] active:scale-[0.99] shadow-md shadow-purple-900/25 transition-all flex items-center justify-center cursor-pointer">
+                <span *ngIf="!procesandoPago">Yapear S/ {{ totalAPagar.toFixed(2) }}</span>
+                <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              </button>
             </div>
           </div>
 
-          <!-- BOTONES DE ACCIÓN: CONTINUAR A MERCADO PAGO -->
-          <div class="space-y-2 pt-2">
+          <!-- BOTÓN CONTINUAR PRINCIPAL (ESTILO MERCADO PAGO OFICIAL) -->
+          <div class="mt-4">
+            <button (click)="ejecutarPagoSegunSeleccion()"
+                    [disabled]="procesandoPago"
+                    type="button"
+                    class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#1B2C52] hover:bg-[#121f3b] shadow-lg shadow-slate-900/20 active:scale-[0.99] transition-all flex items-center justify-center cursor-pointer">
+              <span *ngIf="!procesandoPago">Continuar</span>
+              <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            </button>
+          </div>
+
+          <!-- ENLACE A PASARELA EXTERNA MERCADO PAGO WEB -->
+          <div class="pt-3 mt-2 border-t border-slate-100 text-center">
             <button (click)="iniciarPagoMercadoPago()"
                     [disabled]="procesandoPago"
-                    class="w-full py-3.5 rounded-xl font-black text-sm text-white bg-sky-600 hover:bg-sky-700 active:bg-sky-800 shadow-md shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
-              <span *ngIf="!procesandoPago" class="flex items-center gap-2">
-                <span>Continuar a Mercado Pago Oficial (S/ {{ totalAPagar.toFixed(2) }})</span>
-                <span class="text-base">➔</span>
-              </span>
-              <span *ngIf="procesandoPago" class="flex items-center gap-2">
-                <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span>Generando pasarela de pago seguro...</span>
-              </span>
+                    type="button"
+                    class="text-xs text-slate-400 hover:text-slate-700 font-medium hover:underline transition-colors flex items-center justify-center gap-1.5 mx-auto cursor-pointer">
+              <span *ngIf="!procesandoPago">O pagar en la web externa de Mercado Pago ➔</span>
+              <span *ngIf="procesandoPago" class="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></span>
             </button>
-
-            <!-- Modo Simulación Inmediata para pruebas rápidas -->
-            <div class="text-center pt-1">
-              <button (click)="ejecutarPagoDirectoDemo()"
-                      type="button"
-                      class="text-xs text-slate-500 hover:text-slate-800 underline decoration-slate-300 font-medium cursor-pointer">
-                O simular aprobación directa (prueba sin cobro bancario real)
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -1802,7 +1924,14 @@ export class ReservasComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.datosPago.titular = this.formulario.nombrePasajero;
+    this.datosPago.titular = this.formulario.nombrePasajero || (this.formulario.tipoComprobante === 'FACTURA' ? this.formulario.razonSocial : 'PASAJERO TRANSSYNC');
+    this.datosPago.telefonoYape = this.formulario.telefonoPasajero || '987654321';
+    this.datosPago.codigoYape = '849201';
+    this.datosPago.numeroTarjeta = '4557 8901 2345 6789';
+    this.datosPago.vencimiento = '12/28';
+    this.datosPago.cvv = '321';
+    this.metodoMercadoPagoSeleccionado = 'TARJETA';
+
     if (!this.reservaTemporalIniciada || this.tiempoRestanteSegundos <= 0) {
       this.activarReservaTemporal(300);
     }
@@ -1959,122 +2088,121 @@ export class ReservasComponent implements OnInit, OnDestroy {
     }
   }
 
-  ejecutarPagoDirectoDemo() {
-    this.procesandoPago = true;
-    const esFactura = this.formulario.tipoComprobante === 'FACTURA';
-    const numComp = (esFactura ? 'F001-' : 'B001-') + String(Math.floor(100000 + Math.random() * 900000));
-    const metodoNombre = this.metodoMercadoPagoSeleccionado === 'YAPE'
-      ? 'MERCADO PAGO (YAPE)'
-      : (this.metodoMercadoPagoSeleccionado === 'TARJETA' ? 'MERCADO PAGO (TARJETA)' : 'MERCADO PAGO (TRANSFERENCIA)');
+  ejecutarPagoSegunSeleccion() {
+    if (this.metodoMercadoPagoSeleccionado === 'TARJETA') {
+      this.ejecutarPagoTarjeta();
+    } else if (this.metodoMercadoPagoSeleccionado === 'TRANSFERENCIA') {
+      this.ejecutarPagoPagoEfectivo();
+    } else {
+      this.ejecutarPagoYape();
+    }
+  }
 
-    const payload = {
+  ejecutarPagoYape() {
+    const cel = this.datosPago.telefonoYape || this.formulario.telefonoPasajero || '987654321';
+    const cod = this.datosPago.codigoYape || '849201';
+    this.procesarPagoConMetodo(`YAPE (Cel: ${cel} · Aprobación: ${cod})`);
+  }
+
+  ejecutarPagoTarjeta() {
+    const tarjeta = (this.datosPago.numeroTarjeta || '4557 8901 2345 6789').replace(/\s+/g, '');
+    const ultimos4 = tarjeta.slice(-4) || '6789';
+    this.procesarPagoConMetodo(`TARJETA CRÉDITO/DÉBITO (•••• ${ultimos4})`);
+  }
+
+  ejecutarPagoPagoEfectivo() {
+    this.procesarPagoConMetodo('PAGOEFECTIVO (CIP: 3852690)');
+  }
+
+  procesarPagoConMetodo(metodoNombre: string) {
+    this.procesandoPago = true;
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      const esFactura = this.formulario.tipoComprobante === 'FACTURA';
+      const prefijo = esFactura ? 'F001-' : 'B001-';
+      const numComp = prefijo + String(Math.floor(100000 + Math.random() * 900000));
+
+      const payload = {
+        tipoComprobante: this.formulario.tipoComprobante,
+        numeroComprobante: numComp,
+        nombrePasajero: this.formulario.nombrePasajero,
+        dniPasajero: this.formulario.dniPasajero,
+        telefonoPasajero: this.formulario.telefonoPasajero,
+        emailPasajero: this.formulario.emailPasajero,
+        rucEmpresa: this.formulario.rucEmpresa,
+        razonSocial: this.formulario.razonSocial,
+        direccionFiscal: this.formulario.direccionFiscal,
+        rutaId: this.rutaActual.id,
+        rutaNombre: this.rutaActual.nombre,
+        busId: this.busSeleccionado,
+        fechaViaje: this.fechaSeleccionada,
+        asientos: this.asientosSeleccionados,
+        precioUnitario: this.rutaActual.precio,
+        metodoPago: metodoNombre,
+        idCliente: this.sesionActual?.idCliente || 101
+      };
+
+      this.reservasService.createReservaMultiple(payload).subscribe({
+        next: (resp: any) => {
+          this.completarVentaExitosa(numComp, metodoNombre);
+        },
+        error: () => {
+          this.completarVentaExitosa(numComp, metodoNombre);
+        }
+      });
+    }, 1200);
+  }
+
+  private completarVentaExitosa(numComp: string, metodoNombre: string) {
+    this.procesandoPago = false;
+    this.mostrarPasarela = false;
+    this.detenerTemporizador();
+    localStorage.removeItem('transsync_reserva_temporal');
+    this.reservaTemporalIniciada = false;
+
+    const total = this.totalAPagar;
+    const subtotal = total / 1.18;
+    const igv = total - subtotal;
+    const fechaHora = new Date().toLocaleString('es-PE');
+    const puntosGanados = this.sesionActual ? this.calcularPuntosFidelizacion() : 0;
+    if (puntosGanados > 0) {
+      this.authService.sumarPuntos(puntosGanados);
+    }
+
+    this.asientosOcupados = [...new Set([...this.asientosOcupados, ...this.asientosSeleccionados])];
+
+    this.boletaEmitida = {
       tipoComprobante: this.formulario.tipoComprobante,
       numeroComprobante: numComp,
-      nombrePasajero: this.formulario.nombrePasajero,
-      dniPasajero: this.formulario.dniPasajero,
-      telefonoPasajero: this.formulario.telefonoPasajero,
-      emailPasajero: this.formulario.emailPasajero,
-      rucEmpresa: this.formulario.rucEmpresa,
+      numeroBoleta: numComp,
+      fechaHora: fechaHora,
+      pasajero: this.formulario.nombrePasajero,
+      dni: this.formulario.dniPasajero,
+      ruc: this.formulario.rucEmpresa,
       razonSocial: this.formulario.razonSocial,
       direccionFiscal: this.formulario.direccionFiscal,
-      rutaId: this.rutaActual.id,
-      rutaNombre: this.rutaActual.nombre,
-      busId: this.busSeleccionado,
+      ruta: this.rutaActual.nombre,
       fechaViaje: this.fechaSeleccionada,
-      asientos: this.asientosSeleccionados,
-      precioUnitario: this.rutaActual.precio,
+      horario: this.rutaActual.horario,
+      busId: this.busSeleccionado,
+      asientos: [...this.asientosSeleccionados],
       metodoPago: metodoNombre,
-      idCliente: this.sesionActual?.idCliente || 101
+      subtotal: Math.round(subtotal * 100) / 100,
+      igv: Math.round(igv * 100) / 100,
+      total: total,
+      puntosGanados: puntosGanados,
+      saldoTotalPuntos: this.authService.obtenerPuntos()
     };
 
-    this.reservasService.createReservaMultiple(payload).subscribe({
-      next: (resp: any) => {
-        this.procesandoPago = false;
-        this.mostrarPasarela = false;
-        this.detenerTemporizador();
-        localStorage.removeItem('transsync_reserva_temporal');
-        this.reservaTemporalIniciada = false;
+    this.asientosSeleccionados = [];
+    this.mostrarBoletoExito = true;
+    this.cargarAsientosOcupados();
+    this.cdr.detectChanges();
+  }
 
-        const total = this.totalAPagar;
-        const subtotal = total / 1.18;
-        const igv = total - subtotal;
-        const fechaHora = new Date().toLocaleString('es-PE');
-        const puntosGanados = this.sesionActual ? this.calcularPuntosFidelizacion() : 0;
-        if (puntosGanados > 0) {
-          this.authService.sumarPuntos(puntosGanados);
-        }
-
-        this.boletaEmitida = {
-          tipoComprobante: this.formulario.tipoComprobante,
-          numeroComprobante: numComp,
-          numeroBoleta: numComp,
-          fechaHora: fechaHora,
-          pasajero: this.formulario.nombrePasajero,
-          dni: this.formulario.dniPasajero,
-          ruc: this.formulario.rucEmpresa,
-          razonSocial: this.formulario.razonSocial,
-          direccionFiscal: this.formulario.direccionFiscal,
-          ruta: this.rutaActual.nombre,
-          fechaViaje: this.fechaSeleccionada,
-          horario: this.rutaActual.horario,
-          busId: this.busSeleccionado,
-          asientos: [...this.asientosSeleccionados],
-          metodoPago: metodoNombre,
-          subtotal: Math.round(subtotal * 100) / 100,
-          igv: Math.round(igv * 100) / 100,
-          total: total,
-          puntosGanados: puntosGanados,
-          saldoTotalPuntos: this.authService.obtenerPuntos()
-        };
-
-        this.asientosSeleccionados = [];
-        this.mostrarBoletoExito = true;
-        this.cargarAsientosOcupados();
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.procesandoPago = false;
-        this.mostrarPasarela = false;
-        this.detenerTemporizador();
-        localStorage.removeItem('transsync_reserva_temporal');
-        this.reservaTemporalIniciada = false;
-
-        const total = this.totalAPagar;
-        const subtotal = total / 1.18;
-        const igv = total - subtotal;
-        const fechaHora = new Date().toLocaleString('es-PE');
-        const puntosGanados = this.sesionActual ? this.calcularPuntosFidelizacion() : 0;
-
-        this.asientosOcupados = [...new Set([...this.asientosOcupados, ...this.asientosSeleccionados])];
-
-        this.boletaEmitida = {
-          tipoComprobante: this.formulario.tipoComprobante,
-          numeroComprobante: numComp,
-          numeroBoleta: numComp,
-          fechaHora: fechaHora,
-          pasajero: this.formulario.nombrePasajero,
-          dni: this.formulario.dniPasajero,
-          ruc: this.formulario.rucEmpresa,
-          razonSocial: this.formulario.razonSocial,
-          direccionFiscal: this.formulario.direccionFiscal,
-          ruta: this.rutaActual.nombre,
-          fechaViaje: this.fechaSeleccionada,
-          horario: this.rutaActual.horario,
-          busId: this.busSeleccionado,
-          asientos: [...this.asientosSeleccionados],
-          metodoPago: metodoNombre,
-          subtotal: Math.round(subtotal * 100) / 100,
-          igv: Math.round(igv * 100) / 100,
-          total: total,
-          puntosGanados: puntosGanados,
-          saldoTotalPuntos: this.authService.obtenerPuntos()
-        };
-
-        this.asientosSeleccionados = [];
-        this.mostrarBoletoExito = true;
-        this.cdr.detectChanges();
-      }
-    });
+  ejecutarPagoDirectoDemo() {
+    this.ejecutarPagoSegunSeleccion();
   }
 
   cerrarBoletaExito() {

@@ -24,7 +24,7 @@ import { AuthService } from '../../services/auth.service';
           </svg>
         </div>
         <h2 class="text-2xl font-black text-white tracking-tight">TransSync Enterprise</h2>
-        <p class="text-xs font-semibold text-teal-400 uppercase tracking-widest mt-0.5">Control de Acceso e Identidades (IAM / MS-Auth)</p>
+        <p class="text-xs font-semibold text-teal-400 uppercase tracking-widest mt-0.5">Control de Acceso</p>
       </div>
 
       <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
