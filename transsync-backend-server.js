@@ -260,6 +260,10 @@ const server = http.createServer((req, res) => {
 
       // 3. Crear registros individuales
       const nuevasReservas = [];
+      const esFactura = body.tipoComprobante === 'FACTURA';
+      const prefijo = esFactura ? 'F001-' : 'B001-';
+      const numComprobante = body.numeroComprobante || (prefijo + String(Math.floor(100000 + Math.random() * 900000)));
+
       asientos.forEach((asiento, idx) => {
         const id = Date.now() + idx;
         const resObj = {
@@ -267,10 +271,15 @@ const server = http.createServer((req, res) => {
           busId: Number(busId),
           fechaViaje: fechaViaje,
           asiento: asiento,
+          tipoComprobante: esFactura ? 'FACTURA' : 'BOLETA',
+          numeroComprobante: numComprobante,
+          numeroBoleta: numComprobante,
           nombrePasajero: nombrePasajero,
           dniPasajero: dniPasajero,
           telefonoPasajero: telefonoPasajero,
-          numeroBoleta: 'B001-' + String(Math.floor(100000 + Math.random() * 900000)),
+          ruc: body.rucEmpresa || body.ruc || '',
+          razonSocial: body.razonSocial || '',
+          direccionFiscal: body.direccionFiscal || '',
           precio: precioUnitario,
           metodoPago: metodoPago,
           fechaHora: new Date().toLocaleString('es-PE'),
@@ -300,7 +309,10 @@ const server = http.createServer((req, res) => {
         nombrePasajero: r.nombrePasajero,
         dniPasajero: r.dniPasajero,
         telefonoPasajero: r.telefonoPasajero,
-        numeroBoleta: r.numeroBoleta,
+        numeroBoleta: r.numeroComprobante || r.numeroBoleta,
+        tipoComprobante: r.tipoComprobante || 'BOLETA',
+        ruc: r.ruc || '',
+        razonSocial: r.razonSocial || '',
         abordado: !!r.abordado
       }));
 
@@ -320,7 +332,17 @@ const server = http.createServer((req, res) => {
       state.asientosOcupadosPorBus[busId] = [];
       state.reservas = state.reservas.filter(r => r.busId !== Number(busId));
       persistState();
-      return sendJson(200, { exito: true, mensaje: `Viaje finalizado con éxito para Bus #${busId}. Asientos liberados.` });
+      return sendJson(200, { exito: true, mensaje: `Viaje finalizado con éxito para Bus #${busId}. Todos los asientos quedaron liberados.` });
+    }
+
+    // 7b. REINICIAR BUS (Liberar asientos)
+    const matchReiniciar = pathname.match(/^\/api\/reservas\/bus\/(\d+)\/reiniciar$/);
+    if (matchReiniciar && (req.method === 'DELETE' || req.method === 'POST')) {
+      const busId = matchReiniciar[1];
+      state.asientosOcupadosPorBus[busId] = [];
+      state.reservas = state.reservas.filter(r => r.busId !== Number(busId));
+      persistState();
+      return sendJson(200, { exito: true, mensaje: `Bus #${busId} reiniciado con éxito. Todos los asientos han sido liberados.` });
     }
 
     // 8. AUDITORÍA VENTAS ADMIN
