@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { ReservasService } from '../../services/reservas.service';
 import { RutasService } from '../../services/rutas.service';
@@ -50,7 +50,7 @@ interface FilaAsiento {
           </p>
         </div>
 
-        <!-- Selector de Perfil para la demostración -->
+        <!-- Selector de Perfil -->
         <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
           <span class="text-[11px] font-bold text-slate-500 px-2 uppercase">Perfil:</span>
           <button (click)="cambiarRol('cliente@transsync.com', 'cliente123')"
@@ -95,7 +95,7 @@ interface FilaAsiento {
         </button>
       </div>
 
-      <!-- ================= PESTAÑA 1: VENTA DE BOLETOS PARA EL PASAJERO ================= -->
+      <!-- Venta de Boletos -->
       <div *ngIf="tabActiva === 'reserva'" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
         <!-- PLANO DEL BUS (7 Columnas) -->
@@ -142,7 +142,7 @@ interface FilaAsiento {
           <div *ngIf="reservaTemporalIniciada && tiempoRestanteSegundos > 0 && asientosSeleccionados.length > 0"
                class="mb-5 p-4 rounded-2xl border transition-all shadow-sm"
                [ngClass]="tiempoRestanteSegundos < 60 ? 'bg-rose-50/95 border-rose-300 text-rose-950' : 'bg-amber-50/90 border-amber-300 text-amber-950'">
-            
+
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <!-- Información de los asientos -->
               <div class="flex items-center gap-3">
@@ -507,26 +507,51 @@ interface FilaAsiento {
 
           <!-- Medio de Pago -->
           <p class="text-xs font-bold text-slate-700 mb-2">Seleccione medio de pago:</p>
-          <div class="grid grid-cols-3 gap-2 mb-4">
+          <div class="grid grid-cols-4 gap-2 mb-4">
+            <button (click)="metodoPagoElegido = 'MERCADOPAGO'"
+                    [class]="metodoPagoElegido === 'MERCADOPAGO' ? 'border-sky-600 bg-sky-50 text-sky-900 font-bold shadow-xs' : 'border-slate-200 bg-white text-slate-600'"
+                    class="py-2.5 px-1.5 rounded-xl border text-xs transition-all text-center">
+              Mercado Pago
+            </button>
             <button (click)="metodoPagoElegido = 'YAPE'"
                     [class]="metodoPagoElegido === 'YAPE' ? 'border-purple-600 bg-purple-50 text-purple-900 font-bold' : 'border-slate-200 bg-white text-slate-600'"
-                    class="py-2.5 px-2 rounded-xl border text-xs transition-all text-center">
+                    class="py-2.5 px-1.5 rounded-xl border text-xs transition-all text-center">
               Yape / Plin
             </button>
             <button (click)="metodoPagoElegido = 'TARJETA'"
                     [class]="metodoPagoElegido === 'TARJETA' ? 'border-teal-600 bg-teal-50 text-teal-900 font-bold' : 'border-slate-200 bg-white text-slate-600'"
-                    class="py-2.5 px-2 rounded-xl border text-xs transition-all text-center">
+                    class="py-2.5 px-1.5 rounded-xl border text-xs transition-all text-center">
               Tarjeta Déb/Créd
             </button>
             <button (click)="metodoPagoElegido = 'TRANSFERENCIA'"
                     [class]="metodoPagoElegido === 'TRANSFERENCIA' ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-bold' : 'border-slate-200 bg-white text-slate-600'"
-                    class="py-2.5 px-2 rounded-xl border text-xs transition-all text-center">
+                    class="py-2.5 px-1.5 rounded-xl border text-xs transition-all text-center">
               Transferencia
             </button>
           </div>
 
           <!-- Formularios Limpios sin Datos Predeterminados -->
           <div class="mb-5">
+
+            <!-- MERCADO PAGO OFICIAL -->
+            <div *ngIf="metodoPagoElegido === 'MERCADOPAGO'" class="p-4 rounded-xl bg-sky-50/80 border border-sky-200 space-y-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white font-black text-xs shrink-0 shadow-sm">
+                  MP
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-sky-950">Pasarela Oficial Mercado Pago</p>
+                  <p class="text-[11px] text-sky-700">Pago seguro en Soles (PEN) con Yape, Tarjetas Visa / Mastercard y Débito.</p>
+                </div>
+              </div>
+              <div class="p-3 bg-white rounded-lg border border-sky-200/80 text-xs text-slate-600 space-y-1">
+                <div class="flex items-center justify-between text-slate-700">
+                  <span>Monto exacto a cobrar:</span>
+                  <strong class="text-slate-900 text-sm">S/ {{ totalAPagar.toFixed(2) }}</strong>
+                </div>
+                <p class="text-[11px] text-slate-500">Al pulsar el botón serás transferido a la pasarela segura de Mercado Pago para realizar el pago real.</p>
+              </div>
+            </div>
 
             <!-- YAPE / PLIN -->
             <div *ngIf="metodoPagoElegido === 'YAPE'" class="p-4 rounded-xl bg-purple-50 border border-purple-200 space-y-3">
@@ -591,11 +616,13 @@ interface FilaAsiento {
           <!-- Botón de Confirmación -->
           <button (click)="ejecutarPagoYBloquearAsientos()"
                   [disabled]="procesandoPago"
-                  class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md shadow-teal-500/20 transition-all flex items-center justify-center gap-2">
-            <span *ngIf="!procesandoPago">Confirmar y Emitir Boletos (S/ {{ totalAPagar.toFixed(2) }})</span>
+                  [class]="metodoPagoElegido === 'MERCADOPAGO' ? 'bg-sky-600 hover:bg-sky-700 shadow-sky-500/25' : 'bg-teal-600 hover:bg-teal-700 shadow-teal-500/20'"
+                  class="w-full py-3.5 rounded-xl font-bold text-sm text-white shadow-md transition-all flex items-center justify-center gap-2">
+            <span *ngIf="!procesandoPago && metodoPagoElegido === 'MERCADOPAGO'">Ir a Pagar con Mercado Pago (S/ {{ totalAPagar.toFixed(2) }})</span>
+            <span *ngIf="!procesandoPago && metodoPagoElegido !== 'MERCADOPAGO'">Confirmar y Emitir Boletos (S/ {{ totalAPagar.toFixed(2) }})</span>
             <span *ngIf="procesandoPago" class="flex items-center gap-2">
               <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-              Validando pago y emitiendo comprobante oficial...
+              Conectando con la pasarela oficial...
             </span>
           </button>
         </div>
@@ -680,7 +707,7 @@ interface FilaAsiento {
         </div>
       </div>
 
-      <!-- ================= PESTAÑA 2: VISTA DEL CONDUCTOR (PANEL DE CONTROL Y ABORDAJE) ================= -->
+      <!-- Vista del Conductor -->
       <div *ngIf="tabActiva === 'conductor'" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5 animate-in fade-in">
 
         <!-- CABECERA DEL PANEL DEL CONDUCTOR -->
@@ -729,7 +756,7 @@ interface FilaAsiento {
         </div>
 
         <!-- Banner de Notificación de Viaje Finalizado con Éxito -->
-        <div *ngIf="viajeFinalizadoExitoMensaje" 
+        <div *ngIf="viajeFinalizadoExitoMensaje"
              class="p-4 rounded-xl bg-emerald-50 border border-emerald-300 flex items-center justify-between text-emerald-900 shadow-sm">
           <div class="flex items-center gap-3">
             <span class="text-2xl">🏁</span>
@@ -738,14 +765,14 @@ interface FilaAsiento {
               <p class="text-xs text-emerald-700">{{ viajeFinalizadoExitoMensaje }}</p>
             </div>
           </div>
-          <button (click)="viajeFinalizadoExitoMensaje = null" 
+          <button (click)="viajeFinalizadoExitoMensaje = null"
                   class="px-2.5 py-1 text-xs font-bold bg-white text-emerald-800 hover:bg-emerald-100 rounded-lg border border-emerald-300 transition-colors">
             Entendido
           </button>
         </div>
 
         <!-- Estado Operativo si todos los asientos están libres -->
-        <div *ngIf="manifiesto && (manifiesto.asientosOcupados === 0)" 
+        <div *ngIf="manifiesto && (manifiesto.asientosOcupados === 0)"
              class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <span class="text-lg">✨</span>
@@ -850,7 +877,7 @@ interface FilaAsiento {
 
           <!-- Columna Derecha: Tabla Nominal de Pasajeros y Check-In (7 Columnas) -->
           <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs flex flex-col">
-            
+
             <!-- Barra Superior de Control de Abordaje -->
             <div class="p-3.5 bg-slate-100 border-b border-slate-200 space-y-2.5">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -904,7 +931,7 @@ interface FilaAsiento {
                   <tr *ngFor="let p of pasajerosFiltradosConductor"
                       class="hover:bg-slate-50 transition-colors"
                       [class.bg-emerald-50/50]="estaAbordado(p.reservaId)">
-                    
+
                     <td class="px-3.5 py-2.5 font-mono font-black text-teal-700 text-xs">
                       #{{ p.asiento }}
                     </td>
@@ -950,7 +977,7 @@ interface FilaAsiento {
 
       </div>
 
-      <!-- ================= PESTAÑA 3: AUDITORÍA DE VENTAS POR FECHA (ADMINISTRADOR) ================= -->
+      <!-- Auditoría de Ventas -->
       <div *ngIf="tabActiva === 'ventas'" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
 
         <!-- Barra de Filtro por Fecha -->
@@ -1097,9 +1124,9 @@ export class ReservasComponent implements OnInit, OnDestroy {
   };
   mensajeErrorForm = '';
 
-  // Pasarela de Pagos (Totalmente Limpia)
+  // Pasarela de Pagos (Totalmente Limpia y con Mercado Pago Real)
   mostrarPasarela = false;
-  metodoPagoElegido: 'YAPE' | 'TARJETA' | 'TRANSFERENCIA' = 'YAPE';
+  metodoPagoElegido: 'MERCADOPAGO' | 'YAPE' | 'TARJETA' | 'TRANSFERENCIA' = 'MERCADOPAGO';
   procesandoPago = false;
   mostrarBoletoExito = false;
   boletaEmitida: any = null;
@@ -1158,6 +1185,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private pagosService: PagosService,
     private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
   ) {
@@ -1168,16 +1196,21 @@ export class ReservasComponent implements OnInit, OnDestroy {
     this.cargarRutasDesdeServicio();
     this.verificarReservaTemporalPersistida();
 
+    this.route.queryParams.subscribe(params => {
+      const mpStatus = params['mp_status'] || params['collection_status'] || params['status'];
+      if (mpStatus === 'approved') {
+        this.completarCompraMercadoPagoAprobada(params['payment_id'] || params['collection_id']);
+      }
+    });
+
     this.authService.currentUser$.subscribe(user => {
       this.sesionActual = user;
       if (user && user.roles.includes('CLIENTE')) {
-        // Compra Directa: autocompletar datos del pasajero registrado
         this.formulario.nombrePasajero = user.nombre;
         this.formulario.dniPasajero = user.dni || '72384910';
         this.formulario.telefonoPasajero = user.telefono || '951234567';
         this.formulario.emailPasajero = user.email;
       } else if (!user) {
-        // Modo invitado: campos limpios para llenar libremente
         this.formulario.nombrePasajero = '';
         this.formulario.dniPasajero = '';
         this.formulario.telefonoPasajero = '';
@@ -1186,10 +1219,10 @@ export class ReservasComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
-    // Cargar asientos inmediatamente al iniciar
+
     this.cargarAsientosOcupados();
 
-    // Polling en tiempo real cada 4 segundos
+
     this.pollingSub = interval(4000).subscribe(() => {
       this.cargarAsientosOcupadosSilencioso();
       if (this.tabActiva === 'conductor') {
@@ -1351,7 +1384,6 @@ export class ReservasComponent implements OnInit, OnDestroy {
     const expiraEn = expiraEnParam || (Date.now() + segundos * 1000);
     this.guardarEnLocalStorage(expiraEn);
 
-    // Notificar al backend ms-reservas para que cualquier otra pestaña o incógnito lo vea en ámbar
     if (this.asientosSeleccionados.length > 0) {
       this.reservasService.bloquearAsientosTemporal(this.busSeleccionado, this.fechaSeleccionada, this.asientosSeleccionados).subscribe({
         next: () => {},
@@ -1359,7 +1391,6 @@ export class ReservasComponent implements OnInit, OnDestroy {
       });
     }
 
-    // Ejecutar el temporizador segundo a segundo dentro de NgZone para refresco inmediato de UI
     this.temporizadorInterval = setInterval(() => {
       this.ngZone.run(() => {
         const ahora = Date.now();
@@ -1547,7 +1578,13 @@ export class ReservasComponent implements OnInit, OnDestroy {
   }
 
   ejecutarPagoYBloquearAsientos() {
-    // Validaciones según medio de pago
+    // Si eligió Mercado Pago, delegamos a la pasarela oficial
+    if (this.metodoPagoElegido === 'MERCADOPAGO') {
+      this.iniciarPagoMercadoPago();
+      return;
+    }
+
+    // Validaciones según medio de pago simulado
     if (this.metodoPagoElegido === 'YAPE' && !this.datosPago.codigoYape) {
       alert('Por favor ingrese el código de operación de la app Yape.');
       return;
@@ -1580,7 +1617,6 @@ export class ReservasComponent implements OnInit, OnDestroy {
         this.mostrarPasarela = false;
         this.asientosSeleccionadosGuardados = [...this.asientosSeleccionados];
 
-        // Sincronizar automáticamente cada boleto comprado con ms-pagos
         const reservasCreadas = resp?.datos?.reservas || [];
         if (reservasCreadas.length > 0) {
           reservasCreadas.forEach((r: any) => {
@@ -1591,7 +1627,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
               estado: 'COMPLETADO'
             }).subscribe({
               next: () => {},
-              error: (err: any) => console.warn('Aviso: ms-pagos no pudo registrar el pago:', err)
+              error: (err: any) => console.warn('ms-pagos:', err)
             });
           });
         }
@@ -1635,6 +1671,148 @@ export class ReservasComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  iniciarPagoMercadoPago() {
+    this.procesandoPago = true;
+
+    // Guardar compra pendiente en localStorage antes de salir del sitio
+    const compraPendiente = {
+      nombrePasajero: this.formulario.nombrePasajero,
+      dniPasajero: this.formulario.dniPasajero,
+      telefonoPasajero: this.formulario.telefonoPasajero,
+      emailPasajero: this.formulario.emailPasajero,
+      rutaId: this.rutaActual.id,
+      rutaNombre: this.rutaActual.nombre,
+      busId: this.busSeleccionado,
+      fechaViaje: this.fechaSeleccionada,
+      asientos: [...this.asientosSeleccionados],
+      precioUnitario: this.rutaActual.precio,
+      totalAPagar: this.totalAPagar,
+      idCliente: this.sesionActual?.idCliente || 101,
+      horario: this.rutaActual.horario
+    };
+    localStorage.setItem('transsync_mp_pending_purchase', JSON.stringify(compraPendiente));
+
+    const payload = {
+      rutaNombre: `${this.rutaActual.nombre} (${this.rutaActual.origen} - ${this.rutaActual.destino})`,
+      montoTotal: this.totalAPagar,
+      cantidadPasajes: this.asientosSeleccionados.length,
+      nombreComprador: this.formulario.nombrePasajero || 'Pasajero TransSync',
+      emailComprador: this.formulario.emailPasajero || 'cliente@transsync.com',
+      frontendUrl: window.location.origin + window.location.pathname
+    };
+
+    this.pagosService.crearPreferenciaMercadoPago(payload).subscribe({
+      next: (res: any) => {
+        if (res && res.init_point) {
+          window.location.href = res.init_point;
+        } else {
+          this.procesandoPago = false;
+          alert('No se pudo generar el enlace de Mercado Pago. Intente nuevamente.');
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err: any) => {
+        this.procesandoPago = false;
+        console.error('Error al crear preferencia MP:', err);
+        alert('Error al conectar con Mercado Pago. Verifique que ms-pagos esté activo.');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  completarCompraMercadoPagoAprobada(paymentId?: string) {
+    const rawData = localStorage.getItem('transsync_mp_pending_purchase');
+    if (!rawData) return;
+
+    try {
+      const data = JSON.parse(rawData);
+      localStorage.removeItem('transsync_mp_pending_purchase');
+      localStorage.removeItem('transsync_reserva_temporal');
+      this.detenerTemporizador();
+
+      const payload = {
+        nombrePasajero: data.nombrePasajero,
+        dniPasajero: data.dniPasajero,
+        telefonoPasajero: data.telefonoPasajero,
+        emailPasajero: data.emailPasajero,
+        rutaId: data.rutaId,
+        rutaNombre: data.rutaNombre,
+        busId: data.busId,
+        fechaViaje: data.fechaViaje,
+        asientos: data.asientos,
+        precioUnitario: data.precioUnitario,
+        metodoPago: 'MERCADO PAGO',
+        idCliente: data.idCliente
+      };
+
+      this.reservasService.createReservaMultiple(payload).subscribe({
+        next: (resp: any) => {
+          const reservasCreadas = resp?.datos?.reservas || [];
+          if (reservasCreadas.length > 0) {
+            reservasCreadas.forEach((r: any) => {
+              this.pagosService.createPago({
+                reservaId: r.id,
+                monto: r.precio || data.precioUnitario || 45,
+                metodoPago: 'MERCADO PAGO',
+                estado: 'COMPLETADO'
+              }).subscribe({
+                next: () => {},
+                error: (err: any) => console.warn('ms-pagos:', err)
+              });
+            });
+          }
+
+          const total = data.totalAPagar;
+          const subtotal = total / 1.18;
+          const igv = total - subtotal;
+          const fechaHora = new Date().toLocaleString('es-PE');
+
+          let puntosGanados = 0;
+          const cant = data.asientos.length;
+          if (cant === 1) puntosGanados = 1;
+          else if (cant === 2) puntosGanados = 2;
+          else if (cant >= 3) puntosGanados = 5;
+
+          if (this.sesionActual && puntosGanados > 0) {
+            this.authService.sumarPuntos(puntosGanados);
+          }
+
+          this.boletaEmitida = {
+            numeroBoleta: 'B001-' + String(Math.floor(100000 + Math.random() * 900000)),
+            fechaHora: fechaHora,
+            pasajero: data.nombrePasajero,
+            dni: data.dniPasajero,
+            ruta: data.rutaNombre,
+            fechaViaje: data.fechaViaje,
+            horario: data.horario,
+            busId: data.busId,
+            asientos: [...data.asientos],
+            metodoPago: 'MERCADO PAGO (APROBADO)',
+            subtotal: Math.round(subtotal * 100) / 100,
+            igv: Math.round(igv * 100) / 100,
+            total: total,
+            puntosGanados: puntosGanados,
+            saldoTotalPuntos: this.authService.obtenerPuntos()
+          };
+
+          this.asientosSeleccionados = [];
+          this.mostrarBoletoExito = true;
+          this.cargarAsientosOcupados();
+          this.router.navigate([], { replaceUrl: true, queryParams: {} });
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          console.error('Error al emitir reserva post-MP:', err);
+          this.cargarAsientosOcupados();
+          this.router.navigate([], { replaceUrl: true, queryParams: {} });
+          this.cdr.detectChanges();
+        }
+      });
+    } catch (e) {
+      console.error('Error procesando compra guardada:', e);
+    }
   }
 
   cerrarBoletaExito() {
@@ -1802,8 +1980,8 @@ export class ReservasComponent implements OnInit, OnDestroy {
     });
   }
 
-  reiniciarBusDemostracion() {
-    if (confirm('¿Desea reiniciar todos los asientos del Bus #' + this.busSeleccionado + ' a 0% para la prueba con el docente?')) {
+  reiniciarBus() {
+    if (confirm('¿Desea reiniciar los asientos del Bus #' + this.busSeleccionado + ' y restablecer la disponibilidad al 100%?')) {
       this.reservasService.reiniciarBus(this.busSeleccionado).subscribe({
         next: () => {
           alert('Bus #' + this.busSeleccionado + ' reiniciado con éxito. Todos los asientos ahora están libres.');

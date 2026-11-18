@@ -192,9 +192,8 @@ import { AuthService, UserSession } from '../../services/auth.service';
             </div>
           </div>
 
-          <!-- Acceso Rapido a Cambiar de Rol (Demostracion) -->
           <div class="pt-2 border-t border-slate-100">
-            <p class="text-[11px] font-semibold text-slate-500 mb-2">Cambiar rol para demostracion:</p>
+            <p class="text-[11px] font-semibold text-slate-500 mb-2">Cambiar sesión de usuario:</p>
             <div class="grid grid-cols-3 gap-2">
               <button (click)="cambiarRol('cliente@transsync.com', 'cliente123')"
                       class="py-2 px-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-xs font-semibold text-slate-700 text-center transition-colors">

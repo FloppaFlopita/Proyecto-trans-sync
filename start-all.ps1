@@ -9,7 +9,7 @@ docker compose up -d postgres-db zookeeper kafka prometheus grafana
 
 # 2. Eureka Server (Registro y Descubrimiento)
 Write-Host "`n[2/4] Levantando Eureka Server (:8761)..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot\eureka-server'; Write-Host '>>> Eureka Server (:8761)' -ForegroundColor Green; mvn spring-boot:run"
+Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$PSScriptRoot\eureka-server'; Write-Host '>>> Eureka Server (:8761)' -ForegroundColor Green; mvn spring-boot:run"
 
 Write-Host "Esperando 10 segundos a que Eureka inicie..." -ForegroundColor Gray
 Start-Sleep -Seconds 10
@@ -31,13 +31,13 @@ $servicios = @(
 
 foreach ($s in $servicios) {
     Write-Host "Iniciando $($s.Name)..." -ForegroundColor Green
-    Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot\$($s.Dir)'; Write-Host '>>> $($s.Name)' -ForegroundColor Green; mvn spring-boot:run"
+    Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$PSScriptRoot\$($s.Dir)'; Write-Host '>>> $($s.Name)' -ForegroundColor Green; mvn spring-boot:run"
     Start-Sleep -Seconds 3
 }
 
 # 4. Frontend Angular
 Write-Host "`n[4/4] Levantando Cliente Frontend Angular (:4200)..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot\frontend-angular'; Write-Host '>>> Frontend Angular (:4200)' -ForegroundColor Green; npm.cmd start"
+Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$PSScriptRoot\frontend-angular'; Write-Host '>>> Frontend Angular (:4200)' -ForegroundColor Green; npm.cmd start"
 
 Write-Host "`n=====================================================" -ForegroundColor Cyan
 Write-Host "     ¡SISTEMA TRANSSYNC COMPLETAMENTE DESPLEGADO!     " -ForegroundColor Cyan
@@ -46,6 +46,7 @@ Write-Host "Accesos Rápidos:" -ForegroundColor White
 Write-Host "  - Frontend Web:        http://localhost:4200" -ForegroundColor White
 Write-Host "  - Swagger Central:     http://localhost:8100/swagger-ui.html" -ForegroundColor White
 Write-Host "  - Eureka Dashboard:    http://localhost:8761" -ForegroundColor White
+Write-Host "  - Keycloak Auth IAM:   http://localhost:8085 (admin/admin)" -ForegroundColor White
 Write-Host "  - Grafana Dashboard:   http://localhost:8300 (admin/admin)" -ForegroundColor White
 Write-Host "  - Prometheus Metrics:  http://localhost:8900" -ForegroundColor White
 Write-Host "  - API Gateway:         http://localhost:8100/api" -ForegroundColor White

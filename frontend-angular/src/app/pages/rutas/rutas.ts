@@ -222,7 +222,7 @@ interface RutaItem {
           <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
             <div>
               <h3 class="text-lg font-black text-slate-900">
-                {{ modoEdicion ? 'Modificar Ruta #' + rutaFormulario.id : 'Registrar Nueva Ruta' }}
+                {{ modoEdicion ? 'Modificar Ruta ##' + rutaFormulario.id : 'Registrar Nueva Ruta' }}
               </h3>
               <p class="text-xs text-slate-500">Parámetros del corredor interprovincial</p>
             </div>

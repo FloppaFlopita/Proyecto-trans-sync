@@ -16,6 +16,28 @@ public class PagoController {
     @Autowired
     private PagoService pagoService;
 
+    @Autowired
+    private MercadoPagoService mercadoPagoService;
+
+    // POST /pagos/crear-preferencia - Crear preferencia de Checkout Pro con Mercado Pago
+    @PostMapping("/crear-preferencia")
+    public ResponseEntity<Map<String, Object>> crearPreferenciaMercadoPago(@RequestBody Map<String, Object> datos) {
+        Map<String, Object> respuesta = new HashMap<>();
+        try {
+            Map<String, Object> preferencia = mercadoPagoService.crearPreferencia(datos);
+            respuesta.put("exito", true);
+            respuesta.put("mensaje", "Preferencia de Mercado Pago creada con éxito");
+            respuesta.put("id", preferencia.get("id"));
+            respuesta.put("init_point", preferencia.get("init_point"));
+            respuesta.put("sandbox_init_point", preferencia.get("sandbox_init_point"));
+            return ResponseEntity.ok(respuesta);
+        } catch (Exception e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", "Error al crear preferencia con Mercado Pago: " + e.getMessage());
+            return ResponseEntity.status(500).body(respuesta);
+        }
+    }
+
     // GET /pagos - Listar todos los pagos
     @GetMapping
     public ResponseEntity<Map<String, Object>> listarPagos() {
