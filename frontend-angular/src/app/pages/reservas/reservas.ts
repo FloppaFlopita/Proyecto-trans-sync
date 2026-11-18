@@ -790,14 +790,29 @@ interface FilaAsiento {
             </div>
           </div>
 
-          <!-- BOTÓN ÚNICO CONTINUAR (DISEÑO OFICIAL IDÉNTICO A LA IMAGEN) -->
-          <div class="mt-5">
+          <!-- BOTÓN CONTINUAR PRINCIPAL CON MERCADO PAGO -->
+          <div class="mt-5 space-y-2">
+            <button (click)="iniciarPagoMercadoPago()"
+                    [disabled]="procesandoPago"
+                    type="button"
+                    class="w-full py-4 rounded-xl font-black text-sm text-white bg-[#009EE3] hover:bg-[#0081ba] active:scale-[0.99] shadow-xl shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span *ngIf="!procesandoPago" class="flex items-center gap-2">
+                <span>⚡</span>
+                <span>Continuar a Mercado Pago (Pagar S/ {{ totalAPagar.toFixed(2) }})</span>
+              </span>
+              <span *ngIf="procesandoPago" class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></span>
+            </button>
+            <p class="text-[11px] text-slate-500 text-center">
+              Paga seguro con Yape, Tarjeta o Banca Móvil en la pasarela oficial.
+            </p>
+
+            <!-- Modo Simulación sin salir del sitio -->
             <button (click)="ejecutarPagoSegunSeleccion()"
                     [disabled]="procesandoPago"
                     type="button"
-                    class="w-full py-3.5 rounded-xl font-black text-sm text-white bg-[#1B2C52] hover:bg-[#121f3b] active:scale-[0.99] shadow-lg shadow-slate-900/25 transition-all flex items-center justify-center cursor-pointer">
-              <span *ngIf="!procesandoPago">Continuar</span>
-              <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    class="w-full py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer mt-1">
+              <span *ngIf="!procesandoPago">O aprobar inmediatamente sin salir (Modo Demo)</span>
+              <span *ngIf="procesandoPago" class="w-4 h-4 border-2 border-slate-600 border-t-transparent rounded-full animate-spin"></span>
             </button>
           </div>
         </div>
@@ -1478,8 +1493,8 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
     this.route.queryParams.subscribe(params => {
       const mpStatus = params['mp_status'] || params['collection_status'] || params['status'];
-      if (mpStatus === 'approved') {
-        this.completarCompraMercadoPagoAprobada(params['payment_id'] || params['collection_id']);
+      if (mpStatus === 'approved' || mpStatus === 'pending') {
+        this.completarCompraMercadoPagoAprobada(params['payment_id'] || params['collection_id'], mpStatus);
       }
     });
 
@@ -1964,7 +1979,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
     });
   }
 
-  completarCompraMercadoPagoAprobada(paymentId?: string) {
+  completarCompraMercadoPagoAprobada(paymentId?: string, statusParam: string = 'approved') {
     const rawData = localStorage.getItem('transsync_mp_pending_purchase');
     if (!rawData) return;
 
