@@ -49,49 +49,39 @@ interface FilaAsiento {
             Consulte rutas, seleccione asientos en tiempo real y emita su comprobante de pago electrónico.
           </p>
         </div>
-
-        <!-- Selector de Perfil -->
-        <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
-          <span class="text-[11px] font-bold text-slate-500 px-2 uppercase">Perfil:</span>
-          <button (click)="cambiarRol('cliente@transsync.com', 'cliente123')"
-                  [class]="esCliente() ? 'bg-teal-600 text-white font-bold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100'"
-                  class="px-3 py-1.5 rounded-lg text-xs transition-all border border-slate-200">
-            Pasajero / Cliente
-          </button>
-          <button (click)="cambiarRol('conductor@transsync.com', 'chofer123')"
-                  [class]="esConductor() ? 'bg-teal-600 text-white font-bold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100'"
-                  class="px-3 py-1.5 rounded-lg text-xs transition-all border border-slate-200">
-            Conductor
-          </button>
-          <button (click)="cambiarRol('admin@transsync.com', 'admin123')"
-                  [class]="esAdmin() ? 'bg-teal-600 text-white font-bold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100'"
-                  class="px-3 py-1.5 rounded-lg text-xs transition-all border border-slate-200">
-            Administrador
-          </button>
-        </div>
       </div>
 
-      <!-- PESTAÑAS DE NAVEGACIÓN -->
+      <!-- PESTAÑAS DE NAVEGACIÓN SEGÚN ROL -->
       <div class="flex items-center gap-2 border-b border-slate-200 pb-1 text-sm font-medium">
-        <button *ngIf="esCliente() || esAdmin()"
+        <!-- Solo Pasajero / Cliente o Invitado puede Comprar Boletos -->
+        <button *ngIf="esCliente() && !esConductor() && !esAdmin()"
                 (click)="tabActiva = 'reserva'"
                 [class]="tabActiva === 'reserva' ? 'text-teal-700 border-b-2 border-teal-600 font-bold bg-teal-50/50' : 'text-slate-600 hover:text-slate-900'"
-                class="px-4 py-2.5 rounded-t-xl transition-all">
-          Comprar Boletos
+                class="px-4 py-2.5 rounded-t-xl transition-all flex items-center gap-2">
+          <span>🎫</span> Comprar Boletos
         </button>
 
-        <button *ngIf="esConductor() || esAdmin()"
+        <!-- Conductor ve exclusivamente el Panel del Conductor -->
+        <button *ngIf="esConductor()"
                 (click)="tabActiva = 'conductor'; cargarManifiesto()"
                 [class]="tabActiva === 'conductor' ? 'text-teal-700 border-b-2 border-teal-600 font-bold bg-teal-50/50' : 'text-slate-600 hover:text-slate-900'"
-                class="px-4 py-2.5 rounded-t-xl transition-all">
-          Vista del Conductor (Plano y Pasajeros)
+                class="px-4 py-2.5 rounded-t-xl transition-all flex items-center gap-2">
+          <span>📋</span> Panel del Conductor (Manifiesto de Pasajeros)
         </button>
 
+        <!-- Administrador ve Auditoría de Ventas e Inspección de Manifiesto -->
         <button *ngIf="esAdmin()"
                 (click)="tabActiva = 'ventas'; cargarVentas()"
                 [class]="tabActiva === 'ventas' ? 'text-teal-700 border-b-2 border-teal-600 font-bold bg-teal-50/50' : 'text-slate-600 hover:text-slate-900'"
-                class="px-4 py-2.5 rounded-t-xl transition-all">
-          Auditoría de Ventas por Fecha
+                class="px-4 py-2.5 rounded-t-xl transition-all flex items-center gap-2">
+          <span>📊</span> Auditoría de Ventas y Boletas
+        </button>
+
+        <button *ngIf="esAdmin()"
+                (click)="tabActiva = 'conductor'; cargarManifiesto()"
+                [class]="tabActiva === 'conductor' ? 'text-teal-700 border-b-2 border-teal-600 font-bold bg-teal-50/50' : 'text-slate-600 hover:text-slate-900'"
+                class="px-4 py-2.5 rounded-t-xl transition-all flex items-center gap-2">
+          <span>🚍</span> Inspección de Manifiesto
         </button>
       </div>
 
@@ -1206,6 +1196,17 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
     this.authService.currentUser$.subscribe(user => {
       this.sesionActual = user;
+      if (this.esConductor()) {
+        this.tabActiva = 'conductor';
+        this.conductorIdConsulta = user?.idConductor || 1;
+        this.cargarManifiesto();
+      } else if (this.esAdmin()) {
+        this.tabActiva = 'ventas';
+        this.cargarVentas();
+      } else {
+        this.tabActiva = 'reserva';
+      }
+
       if (user && user.roles.includes('CLIENTE')) {
         this.formulario.nombrePasajero = user.nombre;
         this.formulario.dniPasajero = user.dni || '72384910';
@@ -1220,14 +1221,14 @@ export class ReservasComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
-
     this.cargarAsientosOcupados();
 
-
-    this.pollingSub = interval(4000).subscribe(() => {
+    this.pollingSub = interval(3000).subscribe(() => {
       this.cargarAsientosOcupadosSilencioso();
       if (this.tabActiva === 'conductor') {
         this.cargarManifiestoSilencioso();
+      } else if (this.tabActiva === 'ventas') {
+        this.cargarVentasSilencioso();
       }
     });
   }
@@ -1992,8 +1993,9 @@ export class ReservasComponent implements OnInit, OnDestroy {
   cargarManifiesto() {
     this.reservasService.getManifiestoConductor(this.conductorIdConsulta).subscribe({
       next: (resp: any) => {
-        if (resp && resp.datos) {
-          this.manifiesto = resp.datos;
+        const datos = resp?.datos || resp;
+        if (datos) {
+          this.manifiesto = datos;
           this.cdr.detectChanges();
         }
       },
@@ -2004,8 +2006,9 @@ export class ReservasComponent implements OnInit, OnDestroy {
   cargarManifiestoSilencioso() {
     this.reservasService.getManifiestoConductor(this.conductorIdConsulta).subscribe({
       next: (resp: any) => {
-        if (resp && resp.datos) {
-          this.manifiesto = resp.datos;
+        const datos = resp?.datos || resp;
+        if (datos) {
+          this.manifiesto = datos;
           this.cdr.detectChanges();
         }
       },
@@ -2016,12 +2019,30 @@ export class ReservasComponent implements OnInit, OnDestroy {
   cargarVentas() {
     this.reservasService.getVentasAdmin(this.fechaFiltroVentas).subscribe({
       next: (resp: any) => {
-        if (resp && resp.datos) {
-          this.listaVentas = resp.datos.ventas || [];
-          this.totalBoletosVendidos = resp.datos.totalBoletosVendidos || 0;
-          this.totalRecaudado = resp.datos.totalRecaudado || 0;
-          this.subtotalGravadoVentas = resp.datos.subtotalGravado || (this.totalRecaudado / 1.18);
-          this.igvTotalVentas = resp.datos.igvTotal || (this.totalRecaudado - this.subtotalGravadoVentas);
+        const datos = resp?.datos || resp;
+        if (datos) {
+          this.listaVentas = datos.ventas || [];
+          this.totalBoletosVendidos = datos.totalBoletosVendidos || datos.totalVentas || this.listaVentas.length;
+          this.totalRecaudado = datos.totalRecaudado || 0;
+          this.subtotalGravadoVentas = datos.subtotalGravado || (this.totalRecaudado / 1.18);
+          this.igvTotalVentas = datos.igvTotal || (this.totalRecaudado - this.subtotalGravadoVentas);
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  cargarVentasSilencioso() {
+    this.reservasService.getVentasAdmin(this.fechaFiltroVentas).subscribe({
+      next: (resp: any) => {
+        const datos = resp?.datos || resp;
+        if (datos) {
+          this.listaVentas = datos.ventas || [];
+          this.totalBoletosVendidos = datos.totalBoletosVendidos || datos.totalVentas || this.listaVentas.length;
+          this.totalRecaudado = datos.totalRecaudado || 0;
+          this.subtotalGravadoVentas = datos.subtotalGravado || (this.totalRecaudado / 1.18);
+          this.igvTotalVentas = datos.igvTotal || (this.totalRecaudado - this.subtotalGravadoVentas);
           this.cdr.detectChanges();
         }
       },
@@ -2043,24 +2064,6 @@ export class ReservasComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
-
-  cambiarRol(email: string, pass: string) {
-    this.authService.login({ email, password: pass }).subscribe({
-      next: () => {
-        if (this.esConductor()) {
-          this.tabActiva = 'conductor';
-          this.cargarManifiesto();
-        } else if (this.esAdmin()) {
-          this.tabActiva = 'ventas';
-          this.cargarVentas();
-        } else {
-          this.tabActiva = 'reserva';
-          this.cargarAsientosOcupados();
-        }
-        this.cdr.detectChanges();
-      }
-    });
   }
 
   esCliente(): boolean {
