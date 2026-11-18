@@ -117,6 +117,9 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Si llega a la pantalla de login, limpiamos cualquier sesión previa para garantizar acceso limpio
+    this.authService.logout();
+
     this.route.queryParams.subscribe(params => {
       this.returnUrl = params['returnUrl'] || '';
       const authReq = params['auth_required'];

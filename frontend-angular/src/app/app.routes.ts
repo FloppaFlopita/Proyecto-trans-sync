@@ -9,9 +9,13 @@ export const routes: Routes = [
   },
   {
     path: '',
+    pathMatch: 'full',
+    redirectTo: 'login'
+  },
+  {
+    path: '',
     component: MainLayoutComponent,
     children: [
-      { path: '', redirectTo: 'login', pathMatch: 'full' },
       {
         path: 'dashboard',
         canActivate: [adminGuard],
