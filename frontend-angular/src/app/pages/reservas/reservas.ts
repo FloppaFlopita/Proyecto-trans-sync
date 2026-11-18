@@ -815,35 +815,32 @@ interface FilaAsiento {
             </div>
           </div>
 
-          <!-- BOTÓN CONTINUAR PRINCIPAL (ESTILO MERCADO PAGO OFICIAL) -->
-          <div class="mt-4">
-            <button (click)="ejecutarPagoSegunSeleccion()"
-                    [disabled]="procesandoPago"
-                    type="button"
-                    class="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#1B2C52] hover:bg-[#121f3b] shadow-lg shadow-slate-900/20 active:scale-[0.99] transition-all flex items-center justify-center cursor-pointer">
-              <span *ngIf="!procesandoPago">Continuar</span>
-              <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-            </button>
-          </div>
-
-          <!-- BOTÓN ABRIR CULQI CHECKOUT V4 OFICIAL -->
-          <div class="mt-2.5">
-            <button (click)="abrirCulqiOficial()"
-                    type="button"
-                    class="w-full py-3 rounded-xl font-bold text-xs text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 shadow-xs active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer">
-              <span>💳</span>
-              <span>Abrir Culqi Checkout v4 Oficial (Yape / PagoEfectivo / Tarjeta)</span>
-            </button>
-          </div>
-
-          <!-- ENLACE A PASARELA EXTERNA MERCADO PAGO WEB -->
-          <div class="pt-3 mt-2 border-t border-slate-100 text-center">
+          <!-- BOTÓN PAGO REAL CON MERCADO PAGO (SIN RUC, CON CIP REAL Y TARJETA) -->
+          <div class="mt-5 space-y-2">
             <button (click)="iniciarPagoMercadoPago()"
                     [disabled]="procesandoPago"
                     type="button"
-                    class="text-xs text-slate-400 hover:text-slate-700 font-medium hover:underline transition-colors flex items-center justify-center gap-1.5 mx-auto cursor-pointer">
-              <span *ngIf="!procesandoPago">O pagar en la web externa de Mercado Pago ➔</span>
-              <span *ngIf="procesandoPago" class="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></span>
+                    class="w-full py-4 rounded-2xl font-black text-sm text-white bg-[#009EE3] hover:bg-[#0081ba] shadow-xl shadow-sky-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span *ngIf="!procesandoPago" class="flex items-center gap-2">
+                <span>⚡</span>
+                <span>Pagar S/ {{ totalAPagar.toFixed(2) }} con Mercado Pago Real (Banca Móvil / CIP Real / Tarjeta)</span>
+              </span>
+              <span *ngIf="procesandoPago" class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></span>
+            </button>
+            <p class="text-[11px] text-slate-500 text-center leading-relaxed">
+              No requiere RUC. En la pasarela oficial elige <strong>"Banca y agentes"</strong> para generar tu código CIP real para BCP/BBVA o paga directo con tarjeta.
+            </p>
+          </div>
+
+          <!-- SEPARADOR Y MODO SIMULACIÓN DEMO -->
+          <div class="mt-4 pt-3 border-t border-slate-200">
+            <p class="text-[10px] uppercase font-bold text-slate-400 text-center mb-2">O para demostración sin gastar dinero real:</p>
+            <button (click)="ejecutarPagoSegunSeleccion()"
+                    [disabled]="procesandoPago"
+                    type="button"
+                    class="w-full py-2.5 rounded-xl font-bold text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span *ngIf="!procesandoPago">Aprobar Compra Inmediata (Modo Demo)</span>
+              <span *ngIf="procesandoPago" class="w-4 h-4 border-2 border-slate-600 border-t-transparent rounded-full animate-spin"></span>
             </button>
           </div>
         </div>
