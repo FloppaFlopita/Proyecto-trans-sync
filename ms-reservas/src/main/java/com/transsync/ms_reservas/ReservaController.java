@@ -19,7 +19,6 @@ public class ReservaController {
     @Autowired
     private ReservaService reservaService;
 
-    // GET /reservas - Listar todas las reservas
     @GetMapping
     public ResponseEntity<Map<String, Object>> listarReservas() {
         List<Reserva> reservas = reservaService.listarReservas();
@@ -30,7 +29,6 @@ public class ReservaController {
         return ResponseEntity.ok(respuesta);
     }
 
-    // GET /reservas/{id} - Obtener reserva por ID
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> obtenerReserva(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -47,7 +45,6 @@ public class ReservaController {
         }
     }
 
-    // GET /reservas/bus/{busId}/asientos-ocupados - Consultar asientos bloqueados/ocupados para un bus y fecha
     @GetMapping("/bus/{busId}/asientos-ocupados")
     public ResponseEntity<Map<String, Object>> obtenerAsientosOcupados(
             @PathVariable Long busId,
@@ -67,7 +64,6 @@ public class ReservaController {
         return ResponseEntity.ok(respuesta);
     }
 
-    // POST /reservas/bloquear-temporal - Bloqueo temporal de asientos para que otros clientes los vean en ámbar
     @PostMapping("/bloquear-temporal")
     public ResponseEntity<Map<String, Object>> bloquearAsientosTemporal(@RequestBody Map<String, Object> body) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -91,7 +87,6 @@ public class ReservaController {
         }
     }
 
-    // POST /reservas/liberar-temporal - Liberar bloqueo temporal al cancelar o expirar timer
     @PostMapping("/liberar-temporal")
     public ResponseEntity<Map<String, Object>> liberarAsientosTemporal(@RequestBody Map<String, Object> body) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -113,7 +108,6 @@ public class ReservaController {
         }
     }
 
-    // POST /reservas/finalizar-viaje - Conductor finaliza el viaje, marca pasajes completados y libera asientos
     @PostMapping("/finalizar-viaje")
     public ResponseEntity<Map<String, Object>> finalizarViaje(@RequestBody Map<String, Object> body) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -131,7 +125,6 @@ public class ReservaController {
         }
     }
 
-    // POST /reservas/multiple - Reserva de uno o más asientos seleccionados en el bus
     @PostMapping("/multiple")
     public ResponseEntity<Map<String, Object>> crearReservasMultiples(@RequestBody ReservaMultiRequest request) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -156,7 +149,6 @@ public class ReservaController {
         }
     }
 
-    // GET /reservas/bus/{busId} - Listar pasajeros asignados a un bus
     @GetMapping("/bus/{busId}")
     public ResponseEntity<Map<String, Object>> listarPorBus(@PathVariable Long busId) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -167,7 +159,6 @@ public class ReservaController {
         return ResponseEntity.ok(respuesta);
     }
 
-    // GET /reservas/bus/{busId}/manifiesto - Manifiesto completo para el conductor
     @GetMapping("/bus/{busId}/manifiesto")
     public ResponseEntity<Map<String, Object>> obtenerManifiestoBus(@PathVariable Long busId) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -184,7 +175,6 @@ public class ReservaController {
         }
     }
 
-    // GET /reservas/conductor/{conductorId}/manifiesto - Manifiesto por ID del conductor
     @GetMapping("/conductor/{conductorId}/manifiesto")
     public ResponseEntity<Map<String, Object>> obtenerManifiestoConductor(@PathVariable Long conductorId) {
         Long busAsignado = conductorId;
@@ -203,7 +193,6 @@ public class ReservaController {
         }
     }
 
-    // GET /reservas/historial/cliente/{dni} - Historial de compras/reservas por DNI
     @GetMapping("/historial/cliente/{dni}")
     public ResponseEntity<Map<String, Object>> historialPorDni(@PathVariable String dni) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -215,7 +204,6 @@ public class ReservaController {
         return ResponseEntity.ok(respuesta);
     }
 
-    // GET /reservas/historial/usuario/{email} - Historial de compras/reservas por Email
     @GetMapping("/historial/usuario/{email}")
     public ResponseEntity<Map<String, Object>> historialPorEmail(@PathVariable String email) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -227,7 +215,6 @@ public class ReservaController {
         return ResponseEntity.ok(respuesta);
     }
 
-    // GET /reservas/ventas - Historial global de ventas para Administrador con filtro por fecha
     @GetMapping("/ventas")
     public ResponseEntity<Map<String, Object>> obtenerVentasAdmin(
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate fecha) {
@@ -239,7 +226,6 @@ public class ReservaController {
         return ResponseEntity.ok(respuesta);
     }
 
-    // DELETE /reservas/bus/{busId}/reiniciar - Reiniciar bus para demostración en vivo
     @DeleteMapping("/bus/{busId}/reiniciar")
     public ResponseEntity<Map<String, Object>> reiniciarBus(@PathVariable Long busId) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -255,7 +241,6 @@ public class ReservaController {
         }
     }
 
-    // POST /reservas - Crear nueva reserva individual
     @PostMapping
     public ResponseEntity<Map<String, Object>> crearReserva(@RequestBody Reserva reserva) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -280,7 +265,6 @@ public class ReservaController {
         }
     }
 
-    // PUT /reservas/{id} - Actualizar datos de la reserva
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> actualizarReserva(@PathVariable Long id, @RequestBody Reserva datosActualizados) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -297,7 +281,6 @@ public class ReservaController {
         }
     }
 
-    // DELETE /reservas/{id} - Cancelar reserva y liberar asiento en ms-flota
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> cancelarReserva(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();

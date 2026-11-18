@@ -16,7 +16,6 @@ public class BusController {
     @Autowired
     private BusService busService;
 
-    // GET /buses - Listar todos los buses
     @GetMapping
     public ResponseEntity<Map<String, Object>> listarBuses() {
         List<Bus> buses = busService.listarBuses();
@@ -27,7 +26,6 @@ public class BusController {
         return ResponseEntity.ok(respuesta);
     }
 
-    // GET /buses/{id} - Obtener bus por ID
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> obtenerBus(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -44,7 +42,6 @@ public class BusController {
         }
     }
 
-    // GET /buses/{id}/disponibilidad - Consulta de asientos
     @GetMapping("/{id}/disponibilidad")
     public ResponseEntity<Map<String, Object>> verificarDisponibilidad(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -69,7 +66,6 @@ public class BusController {
         }
     }
 
-    // PUT /buses/{id}/descontar-asiento - Descuenta 1 asiento (transaccional)
     @PutMapping("/{id}/descontar-asiento")
     public ResponseEntity<Map<String, Object>> descontarAsiento(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -93,7 +89,6 @@ public class BusController {
         }
     }
 
-    // PUT /buses/{id}/liberar-asiento - Libera 1 asiento (transaccional)
     @PutMapping("/{id}/liberar-asiento")
     public ResponseEntity<Map<String, Object>> liberarAsiento(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -110,10 +105,13 @@ public class BusController {
             respuesta.put("exito", false);
             respuesta.put("mensaje", e.getMessage());
             return ResponseEntity.status(404).body(respuesta);
+        } catch (IllegalStateException e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", e.getMessage());
+            return ResponseEntity.status(409).body(respuesta);
         }
     }
 
-    // PUT /buses/{id}/reiniciar - Reinicia todos los asientos a la capacidad total
     @PutMapping("/{id}/reiniciar")
     public ResponseEntity<Map<String, Object>> reiniciarBus(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -131,7 +129,6 @@ public class BusController {
         return ResponseEntity.status(404).body(respuesta);
     }
 
-    // POST /buses - Registrar nuevo bus
     @PostMapping
     public ResponseEntity<Map<String, Object>> registrarBus(@RequestBody Bus bus) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -152,7 +149,6 @@ public class BusController {
         }
     }
 
-    // PUT /buses/{id} - Actualizar datos del bus
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> actualizarBus(@PathVariable Long id, @RequestBody Bus datosActualizados) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -173,7 +169,6 @@ public class BusController {
         }
     }
 
-    // DELETE /buses/{id} - Eliminar bus
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> eliminarBus(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();

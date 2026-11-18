@@ -42,9 +42,6 @@ public class ReservaService {
         return reservaRepository.findByBusId(busId);
     }
 
-    /**
-     * Devuelve la lista de números de asientos ocupados/confirmados para un bus y fecha.
-     */
     @Transactional(readOnly = true)
     public List<Integer> obtenerAsientosOcupados(Long busId, LocalDate fechaViaje) {
         LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
@@ -64,7 +61,6 @@ public class ReservaService {
         LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
         java.time.LocalDateTime limite = java.time.LocalDateTime.now().minusMinutes(5);
 
-        // Limpiar automáticamente reservas temporales PENDIENTE que hayan superado los 5 minutos
         try {
             List<Reserva> pendientes = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "PENDIENTE");
             for (Reserva p : pendientes) {
@@ -73,7 +69,7 @@ public class ReservaService {
                 }
             }
         } catch (Exception e) {
-            System.err.println(">>> Aviso al limpiar reservas expiradas: " + e.getMessage());
+            System.err.println("Aviso al limpiar reservas expiradas: " + e.getMessage());
         }
 
         List<Reserva> confirmadas = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "CONFIRMADA");
@@ -108,7 +104,6 @@ public class ReservaService {
         LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
         java.time.LocalDateTime limite = java.time.LocalDateTime.now().minusMinutes(5);
 
-        // Limpiar reservas expiradas
         List<Reserva> pendientes = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "PENDIENTE");
         for (Reserva p : pendientes) {
             if (p.getFechaHoraVenta() != null && p.getFechaHoraVenta().isBefore(limite)) {
@@ -116,7 +111,6 @@ public class ReservaService {
             }
         }
 
-        // Validar que ninguno esté confirmado
         List<Reserva> confirmadas = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "CONFIRMADA");
         List<Integer> ocupados = confirmadas.stream().map(Reserva::getAsientoNumero).filter(Objects::nonNull).toList();
         for (Integer a : asientos) {
@@ -125,7 +119,6 @@ public class ReservaService {
             }
         }
 
-        // Crear/renovar reservas PENDIENTE
         List<Integer> bloqueados = new ArrayList<>();
         for (Integer a : asientos) {
             List<Reserva> existentes = reservaRepository.findByBusIdAndFechaViajeAndAsientoNumeroAndEstadoIn(
@@ -168,16 +161,10 @@ public class ReservaService {
         }
     }
 
-    /**
-     * Manifiesto para el Conductor:
-     * Devuelve información del bus, cuántos asientos están reservados/comprados,
-     * cuántos libres y la lista detallada de pasajeros asignados con sus asientos y contacto.
-     */
     @Transactional(readOnly = true)
     public Map<String, Object> obtenerManifiestoConductor(Long busId) {
         Map<String, Object> manifiesto = new HashMap<>();
 
-        // 1. Obtener información del bus desde ms-flota
         String placa = "BUS-TS-01";
         String modelo = "MERCEDES SCANIA 2025";
         int capacidadTotal = 50;
@@ -195,16 +182,14 @@ public class ReservaService {
                 }
             }
         } catch (Exception e) {
-            System.err.println(">>> Advertencia al consultar ms-flota para manifiesto: " + e.getMessage());
+            System.err.println("Aviso al consultar ms-flota para manifiesto: " + e.getMessage());
         }
 
-        // 2. Obtener lista de reservas activas para este bus
         List<Reserva> confirmadas = reservaRepository.findByBusIdAndEstado(busId, "CONFIRMADA");
         List<Reserva> pendientes = reservaRepository.findByBusIdAndEstado(busId, "PENDIENTE");
 
         int asientosOcupados = confirmadas.size() + pendientes.size();
 
-        // 3. Mapear pasajeros para la vista del conductor
         List<Map<String, Object>> listaPasajeros = new ArrayList<>();
         int asientoAuto = 1;
         for (Reserva r : confirmadas) {
@@ -235,12 +220,10 @@ public class ReservaService {
             listaPasajeros.add(pas);
         }
 
-        // Ordenar pasajeros por número de asiento
         listaPasajeros.sort(Comparator.comparingInt(p -> (Integer) p.get("asiento")));
 
         List<Reserva> completadas = reservaRepository.findByBusIdAndEstado(busId, "COMPLETADA");
 
-        // 4. Armar el resumen del conductor
         manifiesto.put("busId", busId);
         manifiesto.put("placa", placa);
         manifiesto.put("modelo", modelo);
@@ -254,13 +237,6 @@ public class ReservaService {
         return manifiesto;
     }
 
-    /**
-     * Reserva múltiple de asientos:
-     * - Permite elegir 1 o más asientos (ej: [12, 13]).
-     * - Valida que ninguno esté previamente reservado/bloqueado.
-     * - Descuenta cupos en ms-flota.
-     * - Si el cliente tiene cuenta o email, acumula puntos de fidelización automáticamente.
-     */
     @Transactional
     public Map<String, Object> crearReservasMultiples(ReservaMultiRequest req) {
         if (req.getNombrePasajero() == null || req.getNombrePasajero().isBlank()) {
@@ -282,7 +258,6 @@ public class ReservaService {
         LocalDate fecha = (req.getFechaViaje() != null) ? req.getFechaViaje() : LocalDate.now();
         double precioUnitario = (req.getPrecioUnitario() != null && req.getPrecioUnitario() > 0) ? req.getPrecioUnitario() : 45.00;
 
-        // 1. Validar si alguno de los asientos ya está comprado y confirmado para esa fecha
         List<Reserva> yaConfirmadas = reservaRepository.findByBusIdAndFechaViajeAndEstado(req.getBusId(), fecha, "CONFIRMADA");
         List<Integer> ocupados = yaConfirmadas.stream().map(Reserva::getAsientoNumero).filter(Objects::nonNull).toList();
         for (Integer asiento : req.getAsientos()) {
@@ -291,7 +266,6 @@ public class ReservaService {
             }
         }
 
-        // Limpiar bloqueo temporal previo PENDIENTE de estos mismos asientos para convertirlos limpiamente a CONFIRMADA
         try {
             reservaRepository.deleteByBusIdAndFechaViajeAndAsientoNumeroInAndEstado(req.getBusId(), fecha, req.getAsientos(), "PENDIENTE");
         } catch (Exception e) {
@@ -303,7 +277,6 @@ public class ReservaService {
             }
         }
 
-        // 2. Verificar disponibilidad global en ms-flota
         try {
             ResponseEntity<Map<String, Object>> respFlota = flotaClient.verificarDisponibilidad(req.getBusId());
             if (respFlota.getBody() != null && Boolean.TRUE.equals(respFlota.getBody().get("exito"))) {
@@ -316,10 +289,9 @@ public class ReservaService {
         } catch (IllegalStateException e) {
             throw e;
         } catch (Exception e) {
-            System.err.println(">>> Advertencia al verificar disponibilidad en ms-flota: " + e.getMessage());
+            System.err.println("Aviso al verificar disponibilidad en ms-flota: " + e.getMessage());
         }
 
-        // 3. Crear las reservas individuales para cada asiento seleccionado
         List<Reserva> creadas = new ArrayList<>();
         int asientosDescontados = 0;
 
@@ -342,7 +314,6 @@ public class ReservaService {
                 r.setNumeroBoleta(String.format("B001-%06d", numSecuencia));
                 r.setEstado("CONFIRMADA");
 
-                // Descontar en ms-flota
                 flotaClient.descontarAsiento(req.getBusId());
                 asientosDescontados++;
 
@@ -350,23 +321,21 @@ public class ReservaService {
                 creadas.add(guardada);
             }
         } catch (Exception e) {
-            // Compensación: revertir los asientos descontados
             for (int i = 0; i < asientosDescontados; i++) {
                 try {
                     flotaClient.liberarAsiento(req.getBusId());
                 } catch (Exception ex) {
-                    System.err.println(">>> Error en compensación de asiento: " + ex.getMessage());
+                    System.err.println("Aviso en compensación de asiento: " + ex.getMessage());
                 }
             }
             throw new RuntimeException("Error al procesar reserva múltiple: " + e.getMessage(), e);
         }
 
-        // 4. Fidelización automática: si el usuario tiene cuenta o email, otorgar puntos
         int puntosGanados = 0;
         if (fidelizacionClient != null && (req.getIdCliente() != null || (req.getEmailPasajero() != null && !req.getEmailPasajero().isBlank()))) {
             try {
                 Long pasajeroId = req.getIdCliente() != null ? req.getIdCliente() : 101L;
-                int puntos = req.getAsientos().size() * 10; // 10 puntos por cada asiento comprado
+                int puntos = req.getAsientos().size() * 10;
                 Map<String, Object> fidelReq = new HashMap<>();
                 fidelReq.put("pasajeroId", pasajeroId);
                 fidelReq.put("puntos", puntos);
@@ -374,7 +343,7 @@ public class ReservaService {
                 fidelizacionClient.acumularPuntos(fidelReq);
                 puntosGanados = puntos;
             } catch (Exception e) {
-                System.err.println(">>> Advertencia: no se pudo acumular puntos en ms-fidelizacion: " + e.getMessage());
+                System.err.println("Aviso: no se pudo acumular puntos en ms-fidelizacion: " + e.getMessage());
             }
         }
 
@@ -389,7 +358,6 @@ public class ReservaService {
         resultado.put("puntosFidelizacionGanados", puntosGanados);
         resultado.put("estado", "CONFIRMADA");
 
-        // 5. Publicación asíncrona desacoplada a Kafka (S8 & S9)
         if (reservaEventProducer != null && !creadas.isEmpty()) {
             try {
                 Reserva primer = creadas.get(0);
@@ -412,13 +380,12 @@ public class ReservaService {
 
                 reservaEventProducer.publicarReservaCreada(evento);
 
-                // Métrica de Negocio para Prometheus (S10)
                 if (meterRegistry != null) {
                     meterRegistry.counter("transsync_reservas_confirmadas_total", "ruta", primer.getRutaNombre() != null ? primer.getRutaNombre() : "General").increment(creadas.size());
                     meterRegistry.counter("transsync_ventas_monto_soles_total", "metodo", primer.getMetodoPago() != null ? primer.getMetodoPago() : "TARJETA").increment(totalPagar);
                 }
             } catch (Exception ex) {
-                System.err.println(">>> Advertencia al emitir evento Kafka: " + ex.getMessage());
+                System.err.println("Aviso al emitir evento Kafka: " + ex.getMessage());
             }
         }
 
@@ -431,7 +398,6 @@ public class ReservaService {
             throw new IllegalArgumentException("Debe especificar el busId para la reserva");
         }
 
-        // Validar si el asiento específico ya está ocupado
         LocalDate fecha = (reserva.getFechaViaje() != null) ? reserva.getFechaViaje() : LocalDate.now();
         if (reserva.getAsientoNumero() != null) {
             List<Integer> ocupados = obtenerAsientosOcupados(reserva.getBusId(), fecha);
@@ -440,7 +406,6 @@ public class ReservaService {
             }
         }
 
-        // Paso 1: Consultar disponibilidad en ms-flota
         try {
             ResponseEntity<Map<String, Object>> respuestaFlota = flotaClient.verificarDisponibilidad(reserva.getBusId());
             if (respuestaFlota.getBody() != null && Boolean.TRUE.equals(respuestaFlota.getBody().get("exito"))) {
@@ -453,17 +418,15 @@ public class ReservaService {
         } catch (IllegalStateException e) {
             throw e;
         } catch (Exception e) {
-            System.err.println(">>> Advertencia ms-flota: " + e.getMessage());
+            System.err.println("Aviso ms-flota: " + e.getMessage());
         }
 
-        // Paso 2: Descontar 1 asiento en ms-flota
         try {
             flotaClient.descontarAsiento(reserva.getBusId());
         } catch (Exception e) {
             throw new RuntimeException("Error al descontar asiento en ms-flota: " + e.getMessage(), e);
         }
 
-        // Paso 3: Asignar número de asiento automático si no vino especificado
         if (reserva.getAsientoNumero() == null) {
             List<Integer> ocupados = obtenerAsientosOcupados(reserva.getBusId(), fecha);
             int proximo = 1;
@@ -478,7 +441,6 @@ public class ReservaService {
         }
         reserva.setFechaViaje(fecha);
 
-        // Paso 4: Guardar reserva localmente con compensación si falla
         try {
             reserva.setEstado("CONFIRMADA");
             return reservaRepository.save(reserva);
@@ -486,7 +448,7 @@ public class ReservaService {
             try {
                 flotaClient.liberarAsiento(reserva.getBusId());
             } catch (Exception ex) {
-                System.err.println(">>> ERROR CRITICO DE COMPENSACION: " + ex.getMessage());
+                System.err.println("ERROR DE COMPENSACION: " + ex.getMessage());
             }
             throw new RuntimeException("Fallo al persistir la reserva: " + e.getMessage(), e);
         }
@@ -505,7 +467,7 @@ public class ReservaService {
             try {
                 flotaClient.liberarAsiento(reserva.getBusId());
             } catch (Exception e) {
-                System.err.println(">>> Advertencia: no se pudo liberar asiento en ms-flota: " + e.getMessage());
+                System.err.println("Aviso: no se pudo liberar asiento en ms-flota: " + e.getMessage());
             }
         }
 
@@ -537,7 +499,6 @@ public class ReservaService {
         return reservaRepository.save(reserva);
     }
 
-    // Reiniciar todas las reservas de un bus para demostración en vivo
     @Transactional
     public void reiniciarReservasBus(Long busId) {
         List<Reserva> reservas = reservaRepository.findByBusId(busId);
@@ -545,28 +506,24 @@ public class ReservaService {
         try {
             flotaClient.reiniciarBus(busId);
         } catch (Exception e) {
-            System.err.println(">>> Advertencia al reiniciar bus en ms-flota: " + e.getMessage());
+            System.err.println("Aviso al reiniciar bus en ms-flota: " + e.getMessage());
         }
     }
 
-    // Historial por DNI de pasajero
     @Transactional(readOnly = true)
     public List<Reserva> obtenerHistorialPorDni(String dni) {
         return reservaRepository.findByDniPasajeroOrderByFechaViajeDesc(dni);
     }
 
-    // Historial por Email de pasajero
     @Transactional(readOnly = true)
     public List<Reserva> obtenerHistorialPorEmail(String email) {
         return reservaRepository.findByEmailPasajeroOrderByFechaViajeDesc(email);
     }
 
-    // Finalizar viaje: pasa las reservas CONFIRMADAS a COMPLETADAS, elimina PENDIENTES y reinicia asientos en ms-flota
     @Transactional
     public Map<String, Object> finalizarViaje(Long busId, LocalDate fechaViaje) {
         LocalDate fecha = (fechaViaje != null) ? fechaViaje : LocalDate.now();
 
-        // 1. Buscar todas las reservas de este bus (por fecha o generales si no coinciden)
         List<Reserva> confirmadas = reservaRepository.findByBusIdAndFechaViajeAndEstado(busId, fecha, "CONFIRMADA");
         if (confirmadas.isEmpty()) {
             confirmadas = reservaRepository.findByBusIdAndEstado(busId, "CONFIRMADA");
@@ -579,29 +536,26 @@ public class ReservaService {
             totalCompletadas++;
         }
 
-        // 2. Limpiar reservas temporales PENDIENTE si las hubiera
         List<Reserva> pendientes = reservaRepository.findByBusIdAndEstado(busId, "PENDIENTE");
         if (!pendientes.isEmpty()) {
             reservaRepository.deleteAll(pendientes);
         }
 
-        // 3. Reiniciar aforo en ms-flota
         try {
             flotaClient.reiniciarBus(busId);
         } catch (Exception e) {
-            System.err.println(">>> Advertencia al reiniciar bus en ms-flota: " + e.getMessage());
+            System.err.println("Aviso al reiniciar bus en ms-flota: " + e.getMessage());
         }
 
         Map<String, Object> resp = new HashMap<>();
         resp.put("exito", true);
-        resp.put("mensaje", "Viaje finalizado con éxito. Se completaron " + totalCompletadas + " boletos y los asientos han quedado 100% libres para la siguiente salida.");
+        resp.put("mensaje", "Viaje finalizado con éxito. Se completaron " + totalCompletadas + " boletos.");
         resp.put("busId", busId);
         resp.put("fechaViaje", fecha);
         resp.put("asientosLiberados", totalCompletadas);
         return resp;
     }
 
-    // Historial global de ventas para Administrador con cálculo de IGV y filtro por fecha
     @Transactional(readOnly = true)
     public Map<String, Object> obtenerResumenVentas(LocalDate fechaFiltro) {
         List<Reserva> ventasConfirmadas = reservaRepository.findByEstadoInOrderByFechaViajeDesc(List.of("CONFIRMADA", "COMPLETADA"));
