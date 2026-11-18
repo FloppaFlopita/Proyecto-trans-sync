@@ -607,23 +607,21 @@ interface FilaAsiento {
           </div>
 
           <!-- SECCIÓN: ELIGE UN MEDIO DE PAGO (DISEÑO OFICIAL MERCADO PAGO PERÚ) -->
+          <!-- SECCIÓN: ELIGE UN MEDIO DE PAGO (DISEÑO OFICIAL MULTIPAGO PERÚ) -->
           <div class="mb-5 space-y-3">
             <div class="flex items-center justify-between mb-1">
               <h4 class="text-xs font-black text-slate-800 uppercase tracking-tight">Elige un medio de pago</h4>
-              <span class="text-[10px] font-bold text-sky-800 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
-                Mercado Pago Perú
-              </span>
             </div>
 
             <!-- Opción 1: Tarjeta de crédito y débito -->
             <div (click)="metodoMercadoPagoSeleccionado = 'TARJETA'"
                  [class]="metodoMercadoPagoSeleccionado === 'TARJETA'
-                   ? 'border-2 border-sky-600 bg-sky-50/50 ring-2 ring-sky-200 shadow-sm'
+                   ? 'border-2 border-slate-900 bg-slate-50/80 ring-2 ring-slate-200 shadow-sm'
                    : 'border border-slate-200 bg-white hover:bg-slate-50'"
                  class="p-3.5 rounded-2xl flex items-center justify-between cursor-pointer transition-all">
               <div class="flex items-center gap-3">
                 <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
-                     [class]="metodoMercadoPagoSeleccionado === 'TARJETA' ? 'border-sky-600 bg-sky-600' : 'border-slate-300 bg-white'">
+                     [class]="metodoMercadoPagoSeleccionado === 'TARJETA' ? 'border-slate-900 bg-slate-900' : 'border-slate-300 bg-white'">
                   <div *ngIf="metodoMercadoPagoSeleccionado === 'TARJETA'" class="w-2 h-2 rounded-full bg-white"></div>
                 </div>
                 <div>
@@ -640,14 +638,15 @@ interface FilaAsiento {
                 </span>
                 <span class="px-1 py-0.5 rounded bg-sky-800 text-white font-bold text-[8px]">Diners</span>
                 <span class="px-1 py-0.5 rounded bg-blue-600 text-white font-black text-[8px]">AMEX</span>
+                <span class="px-1 py-0.5 rounded bg-red-700 text-white font-black text-[8px]">UnionPay</span>
               </div>
             </div>
 
             <!-- PANEL INTERACTIVO DE TARJETA -->
             <div *ngIf="metodoMercadoPagoSeleccionado === 'TARJETA'"
-                 class="p-4 rounded-2xl bg-sky-50/80 border border-sky-200 space-y-3 animate-in fade-in">
-              <div class="flex items-center gap-2 text-xs font-bold text-sky-950">
-                <span>💳</span> Datos de su tarjeta para procesar el pago:
+                 class="p-4 rounded-2xl bg-slate-50 border border-slate-300 space-y-3 animate-in fade-in">
+              <div class="flex items-center gap-2 text-xs font-bold text-slate-900">
+                <span>💳</span> Datos de su tarjeta:
               </div>
               <div>
                 <label class="block text-[11px] font-bold text-slate-700 mb-1">
@@ -656,7 +655,7 @@ interface FilaAsiento {
                 <input [(ngModel)]="datosPago.numeroTarjeta"
                        placeholder="4557 •••• •••• ••••"
                        maxlength="19"
-                       class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-sky-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-sky-400 shadow-xs"/>
+                       class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-slate-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-slate-400 shadow-xs"/>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
@@ -666,7 +665,7 @@ interface FilaAsiento {
                   <input [(ngModel)]="datosPago.vencimiento"
                          placeholder="12/28"
                          maxlength="5"
-                         class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-sky-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-sky-400 shadow-xs"/>
+                         class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-slate-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-slate-400 shadow-xs"/>
                 </div>
                 <div>
                   <label class="block text-[11px] font-bold text-slate-700 mb-1">
@@ -676,7 +675,7 @@ interface FilaAsiento {
                          placeholder="•••"
                          maxlength="4"
                          type="password"
-                         class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-sky-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-sky-400 shadow-xs"/>
+                         class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-slate-300 font-mono text-slate-900 outline-none focus:ring-2 focus:ring-slate-400 shadow-xs"/>
                 </div>
               </div>
               <div>
@@ -685,32 +684,24 @@ interface FilaAsiento {
                 </label>
                 <input [(ngModel)]="datosPago.titular"
                        placeholder="COMO FIGURA EN LA TARJETA"
-                       class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-sky-300 uppercase text-slate-900 outline-none focus:ring-2 focus:ring-sky-400 shadow-xs"/>
+                       class="w-full rounded-xl px-3.5 py-2 text-xs bg-white border border-slate-300 uppercase text-slate-900 outline-none focus:ring-2 focus:ring-slate-400 shadow-xs"/>
               </div>
-
-              <!-- Botón Pagar con Tarjeta (Carga solo ícono circular) -->
-              <button (click)="ejecutarPagoTarjeta()"
-                      [disabled]="procesandoPago"
-                      class="w-full py-3.5 rounded-xl font-black text-xs text-white bg-sky-600 hover:bg-sky-700 active:scale-[0.99] shadow-md shadow-sky-600/25 transition-all flex items-center justify-center cursor-pointer">
-                <span *ngIf="!procesandoPago">Pagar con Tarjeta (S/ {{ totalAPagar.toFixed(2) }})</span>
-                <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-              </button>
             </div>
 
             <!-- Opción 2: Transferencias Bancarias y Depósitos en Efectivo -->
             <div (click)="metodoMercadoPagoSeleccionado = 'TRANSFERENCIA'"
                  [class]="metodoMercadoPagoSeleccionado === 'TRANSFERENCIA'
-                   ? 'border-2 border-amber-600 bg-amber-50/50 ring-2 ring-amber-200 shadow-sm'
+                   ? 'border-2 border-slate-900 bg-amber-50/50 ring-2 ring-slate-200 shadow-sm'
                    : 'border border-slate-200 bg-white hover:bg-slate-50'"
                  class="p-3.5 rounded-2xl flex items-center justify-between cursor-pointer transition-all">
               <div class="flex items-center gap-3">
                 <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
-                     [class]="metodoMercadoPagoSeleccionado === 'TRANSFERENCIA' ? 'border-amber-600 bg-amber-600' : 'border-slate-300 bg-white'">
+                     [class]="metodoMercadoPagoSeleccionado === 'TRANSFERENCIA' ? 'border-slate-900 bg-slate-900' : 'border-slate-300 bg-white'">
                   <div *ngIf="metodoMercadoPagoSeleccionado === 'TRANSFERENCIA'" class="w-2 h-2 rounded-full bg-white"></div>
                 </div>
                 <div>
                   <p class="text-xs font-bold text-slate-900">Transferencias Bancarias y Depósitos en Efectivo</p>
-                  <p class="text-[11px] text-slate-500">PagoEfectivo · BCP, BBVA, Interbank, Agentes</p>
+                  <p class="text-[11px] text-slate-500">Pago en efectivo a través de agentes y banca móvil</p>
                 </div>
               </div>
               <!-- Logo PagoEfectivo -->
@@ -742,25 +733,17 @@ interface FilaAsiento {
                 <p>2. Busca <strong>"Pago de Servicios"</strong> ➔ selecciona <strong>"PagoEfectivo Soles"</strong>.</p>
                 <p>3. Ingresa tu código <strong>CIP: 3852690</strong> y realiza el pago de S/ {{ totalAPagar.toFixed(2) }}.</p>
               </div>
-
-              <!-- Botón Confirmar PagoEfectivo CIP (Carga solo ícono circular) -->
-              <button (click)="ejecutarPagoPagoEfectivo()"
-                      [disabled]="procesandoPago"
-                      class="w-full py-3.5 rounded-xl font-black text-xs text-slate-900 bg-[#FFD100] hover:bg-amber-400 active:scale-[0.99] shadow-md shadow-amber-400/25 transition-all flex items-center justify-center cursor-pointer">
-                <span *ngIf="!procesandoPago">Confirmar Pago con Código CIP (S/ {{ totalAPagar.toFixed(2) }})</span>
-                <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></span>
-              </button>
             </div>
 
             <!-- Opción 3: Pago con Yape -->
             <div (click)="metodoMercadoPagoSeleccionado = 'YAPE'"
                  [class]="metodoMercadoPagoSeleccionado === 'YAPE'
-                   ? 'border-2 border-[#742284] bg-purple-50/50 ring-2 ring-purple-200 shadow-sm'
+                   ? 'border-2 border-slate-900 bg-purple-50/50 ring-2 ring-slate-200 shadow-sm'
                    : 'border border-slate-200 bg-white hover:bg-slate-50'"
                  class="p-3.5 rounded-2xl flex items-center justify-between cursor-pointer transition-all">
               <div class="flex items-center gap-3">
                 <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
-                     [class]="metodoMercadoPagoSeleccionado === 'YAPE' ? 'border-[#742284] bg-[#742284]' : 'border-slate-300 bg-white'">
+                     [class]="metodoMercadoPagoSeleccionado === 'YAPE' ? 'border-slate-900 bg-slate-900' : 'border-slate-300 bg-white'">
                   <div *ngIf="metodoMercadoPagoSeleccionado === 'YAPE'" class="w-2 h-2 rounded-full bg-white"></div>
                 </div>
                 <div>
@@ -804,43 +787,17 @@ interface FilaAsiento {
               <p class="text-[11px] text-purple-800 flex items-center gap-1.5">
                 <span>💡</span> En tu app Yape abre el menú ➔ pulsa <strong>"Código de aprobación"</strong> e ingrésalo aquí.
               </p>
-
-              <!-- Botón Yapear (Carga solo ícono circular) -->
-              <button (click)="ejecutarPagoYape()"
-                      [disabled]="procesandoPago"
-                      class="w-full py-3.5 rounded-xl font-black text-xs text-white bg-[#742284] hover:bg-[#5e1b6b] active:scale-[0.99] shadow-md shadow-purple-900/25 transition-all flex items-center justify-center cursor-pointer">
-                <span *ngIf="!procesandoPago">Yapear S/ {{ totalAPagar.toFixed(2) }}</span>
-                <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-              </button>
             </div>
           </div>
 
-          <!-- BOTÓN PAGO REAL CON MERCADO PAGO (SIN RUC, CON CIP REAL Y TARJETA) -->
-          <div class="mt-5 space-y-2">
-            <button (click)="iniciarPagoMercadoPago()"
-                    [disabled]="procesandoPago"
-                    type="button"
-                    class="w-full py-4 rounded-2xl font-black text-sm text-white bg-[#009EE3] hover:bg-[#0081ba] shadow-xl shadow-sky-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer">
-              <span *ngIf="!procesandoPago" class="flex items-center gap-2">
-                <span>⚡</span>
-                <span>Pagar S/ {{ totalAPagar.toFixed(2) }} con Mercado Pago Real (Banca Móvil / CIP Real / Tarjeta)</span>
-              </span>
-              <span *ngIf="procesandoPago" class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></span>
-            </button>
-            <p class="text-[11px] text-slate-500 text-center leading-relaxed">
-              No requiere RUC. En la pasarela oficial elige <strong>"Banca y agentes"</strong> para generar tu código CIP real para BCP/BBVA o paga directo con tarjeta.
-            </p>
-          </div>
-
-          <!-- SEPARADOR Y MODO SIMULACIÓN DEMO -->
-          <div class="mt-4 pt-3 border-t border-slate-200">
-            <p class="text-[10px] uppercase font-bold text-slate-400 text-center mb-2">O para demostración sin gastar dinero real:</p>
+          <!-- BOTÓN ÚNICO CONTINUAR (DISEÑO OFICIAL IDÉNTICO A LA IMAGEN) -->
+          <div class="mt-5">
             <button (click)="ejecutarPagoSegunSeleccion()"
                     [disabled]="procesandoPago"
                     type="button"
-                    class="w-full py-2.5 rounded-xl font-bold text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all flex items-center justify-center gap-2 cursor-pointer">
-              <span *ngIf="!procesandoPago">Aprobar Compra Inmediata (Modo Demo)</span>
-              <span *ngIf="procesandoPago" class="w-4 h-4 border-2 border-slate-600 border-t-transparent rounded-full animate-spin"></span>
+                    class="w-full py-3.5 rounded-xl font-black text-sm text-white bg-[#1B2C52] hover:bg-[#121f3b] active:scale-[0.99] shadow-lg shadow-slate-900/25 transition-all flex items-center justify-center cursor-pointer">
+              <span *ngIf="!procesandoPago">Continuar</span>
+              <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
             </button>
           </div>
         </div>
