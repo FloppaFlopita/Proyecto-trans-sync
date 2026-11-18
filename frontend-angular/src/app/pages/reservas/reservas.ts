@@ -826,6 +826,16 @@ interface FilaAsiento {
             </button>
           </div>
 
+          <!-- BOTÓN ABRIR CULQI CHECKOUT V4 OFICIAL -->
+          <div class="mt-2.5">
+            <button (click)="abrirCulqiOficial()"
+                    type="button"
+                    class="w-full py-3 rounded-xl font-bold text-xs text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 shadow-xs active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span>💳</span>
+              <span>Abrir Culqi Checkout v4 Oficial (Yape / PagoEfectivo / Tarjeta)</span>
+            </button>
+          </div>
+
           <!-- ENLACE A PASARELA EXTERNA MERCADO PAGO WEB -->
           <div class="pt-3 mt-2 border-t border-slate-100 text-center">
             <button (click)="iniciarPagoMercadoPago()"
@@ -2086,6 +2096,46 @@ export class ReservasComponent implements OnInit, OnDestroy {
     } catch (e) {
       console.error('Error procesando compra guardada:', e);
     }
+  }
+
+  culqiPublicKey = 'pk_test_0e4871e860958117';
+
+  abrirCulqiOficial() {
+    if (typeof (window as any).Culqi === 'undefined') {
+      alert('Cargando librería oficial de Culqi, por favor intente nuevamente en 2 segundos.');
+      return;
+    }
+    const Culqi = (window as any).Culqi;
+    Culqi.publicKey = this.culqiPublicKey;
+    Culqi.settings({
+      title: 'TransSync Transportes S.A.C.',
+      currency: 'PEN',
+      amount: Math.round(this.totalAPagar * 100)
+    });
+    Culqi.options({
+      lang: 'es',
+      installments: true,
+      paymentMethods: {
+        tarjeta: true,
+        yape: true,
+        bancaMovil: true,
+        agente: true
+      }
+    });
+
+    (window as any).culqi = () => {
+      if (Culqi.token) {
+        console.log('Token Culqi recibido:', Culqi.token.id);
+        Culqi.close();
+        this.procesarPagoConMetodo(`CULQI TARJETA (${Culqi.token.id})`);
+      } else if (Culqi.order) {
+        console.log('Orden Culqi generada:', Culqi.order);
+        Culqi.close();
+        this.procesarPagoConMetodo('CULQI PAGOEFECTIVO/YAPE');
+      }
+    };
+
+    Culqi.open();
   }
 
   ejecutarPagoSegunSeleccion() {
