@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout';
-import { adminGuard } from './guards/auth.guard';
+import { adminGuard, sessionGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -15,6 +15,7 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [sessionGuard],
     children: [
       {
         path: 'dashboard',
@@ -28,6 +29,7 @@ export const routes: Routes = [
       },
       {
         path: 'reservas',
+        canActivate: [sessionGuard],
         loadComponent: () => import('./pages/reservas/reservas').then(m => m.ReservasComponent)
       },
       {
@@ -37,10 +39,12 @@ export const routes: Routes = [
       },
       {
         path: 'rutas',
+        canActivate: [sessionGuard],
         loadComponent: () => import('./pages/rutas/rutas').then(m => m.RutasComponent)
       },
       {
         path: 'promociones',
+        canActivate: [sessionGuard],
         loadComponent: () => import('./pages/promociones/promociones').then(m => m.PromocionesComponent)
       }
     ]
