@@ -2,11 +2,11 @@ package com.transsync.ms_flota;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.net.Socket;
 import java.util.concurrent.*;
@@ -18,24 +18,19 @@ import static org.junit.jupiter.api.Assertions.*;
  * Prueba de integración de concurrencia real para Bloqueo Pesimista (PESSIMISTIC_WRITE).
  * 
  * Simula 20 hilos concurrentes compitiendo exactamente en el mismo instante (vía CountDownLatch)
- * por el ÚLTIMO asiento disponible (asientosDisponibles = 1) en un bus.
- *
- * Requiere una instancia de PostgreSQL en ejecución en el puerto 8543 (contenedor Docker).
- * Dado que Docker no se encuentra activo en este entorno de compilación, se mantiene formalmente
- * documentada e identificada como PENDIENTE con @Disabled, para ejecutarse cuando el contenedor
- * PostgreSQL esté levantado.
+ * por el ÚLTIMO asiento disponible (asientosDisponibles = 1) en un bus sobre PostgreSQL real.
  */
 @SpringBootTest
-@Disabled("Prueba de integración de concurrencia PENDIENTE: Requiere contenedor Docker PostgreSQL en puerto 8543 activo.")
+@ActiveProfiles("test")
 public class BusConcurrencyIntegrationTest {
 
-    private static final String DB_HOST = "localhost";
-    private static final int DB_PORT = 8543;
+    private static final String DB_HOST = "127.0.0.1";
+    private static final int DB_PORT = 8544;
 
-    @Autowired(required = false)
+    @Autowired
     private BusService busService;
 
-    @Autowired(required = false)
+    @Autowired
     private BusRepository busRepository;
 
     @BeforeAll
@@ -47,11 +42,9 @@ public class BusConcurrencyIntegrationTest {
             postgresDisponible = false;
         }
 
-        // Si PostgreSQL no está activo, se omite limpiamente la prueba de integración
         Assumptions.assumeTrue(postgresDisponible, 
-                "Prueba de integración de concurrencia PENDIENTE: La base de datos PostgreSQL en " 
-                + DB_HOST + ":" + DB_PORT + " no está disponible (Docker offline). "
-                + "Se preserva la prueba para ejecución con base de datos activa.");
+                "Prueba de integración de concurrencia omitida: PostgreSQL de pruebas en " 
+                + DB_HOST + ":" + DB_PORT + " no está disponible.");
     }
 
     @Test
