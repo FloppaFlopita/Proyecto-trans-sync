@@ -115,18 +115,21 @@ public class BusController {
     @PutMapping("/{id}/reiniciar")
     public ResponseEntity<Map<String, Object>> reiniciarBus(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
-        Optional<Bus> op = busService.obtenerBus(id);
-        if (op.isPresent()) {
-            Bus bus = op.get();
-            bus.setAsientosDisponibles(bus.getCapacidad());
-            busService.actualizarBus(id, bus);
+        try {
+            Bus bus = busService.reiniciarBus(id);
             respuesta.put("exito", true);
             respuesta.put("mensaje", "Bus reiniciado con todos sus asientos disponibles");
             respuesta.put("datos", bus);
             return ResponseEntity.ok(respuesta);
+        } catch (IllegalArgumentException e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", e.getMessage());
+            return ResponseEntity.status(404).body(respuesta);
+        } catch (IllegalStateException e) {
+            respuesta.put("exito", false);
+            respuesta.put("mensaje", e.getMessage());
+            return ResponseEntity.status(409).body(respuesta);
         }
-        respuesta.put("exito", false);
-        return ResponseEntity.status(404).body(respuesta);
     }
 
     @PostMapping

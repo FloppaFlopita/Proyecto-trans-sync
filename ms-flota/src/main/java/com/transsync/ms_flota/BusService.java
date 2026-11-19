@@ -44,11 +44,12 @@ public class BusService {
     }
 
     @Transactional
-    public synchronized Bus descontarAsiento(Long id) {
-        Bus bus = busRepository.findById(id)
+    public Bus descontarAsiento(Long id) {
+        // Bloqueo pesimista: SELECT ... FOR UPDATE a nivel de fila en base de datos
+        Bus bus = busRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new IllegalArgumentException("Bus no encontrado con ID: " + id));
 
-        if (bus.getAsientosDisponibles() <= 0) {
+        if (bus.getAsientosDisponibles() == null || bus.getAsientosDisponibles() <= 0) {
             throw new IllegalStateException("No hay asientos disponibles para descontar en el bus: " + bus.getPlaca());
         }
 
@@ -57,16 +58,30 @@ public class BusService {
     }
 
     @Transactional
-    public synchronized Bus liberarAsiento(Long id) {
-        Bus bus = busRepository.findById(id)
+    public Bus liberarAsiento(Long id) {
+        // Bloqueo pesimista: garantiza lectura exclusiva para validar capacidad sin sobrepasar el límite
+        Bus bus = busRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new IllegalArgumentException("Bus no encontrado con ID: " + id));
 
-        if (bus.getAsientosDisponibles() < bus.getCapacidad()) {
-            bus.setAsientosDisponibles(bus.getAsientosDisponibles() + 1);
-            return busRepository.save(bus);
+        int capacidad = (bus.getCapacidad() != null) ? bus.getCapacidad() : 0;
+        int disponibles = (bus.getAsientosDisponibles() != null) ? bus.getAsientosDisponibles() : 0;
+
+        if (disponibles >= capacidad) {
+            throw new IllegalStateException("No se puede liberar asiento: el bus " + bus.getPlaca() + 
+                    " ya tiene la capacidad máxima completa (" + capacidad + ")");
         }
 
-        return bus;
+        bus.setAsientosDisponibles(disponibles + 1);
+        return busRepository.save(bus);
+    }
+
+    @Transactional
+    public Bus reiniciarBus(Long id) {
+        Bus bus = busRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new IllegalArgumentException("Bus no encontrado con ID: " + id));
+
+        bus.setAsientosDisponibles(bus.getCapacidad());
+        return busRepository.save(bus);
     }
 
     @Transactional
