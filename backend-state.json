@@ -1,7 +1,8 @@
 {
   "asientosOcupadosPorBus": {
     "1": [
-      8
+      8,
+      3
     ],
     "2": [
       1,
@@ -17,6 +18,25 @@
     "1_2026-10-25": []
   },
   "reservas": [
+    {
+      "id": 1795141283101,
+      "busId": 1,
+      "fechaViaje": "2026-10-25",
+      "asiento": 3,
+      "tipoComprobante": "BOLETA",
+      "numeroComprobante": "B001-492865",
+      "numeroBoleta": "B001-492865",
+      "nombrePasajero": "Carlos Mendoza Ramos",
+      "dniPasajero": "72384910",
+      "telefonoPasajero": "951234567",
+      "ruc": "",
+      "razonSocial": "",
+      "direccionFiscal": "",
+      "precio": 3,
+      "metodoPago": "MERCADO PAGO",
+      "fechaHora": "19/11/2026, 8:21:23 p. m.",
+      "abordado": false
+    },
     {
       "id": 1794972552624,
       "busId": 1,

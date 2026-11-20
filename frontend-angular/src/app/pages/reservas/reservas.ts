@@ -1081,7 +1081,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
   // Rutas Interprovinciales
   rutasDisponibles: RutaOpcion[] = [
-    { id: 99, nombre: 'Juliaca ➔ Puno (Test Pago Real S/ 3.00)', origen: 'Juliaca', destino: 'Puno', busId: 1, precio: 3.00, horario: '10:00 hrs' },
+    { id: 99, nombre: 'Juliaca → Puno (Directo)', origen: 'Juliaca', destino: 'Puno', busId: 1, precio: 3.00, horario: '10:00 hrs' },
     { id: 19, nombre: 'Juliaca → Cusco', origen: 'Juliaca', destino: 'Cusco', busId: 3, precio: 35.00, horario: '07:30 hrs' },
     { id: 20, nombre: 'Cusco → Juliaca', origen: 'Cusco', destino: 'Juliaca', busId: 4, precio: 35.00, horario: '14:00 hrs' },
     { id: 21, nombre: 'Cusco → Arequipa', origen: 'Cusco', destino: 'Arequipa', busId: 5, precio: 40.00, horario: '21:00 hrs' },
@@ -1293,7 +1293,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
           const rutaTest: RutaOpcion = {
             id: 99,
-            nombre: 'Juliaca ➔ Puno (Test Pago Real S/ 3.00)',
+            nombre: 'Juliaca → Puno (Directo)',
             origen: 'Juliaca',
             destino: 'Puno',
             busId: 1,
