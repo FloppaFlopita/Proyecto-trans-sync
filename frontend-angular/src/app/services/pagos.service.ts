@@ -27,4 +27,8 @@ export class PagosService {
   crearPreferenciaMercadoPago(datos: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/crear-preferencia`, datos);
   }
+
+  verificarUltimoPago(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/verificar-ultimo-pago`);
+  }
 }

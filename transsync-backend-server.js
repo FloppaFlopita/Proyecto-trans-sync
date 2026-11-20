@@ -431,6 +431,55 @@ const server = http.createServer((req, res) => {
       return;
     }
 
+    // 9.1 VERIFICAR ÚLTIMO PAGO EN MERCADO PAGO API (Detección en tiempo real sin salir ni recargar)
+    if (pathname === '/api/pagos/verificar-ultimo-pago' && req.method === 'GET') {
+      const options = {
+        hostname: 'api.mercadopago.com',
+        path: '/v1/payments/search?sort=date_created&criteria=desc&limit=1',
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
+        }
+      };
+
+      const mpReq = https.request(options, mpRes => {
+        let mpData = '';
+        mpRes.on('data', d => { mpData += d; });
+        mpRes.on('end', () => {
+          try {
+            const parsed = JSON.parse(mpData);
+            if (parsed.results && parsed.results.length > 0) {
+              const ultimo = parsed.results[0];
+              const ahora = Date.now();
+              const fechaAprobado = new Date(ultimo.date_approved || ultimo.date_created).getTime();
+              const minutosDiferencia = (ahora - fechaAprobado) / (1000 * 60);
+
+              // Si se aprobó recientemente (últimas 2 horas)
+              if (ultimo.status === 'approved' && minutosDiferencia < 120) {
+                return sendJson(200, {
+                  aprobado: true,
+                  paymentId: String(ultimo.id),
+                  status: ultimo.status,
+                  metodoPago: (ultimo.payment_method_id || 'YAPE').toUpperCase(),
+                  monto: ultimo.transaction_amount
+                });
+              }
+            }
+            return sendJson(200, { aprobado: false });
+          } catch (e) {
+            return sendJson(200, { aprobado: false, error: e.message });
+          }
+        });
+      });
+
+      mpReq.on('error', err => {
+        return sendJson(200, { aprobado: false, error: err.message });
+      });
+
+      mpReq.end();
+      return;
+    }
+
     // 10. RUTAS CATÁLOGO
     if (pathname === '/api/rutas' && req.method === 'GET') {
       return sendJson(200, [
