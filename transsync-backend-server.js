@@ -6,8 +6,8 @@ const url = require('url');
 
 const PORT = 8100;
 const DATA_FILE = path.join(__dirname, 'backend-state.json');
-// Credencial Oficial Sandbox (Para evaluación académica y aprobación garantizada sin bloqueos bancarios)
-const MP_ACCESS_TOKEN = 'TEST-4665057574203239-111721-794c92e311b0d1867bb0ec6be3b11ce7-3852690669';
+// Credencial Oficial PRODUCCIÓN EN VIVO (Activada y Autorizada para Cobros Reales)
+const MP_ACCESS_TOKEN = 'APP_USR-1789579822505186-111721-79b4c33369e58b48a70ac3692eb3e880-3852779519';
 
 // Estado inicial persistente
 let state = {
@@ -410,7 +410,7 @@ const server = http.createServer((req, res) => {
             console.log('Respuesta MP Status:', mpRes.statusCode, 'Body:', mpData);
             return sendJson(mpRes.statusCode, {
               id: parsed.id,
-              init_point: parsed.sandbox_init_point || parsed.init_point,
+              init_point: parsed.init_point,
               sandbox_init_point: parsed.sandbox_init_point,
               error: parsed.message || parsed.error
             });

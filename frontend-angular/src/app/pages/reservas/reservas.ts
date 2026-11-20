@@ -527,9 +527,6 @@ interface FilaAsiento {
               <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
             </button>
 
-            <p class="text-[11px] text-slate-500 text-center flex items-center justify-center gap-1.5 pt-1">
-              <span>💳</span> Tarjeta de prueba: <strong class="font-mono text-slate-800">4242 4242 4242 4242</strong> · Venc: <strong>11/28</strong> · CVV: <strong>123</strong>
-            </p>
 
             <p *ngIf="mensajeErrorForm" class="text-xs text-rose-700 font-medium text-center p-2.5 rounded-xl bg-rose-50 border border-rose-200 animate-in fade-in">
               {{ mensajeErrorForm }}
