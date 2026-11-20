@@ -21,12 +21,12 @@ Start-Sleep -Seconds 8
 Write-Host "`n[3/4] Levantando Microservicios de Negocio..." -ForegroundColor Yellow
 
 $servicios = @(
-    @{ Name = "TransSync Backend Gateway (:8100) [Mercado Pago]"; Dir = "."; Cmd = "node transsync-backend-server.js" },
-    @{ Name = "MS-Reservas (:8103) [Bloqueo de Asientos]"; Dir = "ms-reservas"; Cmd = "mvn spring-boot:run" },
-    @{ Name = "MS-Pagos (:8104) [Pasarela Bancaria]"; Dir = "ms-pagos"; Cmd = "mvn spring-boot:run" },
-    @{ Name = "MS-Facturacion (:8108) [Kafka SUNAT]"; Dir = "ms-facturacion"; Cmd = "mvn spring-boot:run" },
-    @{ Name = "MS-Flota (:8102) [Buses y Mantenimiento]"; Dir = "ms-flota"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "TransSync Backend Gateway (:8100) [Mercado Pago + SSE]"; Dir = "."; Cmd = "node transsync-backend-server.js" },
     @{ Name = "MS-Rutas (:8101) [Tarifas e Itinerarios]"; Dir = "ms-rutas"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "MS-Flota (:8102) [Buses y Mantenimiento]"; Dir = "ms-flota"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "MS-Reservas (:8103) [Bloqueo de Asientos]"; Dir = "ms-reservas"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "MS-Pagos (:8104) [Mercado Pago Pasarela]"; Dir = "ms-pagos"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "MS-Facturacion (:8108) [Kafka SUNAT]"; Dir = "ms-facturacion"; Cmd = "mvn spring-boot:run" },
     @{ Name = "MS-Auth (:8107) [Seguridad y JWT]"; Dir = "ms-auth"; Cmd = "mvn spring-boot:run" }
 )
 

@@ -472,6 +472,26 @@ const server = http.createServer((req, res) => {
 
     // 9.1 VERIFICAR ÚLTIMO PAGO EN MERCADO PAGO API (Detección en tiempo real sin salir ni recargar)
     if (pathname === '/api/pagos/verificar-ultimo-pago' && req.method === 'GET') {
+      // Soporte para simulación de demostración si se solicita explícitamente (?simular=true)
+      if (query.simular === 'true') {
+        const dummyId = 'SIM-' + Date.now();
+        emitirEventoKafka('pago-eventos', {
+          tipoEvento: 'PAGO_APROBADO',
+          paymentId: dummyId,
+          monto: 3,
+          metodoPago: 'YAPE (DEMO DOCENTE)',
+          estado: 'APROBADO',
+          timestamp: new Date().toISOString()
+        });
+        return sendJson(200, {
+          aprobado: true,
+          paymentId: dummyId,
+          status: 'approved',
+          metodoPago: 'YAPE (DEMO)',
+          monto: 3
+        });
+      }
+
       const options = {
         hostname: 'api.mercadopago.com',
         path: '/v1/payments/search?sort=date_created&criteria=desc&limit=1',
@@ -489,18 +509,39 @@ const server = http.createServer((req, res) => {
             const parsed = JSON.parse(mpData);
             if (parsed.results && parsed.results.length > 0) {
               const ultimo = parsed.results[0];
-              const ahora = Date.now();
-              const fechaAprobado = new Date(ultimo.date_approved || ultimo.date_created).getTime();
-              const minutosDiferencia = (ahora - fechaAprobado) / (1000 * 60);
-
-              // Si se aprobó recientemente (últimas 2 horas)
-              if (ultimo.status === 'approved' && minutosDiferencia < 120) {
+              
+              if (ultimo.status === 'approved') {
+                emitirEventoKafka('pago-eventos', {
+                  tipoEvento: 'PAGO_APROBADO',
+                  paymentId: String(ultimo.id),
+                  monto: ultimo.transaction_amount,
+                  metodoPago: (ultimo.payment_method_id || 'YAPE').toUpperCase(),
+                  estado: 'APROBADO',
+                  timestamp: new Date().toISOString()
+                });
                 return sendJson(200, {
                   aprobado: true,
                   paymentId: String(ultimo.id),
                   status: ultimo.status,
                   metodoPago: (ultimo.payment_method_id || 'YAPE').toUpperCase(),
                   monto: ultimo.transaction_amount
+                });
+              } else if (ultimo.status === 'rejected') {
+                emitirEventoKafka('pago-eventos', {
+                  tipoEvento: 'PAGO_RECHAZADO',
+                  paymentId: String(ultimo.id),
+                  monto: ultimo.transaction_amount,
+                  metodoPago: (ultimo.payment_method_id || 'YAPE').toUpperCase(),
+                  estado: 'RECHAZADO',
+                  motivo: ultimo.status_detail || 'Pago rechazado por el banco o emisor',
+                  timestamp: new Date().toISOString()
+                });
+                return sendJson(200, {
+                  aprobado: false,
+                  rechazado: true,
+                  paymentId: String(ultimo.id),
+                  status: ultimo.status,
+                  motivo: ultimo.status_detail || 'Pago rechazado'
                 });
               }
             }
@@ -524,28 +565,89 @@ const server = http.createServer((req, res) => {
       return sendJson(200, state.kafkaEventos || []);
     }
 
-    // 10. RUTAS CATÁLOGO
-    if (pathname === '/api/rutas' && req.method === 'GET') {
-      return sendJson(200, [
-        { id: 99, origen: 'Juliaca', destino: 'Puno', precio: 3.00, horario: '10:00 hrs' },
-        { id: 1, origen: 'Juliaca', destino: 'Arequipa', precio: 35.00, horario: '08:00 hrs' },
-        { id: 2, origen: 'Puno', destino: 'Cusco', precio: 45.00, horario: '14:30 hrs' },
-        { id: 3, origen: 'Arequipa', destino: 'Lima', precio: 80.00, horario: '20:00 hrs' },
-        { id: 4, origen: 'Cusco', destino: 'Arequipa', precio: 50.00, horario: '21:00 hrs' },
-        { id: 5, origen: 'Lima', destino: 'Huancayo', precio: 40.00, horario: '07:00 hrs' }
-      ]);
+    // 10. RUTAS CATÁLOGO Y GESTIÓN CRUD (PROXY DIRECTO A MS-RUTAS :8101)
+    if (pathname.startsWith('/api/rutas')) {
+      const targetPath = pathname.replace(/^\/api\/rutas/, '/rutas') + (parsedUrl.search || '');
+      const clientReq = http.request({
+        hostname: '127.0.0.1',
+        port: 8101,
+        path: targetPath,
+        method: req.method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(bodyStr || '')
+        }
+      }, (clientRes) => {
+        let respData = '';
+        clientRes.on('data', chunk => { respData += chunk; });
+        clientRes.on('end', () => {
+          res.writeHead(clientRes.statusCode, { 'Content-Type': 'application/json' });
+          res.end(respData);
+        });
+      });
+
+      clientReq.on('error', (err) => {
+        // Fallback local en backend-state.json si MS-Rutas estuviera apagado
+        if (!state.rutas) {
+          state.rutas = [
+            { id: 99, origen: 'Juliaca', destino: 'Puno', precio: 3.00, horario: '10:00 hrs' },
+            { id: 1, origen: 'Juliaca', destino: 'Arequipa', precio: 35.00, horario: '08:00 hrs' },
+            { id: 2, origen: 'Puno', destino: 'Cusco', precio: 45.00, horario: '14:30 hrs' },
+            { id: 3, origen: 'Arequipa', destino: 'Lima', precio: 80.00, horario: '20:00 hrs' }
+          ];
+        }
+        if (req.method === 'GET' && pathname === '/api/rutas') {
+          return sendJson(200, state.rutas);
+        }
+        if (req.method === 'POST' && pathname === '/api/rutas') {
+          const nuevaRuta = { id: Date.now(), ...body };
+          state.rutas.push(nuevaRuta);
+          persistState();
+          return sendJson(200, { exito: true, mensaje: 'Ruta registrada con éxito', datos: nuevaRuta });
+        }
+        sendJson(200, { exito: true, datos: state.rutas });
+      });
+
+      if (bodyStr) clientReq.write(bodyStr);
+      clientReq.end();
+      return;
     }
 
-    // 11. BUSES FLOTA
-    if (pathname === '/api/buses' && req.method === 'GET') {
-      return sendJson(200, [
-        { id: 1, placa: 'BUS-TS-01', modelo: 'Scania Touring HD', capacidad: 48, estado: 'OPERATIVO' },
-        { id: 2, placa: 'BUS-TS-02', modelo: 'Volvo B430R', capacidad: 48, estado: 'OPERATIVO' },
-        { id: 3, placa: 'BUS-TS-03', modelo: 'Mercedes Travego', capacidad: 48, estado: 'MANTENIMIENTO' },
-        { id: 4, placa: 'BUS-TS-04', modelo: 'Marcopolo G8', capacidad: 48, estado: 'OPERATIVO' },
-        { id: 5, placa: 'T3C-104', modelo: 'Volvo 9700 Grand', capacidad: 48, estado: 'OPERATIVO' },
-        { id: 6, placa: 'BUS-TS-06', modelo: 'Scania Irizar i6S', capacidad: 48, estado: 'OPERATIVO' }
-      ]);
+    // 11. BUSES FLOTA (PROXY A MS-FLOTA :8102)
+    if (pathname.startsWith('/api/buses')) {
+      const targetPath = pathname.replace(/^\/api\/buses/, '/buses') + (parsedUrl.search || '');
+      const clientReq = http.request({
+        hostname: '127.0.0.1',
+        port: 8102,
+        path: targetPath,
+        method: req.method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(bodyStr || '')
+        }
+      }, (clientRes) => {
+        let respData = '';
+        clientRes.on('data', chunk => { respData += chunk; });
+        clientRes.on('end', () => {
+          res.writeHead(clientRes.statusCode, { 'Content-Type': 'application/json' });
+          res.end(respData);
+        });
+      });
+
+      clientReq.on('error', () => {
+        return sendJson(200, [
+          { id: 1, placa: 'BUS-TS-01', modelo: 'Scania Touring HD', capacidad: 48, estado: 'OPERATIVO' },
+          { id: 2, placa: 'BUS-TS-02', modelo: 'Volvo B430R', capacidad: 48, estado: 'OPERATIVO' },
+          { id: 3, placa: 'BUS-TS-03', modelo: 'Mercedes Travego', capacidad: 48, estado: 'MANTENIMIENTO' },
+          { id: 4, placa: 'BUS-TS-04', modelo: 'Marcopolo G8', capacidad: 48, estado: 'OPERATIVO' },
+          { id: 5, placa: 'T3C-104', modelo: 'Volvo 9700 Grand', capacidad: 48, estado: 'OPERATIVO' },
+          { id: 6, placa: 'BUS-TS-06', modelo: 'Scania Irizar i6S', capacidad: 48, estado: 'OPERATIVO' }
+        ]);
+      });
+
+      if (bodyStr) clientReq.write(bodyStr);
+      clientReq.end();
+      return;
     }
 
     // Fallback 200 OK

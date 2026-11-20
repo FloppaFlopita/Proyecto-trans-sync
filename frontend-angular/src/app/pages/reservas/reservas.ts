@@ -1724,6 +1724,11 @@ export class ReservasComponent implements OnInit, OnDestroy {
         if (resp && resp.aprobado) {
           this.procesandoPago = false;
           this.completarCompraMercadoPagoAprobada(resp.paymentId, resp.status);
+        } else if (resp && resp.rechazado) {
+          this.procesandoPago = false;
+          const detalle = resp.motivo === 'cc_rejected_high_risk' ? 'Rechazado por prevención de riesgo (Sandbox/Tarjeta)' : (resp.motivo || 'Rechazado');
+          this.mensajeErrorForm = `Mercado Pago / Yape: Pago ${resp.status} (${detalle}). Evento emitido a Kafka.`;
+          this.cdr.detectChanges();
         } else {
           this.procesandoPago = false;
           this.cdr.detectChanges();
