@@ -16,6 +16,9 @@ public class BusController {
     @Autowired
     private BusService busService;
 
+    @Autowired
+    private MantenimientoService mantenimientoService;
+
     @GetMapping
     public ResponseEntity<Map<String, Object>> listarBuses() {
         List<Bus> buses = busService.listarBuses();
@@ -23,6 +26,16 @@ public class BusController {
         respuesta.put("exito", true);
         respuesta.put("mensaje", "Buses obtenidos correctamente");
         respuesta.put("datos", buses);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @GetMapping("/estadisticas")
+    public ResponseEntity<Map<String, Object>> obtenerEstadisticas() {
+        Map<String, Object> stats = busService.obtenerEstadisticasFlota();
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("exito", true);
+        respuesta.put("mensaje", "Estadísticas analíticas de flota calculadas");
+        respuesta.put("datos", stats);
         return ResponseEntity.ok(respuesta);
     }
 
@@ -48,16 +61,30 @@ public class BusController {
         Optional<Bus> opcional = busService.obtenerBus(id);
         if (opcional.isPresent()) {
             Bus bus = opcional.get();
-            boolean hayAsientos = bus.getAsientosDisponibles() > 0;
+            boolean enMantenimiento = mantenimientoService != null && mantenimientoService.busEnMantenimiento(id);
+            boolean hayAsientos = (bus.getAsientosDisponibles() != null && bus.getAsientosDisponibles() > 0) && !enMantenimiento;
+
+            String mensaje;
+            if (enMantenimiento) {
+                mensaje = "El vehículo " + bus.getPlaca() + " se encuentra EN MANTENIMIENTO PREVENTIVO (fuera de servicio)";
+            } else if (hayAsientos) {
+                mensaje = "Hay asientos disponibles";
+            } else {
+                mensaje = "No hay asientos disponibles (autobús lleno)";
+            }
+
+            Map<String, Object> datos = new HashMap<>();
+            datos.put("busId", bus.getId());
+            datos.put("placa", bus.getPlaca());
+            datos.put("modelo", bus.getModelo());
+            datos.put("capacidad", bus.getCapacidad());
+            datos.put("asientosDisponibles", bus.getAsientosDisponibles());
+            datos.put("disponible", hayAsientos);
+            datos.put("enMantenimiento", enMantenimiento);
+
             respuesta.put("exito", true);
-            respuesta.put("mensaje", hayAsientos ? "Hay asientos disponibles" : "No hay asientos disponibles");
-            respuesta.put("datos", Map.of(
-                "busId", bus.getId(),
-                "placa", bus.getPlaca(),
-                "modelo", bus.getModelo(),
-                "asientosDisponibles", bus.getAsientosDisponibles(),
-                "disponible", hayAsientos
-            ));
+            respuesta.put("mensaje", mensaje);
+            respuesta.put("datos", datos);
             return ResponseEntity.ok(respuesta);
         } else {
             respuesta.put("exito", false);
@@ -85,7 +112,7 @@ public class BusController {
         } catch (IllegalStateException e) {
             respuesta.put("exito", false);
             respuesta.put("mensaje", e.getMessage());
-            return ResponseEntity.status(409).body(respuesta);
+            return ResponseEntity.status(409).body(respuesta); // 409 Conflict ante bus lleno o en mantenimiento
         }
     }
 
@@ -175,15 +202,21 @@ public class BusController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> eliminarBus(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();
-        boolean eliminado = busService.eliminarBus(id);
-        if (eliminado) {
-            respuesta.put("exito", true);
-            respuesta.put("mensaje", "Bus eliminado correctamente");
-            return ResponseEntity.ok(respuesta);
-        } else {
+        try {
+            boolean eliminado = busService.eliminarBus(id);
+            if (eliminado) {
+                respuesta.put("exito", true);
+                respuesta.put("mensaje", "Bus eliminado correctamente");
+                return ResponseEntity.ok(respuesta);
+            } else {
+                respuesta.put("exito", false);
+                respuesta.put("mensaje", "Bus no encontrado con id: " + id);
+                return ResponseEntity.status(404).body(respuesta);
+            }
+        } catch (IllegalStateException e) {
             respuesta.put("exito", false);
-            respuesta.put("mensaje", "Bus no encontrado con id: " + id);
-            return ResponseEntity.status(404).body(respuesta);
+            respuesta.put("mensaje", e.getMessage());
+            return ResponseEntity.status(409).body(respuesta);
         }
     }
 }

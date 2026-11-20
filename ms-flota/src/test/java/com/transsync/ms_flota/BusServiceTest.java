@@ -23,6 +23,9 @@ class BusServiceTest {
     @Mock
     private BusRepository busRepository;
 
+    @Mock
+    private MantenimientoRepository mantenimientoRepository;
+
     @InjectMocks
     private BusService busService;
 
@@ -160,5 +163,22 @@ class BusServiceTest {
         assertNotNull(respLiberar.getBody());
         assertEquals(false, respLiberar.getBody().get("exito"));
         assertEquals("Capacidad máxima completa", respLiberar.getBody().get("mensaje"));
+    }
+
+    @Test
+    @DisplayName("7. Rechazo con IllegalStateException al descontar asiento si el bus está EN_MANTENIMIENTO")
+    void testDescontarAsiento_RechazoCuandoBusEnMantenimiento() {
+        // Arrange
+        busPrueba.setAsientosDisponibles(20);
+        when(busRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(busPrueba));
+        when(mantenimientoRepository.existsByBusIdAndEstado(1L, EstadoMantenimiento.EN_MANTENIMIENTO)).thenReturn(true);
+
+        // Act & Assert
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> {
+            busService.descontarAsiento(1L);
+        });
+
+        assertTrue(ex.getMessage().contains("EN MANTENIMIENTO"));
+        verify(busRepository, never()).save(any(Bus.class));
     }
 }
