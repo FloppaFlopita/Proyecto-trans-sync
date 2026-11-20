@@ -7,6 +7,9 @@ const { exec } = require('child_process');
 
 function emitirEventoKafka(topico, evento) {
   console.log(`>>> [KAFKA EVENT PRODUCER] Emitiendo a '${topico}':`, JSON.stringify(evento));
+  if (!state.kafkaEventos) state.kafkaEventos = [];
+  state.kafkaEventos.unshift({ topico, ...evento });
+  if (state.kafkaEventos.length > 50) state.kafkaEventos.pop();
   try {
     const jsonEscaped = JSON.stringify(evento).replace(/"/g, '\"');
     const proc = exec(`docker exec -i trans-sync-kafka kafka-console-producer --bootstrap-server localhost:9092 --topic ${topico}`, (err) => {});
@@ -514,6 +517,11 @@ const server = http.createServer((req, res) => {
 
       mpReq.end();
       return;
+    }
+
+    // 9.2 MONITOR WEB DE EVENTOS KAFKA
+    if (pathname === '/api/kafka/eventos' && req.method === 'GET') {
+      return sendJson(200, state.kafkaEventos || []);
     }
 
     // 10. RUTAS CATÁLOGO

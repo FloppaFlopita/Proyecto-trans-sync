@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # TRANSSYNC: SCRIPT OFICIAL PARA LEVANTAR TODO EL ECOSISTEMA TRAS REINICIO
 # ==============================================================================
 
@@ -7,8 +7,8 @@ Write-Host "           TRANSSYNC: LEVANTANDO ECOSISTEMA COMPLETO                
 Write-Host "=======================================================================" -ForegroundColor Cyan
 
 # 1. Levantar Contenedores Docker
-Write-Host "`n[1/4] Iniciando Contenedores Docker (Postgres, Kafka, Prometheus, Grafana)..." -ForegroundColor Yellow
-docker compose up -d postgres-db zookeeper kafka prometheus grafana
+Write-Host "`n[1/4] Iniciando Contenedores Docker (Postgres, Kafka, Kafka-UI, Prometheus, Grafana)..." -ForegroundColor Yellow
+docker compose up -d postgres-db zookeeper kafka kafka-ui prometheus grafana
 
 # 2. Levantar Eureka Server
 Write-Host "`n[2/4] Levantando Eureka Server (:8761) en ventana visible..." -ForegroundColor Yellow
@@ -43,10 +43,11 @@ Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", 
 Write-Host "`n=======================================================================" -ForegroundColor Cyan
 Write-Host "         ¡SISTEMA TRANSSYNC COMPLETAMENTE DESPLEGADO!                 " -ForegroundColor Cyan
 Write-Host "=======================================================================" -ForegroundColor Cyan
-Write-Host "ENLACES RÁPIDOS:" -ForegroundColor White
+Write-Host "ENLACES RÁPIDOS WEB:" -ForegroundColor White
 Write-Host "  - Frontend Web:        http://localhost:4200" -ForegroundColor White
 Write-Host "  - Grafana (Monitoreo): http://localhost:8300 (admin / admin)" -ForegroundColor White
-Write-Host "  - Prometheus Metricas: http://localhost:8900" -ForegroundColor White
+Write-Host "  - Kafka Web UI:        http://localhost:8089" -ForegroundColor White
 Write-Host "  - Eureka Dashboard:    http://localhost:8761" -ForegroundColor White
+Write-Host "  - Prometheus Métricas: http://localhost:8900" -ForegroundColor White
 Write-Host "  - Gateway API:         http://localhost:8100/api" -ForegroundColor White
 Write-Host "=======================================================================" -ForegroundColor Cyan
