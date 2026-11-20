@@ -363,6 +363,11 @@ const server = http.createServer((req, res) => {
     // 9. MERCADO PAGO: CREAR PREFERENCIA REAL
     if (pathname === '/api/pagos/crear-preferencia' && req.method === 'POST') {
       console.log('Recibida petición crear preferencia Mercado Pago:', body);
+
+      const emailPayer = (body.emailComprador && body.emailComprador.includes('@') && !body.emailComprador.includes('transsync.com'))
+        ? body.emailComprador.trim()
+        : 'tkamado321@gmail.com';
+
       const postDataObj = {
         items: [
           {
@@ -374,7 +379,7 @@ const server = http.createServer((req, res) => {
         ],
         payer: {
           name: body.nombreComprador || 'Pasajero TransSync',
-          email: body.emailComprador || 'cliente@transsync.com'
+          email: emailPayer
         },
         back_urls: {
           success: (body.frontendUrl || 'http://localhost:4200/reservas') + '?mp_status=approved',
