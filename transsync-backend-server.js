@@ -150,6 +150,12 @@ const server = http.createServer((req, res) => {
     };
 
     // ROUTING
+    // 0. PROMETHEUS METRICS & HEALTH (API-GATEWAY & SERVICES MONITOR)
+    if (pathname.includes('prometheus') && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'text/plain; version=0.0.4' });
+      return res.end('# HELP service_up Service UP\n# TYPE service_up gauge\nservice_up 1\n');
+    }
+
     // 1. AUTH LOGIN
     if (pathname === '/api/auth/login' && req.method === 'POST') {
       const email = body.email;

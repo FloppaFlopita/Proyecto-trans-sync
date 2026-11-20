@@ -4,9 +4,9 @@ global:
 
 scrape_configs:
   - job_name: 'eureka-server'
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/actuator/eureka/prometheus'
     static_configs:
-      - targets: ['host.docker.internal:8761']
+      - targets: ['host.docker.internal:8100']
 
   - job_name: 'api-gateway'
     metrics_path: '/actuator/prometheus'
@@ -34,19 +34,19 @@ scrape_configs:
       - targets: ['host.docker.internal:8104']
 
   - job_name: 'ms-promociones'
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/actuator/promociones/prometheus'
     static_configs:
-      - targets: ['host.docker.internal:8105']
+      - targets: ['host.docker.internal:8100']
 
   - job_name: 'ms-fidelizacion'
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/actuator/fidelizacion/prometheus'
     static_configs:
-      - targets: ['host.docker.internal:8106']
+      - targets: ['host.docker.internal:8100']
 
   - job_name: 'ms-auth'
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/actuator/auth/prometheus'
     static_configs:
-      - targets: ['host.docker.internal:8107']
+      - targets: ['host.docker.internal:8100']
 
   - job_name: 'ms-facturacion'
     metrics_path: '/actuator/prometheus'
