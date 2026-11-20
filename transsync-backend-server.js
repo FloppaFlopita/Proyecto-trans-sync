@@ -3,6 +3,19 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const { exec } = require('child_process');
+
+function emitirEventoKafka(topico, evento) {
+  console.log(`>>> [KAFKA EVENT PRODUCER] Emitiendo a '${topico}':`, JSON.stringify(evento));
+  try {
+    const jsonEscaped = JSON.stringify(evento).replace(/"/g, '\"');
+    const proc = exec(`docker exec -i trans-sync-kafka kafka-console-producer --bootstrap-server localhost:9092 --topic ${topico}`, (err) => {});
+    if (proc && proc.stdin) {
+      proc.stdin.write(JSON.stringify(evento) + '\n');
+      proc.stdin.end();
+    }
+  } catch (e) {}
+}
 
 const PORT = 8100;
 const DATA_FILE = path.join(__dirname, 'backend-state.json');
@@ -288,6 +301,29 @@ const server = http.createServer((req, res) => {
         };
         state.reservas.unshift(resObj);
         nuevasReservas.push(resObj);
+
+        // Emitir evento asíncrono a Kafka
+        emitirEventoKafka('reserva-eventos', {
+          tipoEvento: 'RESERVA_CONFIRMADA',
+          reservaId: resObj.id,
+          asiento: resObj.asiento,
+          numeroBoleta: resObj.numeroBoleta,
+          nombrePasajero: resObj.nombrePasajero,
+          dniPasajero: resObj.dniPasajero,
+          totalPagar: resObj.precio,
+          metodoPago: resObj.metodoPago,
+          fechaViaje: resObj.fechaViaje,
+          timestamp: new Date().toISOString()
+        });
+        emitirEventoKafka('pago-eventos', {
+          tipoEvento: 'PAGO_APROBADO',
+          reservaId: resObj.id,
+          monto: resObj.precio,
+          metodoPago: resObj.metodoPago,
+          estado: 'APROBADO',
+          pasajero: resObj.nombrePasajero,
+          timestamp: new Date().toISOString()
+        });
       });
 
       persistState();
