@@ -5,13 +5,13 @@
   "graphTooltip": 0,
   "id": null,
   "links": [],
-  "liveNow": false,
+  "liveNow": true,
   "panels": [
     {
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
-      "id": 99,
-      "title": "MÉTRICAS DE NEGOCIO EN VIVO: RESERVAS, VENTAS Y RECAUDACIÓN (S10)",
+      "id": 100,
+      "title": "ESTADO EN TIEMPO REAL: SALUD Y RESILIENCIA DE MICROSERVICIOS TRANSSYNC",
       "type": "row"
     },
     {
@@ -19,34 +19,158 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [],
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "color": "red", "text": "FUERA DE SERVICIO (CAÍDO)" },
+                "1": { "color": "green", "text": "OPERATIVO (ONLINE)" }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null+nan",
+                "result": { "color": "red", "text": "FUERA DE SERVICIO (CAÍDO)" }
+              }
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "blue", "value": null }, { "color": "green", "value": 1 }]
-          },
-          "unit": "short"
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
         }
       },
-      "gridPos": { "h": 5, "w": 8, "x": 0, "y": 1 },
-      "id": 10,
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 1 },
+      "id": 1,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
       },
       "pluginVersion": "10.0.0",
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "editorMode": "code",
-          "expr": "sum(transsync_reservas_confirmadas_total) or vector(0)",
-          "legendFormat": "Boletos Confirmados",
+          "expr": "up",
+          "legendFormat": "{{job}}",
           "range": true,
           "refId": "A"
         }
       ],
+      "title": "Monitor Central de Disponibilidad (VERDE = ONLINE | ROJO = FUERA DE SERVICIO)",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
+      "id": 105,
+      "title": "MONITORES INDIVIDUALES PARA PRUEBAS DE CAÍDA Y RESILIENCIA",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
+            { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+      "id": 201,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "up{job=\"ms-reservas\"} or vector(0)", "legendFormat": "MS-Reservas (:8103)", "refId": "A" }],
+      "title": "MS-Reservas (:8103)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
+            { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+      "id": 202,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "up{job=\"ms-pagos\"} or vector(0)", "legendFormat": "MS-Pagos (:8104)", "refId": "A" }],
+      "title": "MS-Pagos (:8104)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
+            { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
+      "id": 203,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "up{job=\"ms-facturacion\"} or vector(0)", "legendFormat": "MS-Facturacion (:8108)", "refId": "A" }],
+      "title": "MS-Facturación (:8108)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
+            { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 },
+      "id": 204,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "up{job=\"ms-flota\"} or vector(0)", "legendFormat": "MS-Flota (:8102)", "refId": "A" }],
+      "title": "MS-Flota (:8102)",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 },
+      "id": 99,
+      "title": "MÉTRICAS DE NEGOCIO: VENTAS, RESERVAS Y RECAUDACIÓN EN VIVO",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "green", "value": 1 }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 8, "x": 0, "y": 13 },
+      "id": 10,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(transsync_reservas_confirmadas_total) or vector(0)", "legendFormat": "Boletos Confirmados", "refId": "A" }],
       "title": "Boletos / Reservas Confirmadas",
       "type": "stat"
     },
@@ -55,34 +179,14 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "purple", "value": null }, { "color": "green", "value": 100 }]
-          },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }, { "color": "green", "value": 100 }] },
           "unit": "currencyPEN"
         }
       },
-      "gridPos": { "h": 5, "w": 8, "x": 8, "y": 1 },
+      "gridPos": { "h": 5, "w": 8, "x": 8, "y": 13 },
       "id": 11,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
-      },
-      "pluginVersion": "10.0.0",
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "editorMode": "code",
-          "expr": "sum(transsync_ventas_monto_soles_total) or vector(0)",
-          "legendFormat": "Monto Total (S/)",
-          "range": true,
-          "refId": "A"
-        }
-      ],
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(transsync_ventas_monto_soles_total) or vector(0)", "legendFormat": "Monto Total (S/)", "refId": "A" }],
       "title": "Monto Total de Ventas Recaudado (S/)",
       "type": "stat"
     },
@@ -91,199 +195,57 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "orange", "value": null }, { "color": "red", "value": 5 }]
-          },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }, { "color": "red", "value": 5 }] },
           "unit": "short"
         }
       },
-      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 1 },
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 13 },
       "id": 12,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
-      },
-      "pluginVersion": "10.0.0",
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "editorMode": "code",
-          "expr": "sum(transsync_reservas_canceladas_total) or vector(0)",
-          "legendFormat": "Canceladas",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Reservas Canceladas",
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(transsync_reservas_canceladas_total) or vector(0)", "legendFormat": "Canceladas", "refId": "A" }],
+      "title": "Reservas Canceladas / Expiradas",
       "type": "stat"
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
-      "id": 100,
-      "title": "ESTADO Y HEALTH DE MICROSERVICIOS TRANSSYNC (S10 / S12)",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [
-            { "options": { "0": { "color": "red", "text": "DOWN" }, "1": { "color": "green", "text": "UP" } }, "type": "value" }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }]
-          }
-        }
-      },
-      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 7 },
-      "id": 1,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
-      },
-      "pluginVersion": "10.0.0",
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "editorMode": "code",
-          "expr": "up",
-          "legendFormat": "{{job}} ({{instance}})",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Health Status de Microservicios (Prometheus scrape)",
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
       "id": 101,
-      "title": "MÉTRICAS OPERACIONALES Y TRÁFICO HTTP (S10 RÚBRICA)",
+      "title": "TRÁFICO HTTP, RENDIMIENTO Y MEMORIA JVM",
       "type": "row"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": {
-          "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
-          "unit": "reqps"
-        }
+        "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "smooth" }, "unit": "reqps" }
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 19 },
       "id": 2,
       "options": { "legend": { "displayMode": "table", "placement": "bottom" } },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "editorMode": "code",
-          "expr": "sum by (job, status) (rate(http_server_requests_seconds_count[1m]))",
-          "legendFormat": "{{job}} [HTTP {{status}}]",
-          "range": true,
-          "refId": "A"
-        }
-      ],
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (job, status) (rate(http_server_requests_seconds_count[1m]))", "legendFormat": "{{job}} [HTTP {{status}}]", "refId": "A" }],
       "title": "Throughput de Peticiones HTTP por Servicio (req/s)",
       "type": "timeseries"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": {
-          "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
-          "unit": "bytes"
-        }
+        "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "smooth" }, "unit": "bytes" }
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 19 },
       "id": 3,
       "options": { "legend": { "displayMode": "table", "placement": "bottom" } },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "editorMode": "code",
-          "expr": "sum by (job) (jvm_memory_used_bytes{area=\"heap\"})",
-          "legendFormat": "{{job}} Heap",
-          "range": true,
-          "refId": "A"
-        }
-      ],
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (job) (jvm_memory_used_bytes{area=\"heap\"})", "legendFormat": "{{job}} Heap", "refId": "A" }],
       "title": "Memoria JVM Heap en Uso",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
-      "id": 102,
-      "title": "RESILIENCIA Y LATENCIA (S6 / S9)",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
-          "unit": "s"
-        }
-      },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
-      "id": 4,
-      "options": { "legend": { "displayMode": "table", "placement": "bottom" } },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "editorMode": "code",
-          "expr": "sum by (job) (rate(http_server_requests_seconds_sum[1m])) / sum by (job) (rate(http_server_requests_seconds_count[1m]))",
-          "legendFormat": "{{job}} latencia media",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Latencia Promedio HTTP (Segundos)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
-          "unit": "percentunit"
-        }
-      },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
-      "id": 5,
-      "options": { "legend": { "displayMode": "table", "placement": "bottom" } },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "editorMode": "code",
-          "expr": "system_cpu_usage",
-          "legendFormat": "{{job}} CPU",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Uso de CPU del Sistema por Microservicio",
       "type": "timeseries"
     }
   ],
-  "refresh": "5s",
+  "refresh": "2s",
   "schemaVersion": 38,
   "style": "dark",
-  "tags": ["transsync", "upeu", "s10", "s12"],
+  "tags": ["transsync", "upeu", "microservicios", "resiliencia"],
   "time": { "from": "now-15m", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
   "title": "TransSync - Panel Operacional de Diagnóstico y Métricas",
   "uid": "transsync-overview",
-  "version": 2
+  "version": 3
 }
