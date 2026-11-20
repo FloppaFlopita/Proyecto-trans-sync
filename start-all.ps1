@@ -1,52 +1,52 @@
-# Script para levantar todo el ecosistema TransSync para la sustentación
-Write-Host "=====================================================" -ForegroundColor Cyan
-Write-Host "     TRANSSYNC: INICIANDO ECOSISTEMA DE MICROSERVICIOS     " -ForegroundColor Cyan
-Write-Host "=====================================================" -ForegroundColor Cyan
+﻿# ==============================================================================
+# TRANSSYNC: SCRIPT OFICIAL PARA LEVANTAR TODO EL ECOSISTEMA TRAS REINICIO
+# ==============================================================================
 
-# 1. Infraestructura Docker
-Write-Host "`n[1/4] Verificando Contenedores Docker (Postgres, Kafka, Prometheus, Grafana)..." -ForegroundColor Yellow
+Write-Host "=======================================================================" -ForegroundColor Cyan
+Write-Host "           TRANSSYNC: LEVANTANDO ECOSISTEMA COMPLETO                  " -ForegroundColor Cyan
+Write-Host "=======================================================================" -ForegroundColor Cyan
+
+# 1. Levantar Contenedores Docker
+Write-Host "`n[1/4] Iniciando Contenedores Docker (Postgres, Kafka, Prometheus, Grafana)..." -ForegroundColor Yellow
 docker compose up -d postgres-db zookeeper kafka prometheus grafana
 
-# 2. Eureka Server (Registro y Descubrimiento)
-Write-Host "`n[2/4] Levantando Eureka Server (:8761)..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$PSScriptRoot\eureka-server'; Write-Host '>>> Eureka Server (:8761)' -ForegroundColor Green; mvn spring-boot:run"
+# 2. Levantar Eureka Server
+Write-Host "`n[2/4] Levantando Eureka Server (:8761) en ventana visible..." -ForegroundColor Yellow
+Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$PSScriptRoot\eureka-server'; `$Host.UI.RawUI.WindowTitle = 'Eureka Server (:8761)'; Write-Host '>>> Eureka Server (:8761)' -ForegroundColor Green; mvn spring-boot:run"
 
-Write-Host "Esperando 10 segundos a que Eureka inicie..." -ForegroundColor Gray
-Start-Sleep -Seconds 10
+Write-Host "Esperando 8 segundos a que Eureka inicie..." -ForegroundColor Gray
+Start-Sleep -Seconds 8
 
-# 3. Microservicios del Negocio
-Write-Host "`n[3/4] Levantando Microservicios y Gateway..." -ForegroundColor Yellow
+# 3. Levantar Microservicios en Ventanas Independientes de PowerShell
+Write-Host "`n[3/4] Levantando Microservicios de Negocio..." -ForegroundColor Yellow
 
 $servicios = @(
-    @{ Name = "API Gateway (:8100) [Swagger Central]"; Dir = "api-gateway" },
-    @{ Name = "MS-Auth (:8107)"; Dir = "ms-auth" },
-    @{ Name = "MS-Flota (:8102)"; Dir = "ms-flota" },
-    @{ Name = "MS-Reservas (:8103) [Resilience4j + Kafka]"; Dir = "ms-reservas" },
-    @{ Name = "MS-Pagos (:8104)"; Dir = "ms-pagos" },
-    @{ Name = "MS-Promociones (:8105)"; Dir = "ms-promociones" },
-    @{ Name = "MS-Fidelizacion (:8106) [Kafka Consumer]"; Dir = "ms-fidelizacion" },
-    @{ Name = "MS-Facturacion (:8108) [Kafka Consumer]"; Dir = "ms-facturacion" },
-    @{ Name = "MS-Rutas (:8101)"; Dir = "ms-rutas" }
+    @{ Name = "TransSync Backend Gateway (:8100) [Mercado Pago]"; Dir = "."; Cmd = "node transsync-backend-server.js" },
+    @{ Name = "MS-Reservas (:8103) [Bloqueo de Asientos]"; Dir = "ms-reservas"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "MS-Pagos (:8104) [Pasarela Bancaria]"; Dir = "ms-pagos"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "MS-Facturacion (:8108) [Kafka SUNAT]"; Dir = "ms-facturacion"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "MS-Flota (:8102) [Buses y Mantenimiento]"; Dir = "ms-flota"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "MS-Rutas (:8101) [Tarifas e Itinerarios]"; Dir = "ms-rutas"; Cmd = "mvn spring-boot:run" },
+    @{ Name = "MS-Auth (:8107) [Seguridad y JWT]"; Dir = "ms-auth"; Cmd = "mvn spring-boot:run" }
 )
 
 foreach ($s in $servicios) {
     Write-Host "Iniciando $($s.Name)..." -ForegroundColor Green
-    Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$PSScriptRoot\$($s.Dir)'; Write-Host '>>> $($s.Name)' -ForegroundColor Green; mvn spring-boot:run"
-    Start-Sleep -Seconds 3
+    Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$PSScriptRoot\$($s.Dir)'; `$Host.UI.RawUI.WindowTitle = '$($s.Name)'; Write-Host '>>> $($s.Name)' -ForegroundColor Green; $($s.Cmd)"
+    Start-Sleep -Seconds 2
 }
 
-# 4. Frontend Angular
-Write-Host "`n[4/4] Levantando Cliente Frontend Angular (:4200)..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$PSScriptRoot\frontend-angular'; Write-Host '>>> Frontend Angular (:4200)' -ForegroundColor Green; npm.cmd start"
+# 4. Levantar Frontend Angular
+Write-Host "`n[4/4] Levantando Frontend Angular (:4200) en ventana visible..." -ForegroundColor Yellow
+Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$PSScriptRoot\frontend-angular'; `$Host.UI.RawUI.WindowTitle = 'Frontend Angular (:4200)'; Write-Host '>>> Frontend Angular (:4200)' -ForegroundColor Green; npm.cmd start"
 
-Write-Host "`n=====================================================" -ForegroundColor Cyan
-Write-Host "     ¡SISTEMA TRANSSYNC COMPLETAMENTE DESPLEGADO!     " -ForegroundColor Cyan
-Write-Host "=====================================================" -ForegroundColor Cyan
-Write-Host "Accesos Rápidos:" -ForegroundColor White
+Write-Host "`n=======================================================================" -ForegroundColor Cyan
+Write-Host "         ¡SISTEMA TRANSSYNC COMPLETAMENTE DESPLEGADO!                 " -ForegroundColor Cyan
+Write-Host "=======================================================================" -ForegroundColor Cyan
+Write-Host "ENLACES RÁPIDOS:" -ForegroundColor White
 Write-Host "  - Frontend Web:        http://localhost:4200" -ForegroundColor White
-Write-Host "  - Swagger Central:     http://localhost:8100/swagger-ui.html" -ForegroundColor White
+Write-Host "  - Grafana (Monitoreo): http://localhost:8300 (admin / admin)" -ForegroundColor White
+Write-Host "  - Prometheus Metricas: http://localhost:8900" -ForegroundColor White
 Write-Host "  - Eureka Dashboard:    http://localhost:8761" -ForegroundColor White
-Write-Host "  - Keycloak Auth IAM:   http://localhost:8085 (admin/admin)" -ForegroundColor White
-Write-Host "  - Grafana Dashboard:   http://localhost:8300 (admin/admin)" -ForegroundColor White
-Write-Host "  - Prometheus Metrics:  http://localhost:8900" -ForegroundColor White
-Write-Host "  - API Gateway:         http://localhost:8100/api" -ForegroundColor White
+Write-Host "  - Gateway API:         http://localhost:8100/api" -ForegroundColor White
+Write-Host "=======================================================================" -ForegroundColor Cyan
