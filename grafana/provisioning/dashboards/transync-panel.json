@@ -90,7 +90,7 @@
       "gridPos": { "h": 4, "w": 4, "x": 0, "y": 8 },
       "id": 205,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "up{job=\"ms-rutas\"} or vector(0)", "legendFormat": "MS-Rutas (:8101)", "refId": "A" }],
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-rutas\"}) or vector(0)", "legendFormat": "MS-Rutas (:8101)", "refId": "A" }],
       "title": "MS-Rutas (:8101)",
       "type": "stat"
     },
@@ -109,7 +109,7 @@
       "gridPos": { "h": 4, "w": 5, "x": 4, "y": 8 },
       "id": 204,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "up{job=\"ms-flota\"} or vector(0)", "legendFormat": "MS-Flota (:8102)", "refId": "A" }],
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-flota\"}) or vector(0)", "legendFormat": "MS-Flota (:8102)", "refId": "A" }],
       "title": "MS-Flota (:8102)",
       "type": "stat"
     },
@@ -128,7 +128,7 @@
       "gridPos": { "h": 4, "w": 5, "x": 9, "y": 8 },
       "id": 201,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "up{job=\"ms-reservas\"} or vector(0)", "legendFormat": "MS-Reservas (:8103)", "refId": "A" }],
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-reservas\"}) or vector(0)", "legendFormat": "MS-Reservas (:8103)", "refId": "A" }],
       "title": "MS-Reservas (:8103)",
       "type": "stat"
     },
@@ -147,7 +147,7 @@
       "gridPos": { "h": 4, "w": 5, "x": 14, "y": 8 },
       "id": 202,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "up{job=\"ms-pagos\"} or vector(0)", "legendFormat": "MS-Pagos (:8104)", "refId": "A" }],
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-pagos\"}) or vector(0)", "legendFormat": "MS-Pagos (:8104)", "refId": "A" }],
       "title": "MS-Pagos (:8104)",
       "type": "stat"
     },
@@ -166,7 +166,7 @@
       "gridPos": { "h": 4, "w": 5, "x": 19, "y": 8 },
       "id": 203,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "up{job=\"ms-facturacion\"} or vector(0)", "legendFormat": "MS-Facturacion (:8108)", "refId": "A" }],
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-facturacion\"}) or vector(0)", "legendFormat": "MS-Facturacion (:8108)", "refId": "A" }],
       "title": "MS-Facturación (:8108)",
       "type": "stat"
     },
