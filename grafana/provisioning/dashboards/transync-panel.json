@@ -20,74 +20,13 @@
         "defaults": {
           "color": { "mode": "thresholds" },
           "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": { "color": "red", "text": "FUERA DE SERVICIO (CAÍDO)" },
-                "1": { "color": "green", "text": "OPERATIVO (ONLINE)" }
-              }
-            },
-            {
-              "type": "special",
-              "options": {
-                "match": "null+nan",
-                "result": { "color": "red", "text": "FUERA DE SERVICIO (CAÍDO)" }
-              }
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "green", "value": 1 }
-            ]
-          }
-        }
-      },
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 1 },
-      "id": 1,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "horizontal",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "textMode": "value_and_name"
-      },
-      "pluginVersion": "10.0.0",
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "editorMode": "code",
-          "expr": "up",
-          "legendFormat": "{{job}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Monitor Central de Disponibilidad (VERDE = ONLINE | ROJO = FUERA DE SERVICIO)",
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
-      "id": 105,
-      "title": "MONITORES INDIVIDUALES PARA PRUEBAS DE CAÍDA Y RESILIENCIA",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "mappings": [
             { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
             { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
           ],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
         }
       },
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 8 },
+      "gridPos": { "h": 4, "w": 5, "x": 0, "y": 1 },
       "id": 205,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-rutas\"}) or vector(0)", "legendFormat": "MS-Rutas (:8101)", "refId": "A" }],
@@ -106,7 +45,7 @@
           "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
         }
       },
-      "gridPos": { "h": 4, "w": 5, "x": 4, "y": 8 },
+      "gridPos": { "h": 4, "w": 5, "x": 5, "y": 1 },
       "id": 204,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-flota\"}) or vector(0)", "legendFormat": "MS-Flota (:8102)", "refId": "A" }],
@@ -125,7 +64,7 @@
           "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
         }
       },
-      "gridPos": { "h": 4, "w": 5, "x": 9, "y": 8 },
+      "gridPos": { "h": 4, "w": 5, "x": 10, "y": 1 },
       "id": 201,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-reservas\"}) or vector(0)", "legendFormat": "MS-Reservas (:8103)", "refId": "A" }],
@@ -144,7 +83,7 @@
           "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
         }
       },
-      "gridPos": { "h": 4, "w": 5, "x": 14, "y": 8 },
+      "gridPos": { "h": 4, "w": 5, "x": 15, "y": 1 },
       "id": 202,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-pagos\"}) or vector(0)", "legendFormat": "MS-Pagos (:8104)", "refId": "A" }],
@@ -163,11 +102,113 @@
           "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
         }
       },
-      "gridPos": { "h": 4, "w": 5, "x": 19, "y": 8 },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
       "id": 203,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-facturacion\"}) or vector(0)", "legendFormat": "MS-Facturacion (:8108)", "refId": "A" }],
       "title": "MS-Facturación (:8108)",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 105,
+      "title": "SERVICIOS BASE, GATEWAY Y SEGURIDAD",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
+            { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 5, "x": 0, "y": 6 },
+      "id": 206,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"api-gateway\"}) or vector(0)", "legendFormat": "API-Gateway (:8100)", "refId": "A" }],
+      "title": "API Gateway (:8100)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
+            { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 5, "x": 5, "y": 6 },
+      "id": 207,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"eureka-server\"}) or vector(0)", "legendFormat": "Eureka (:8761)", "refId": "A" }],
+      "title": "Eureka Server (:8761)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
+            { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 5, "x": 10, "y": 6 },
+      "id": 208,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-auth\"}) or vector(0)", "legendFormat": "MS-Auth (:8107)", "refId": "A" }],
+      "title": "MS-Auth (:8107)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
+            { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 5, "x": 15, "y": 6 },
+      "id": 209,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-promociones\"}) or vector(0)", "legendFormat": "MS-Promos (:8105)", "refId": "A" }],
+      "title": "MS-Promociones (:8105)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "color": "red", "text": "CAÍDO" }, "1": { "color": "green", "text": "OPERATIVO" } } },
+            { "type": "special", "options": { "match": "null+nan", "result": { "color": "red", "text": "CAÍDO" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 6 },
+      "id": 210,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(up{job=\"ms-fidelizacion\"}) or vector(0)", "legendFormat": "MS-Fidel (:8106)", "refId": "A" }],
+      "title": "MS-Fidelización (:8106)",
       "type": "stat"
     },
     {
