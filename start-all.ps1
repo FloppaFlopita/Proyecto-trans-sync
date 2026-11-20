@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # TRANSSYNC: SCRIPT OFICIAL PARA LEVANTAR TODO EL ECOSISTEMA TRAS REINICIO
 # ==============================================================================
 
@@ -7,8 +7,8 @@ Write-Host "           TRANSSYNC: LEVANTANDO ECOSISTEMA COMPLETO                
 Write-Host "=======================================================================" -ForegroundColor Cyan
 
 # 1. Levantar Contenedores Docker
-Write-Host "`n[1/4] Iniciando Contenedores Docker (Postgres, Kafka, Kafka-UI, Prometheus, Grafana)..." -ForegroundColor Yellow
-docker compose up -d postgres-db zookeeper kafka kafka-ui prometheus grafana
+Write-Host "`n[1/4] Iniciando Contenedores Docker (Postgres, Kafka, Kafka-UI, Prometheus, Grafana, Keycloak)..." -ForegroundColor Yellow
+docker compose up -d postgres-db zookeeper kafka kafka-ui prometheus grafana keycloak
 
 # 2. Levantar Eureka Server
 Write-Host "`n[2/4] Levantando Eureka Server (:8761) en ventana visible..." -ForegroundColor Yellow
