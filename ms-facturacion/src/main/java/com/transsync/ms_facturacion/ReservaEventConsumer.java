@@ -50,7 +50,7 @@ public class ReservaEventConsumer {
             request.setPagoId(evento.getReservaId()); // Correlativo de pago
             request.setClienteDocumento(evento.getDniPasajero() != null ? evento.getDniPasajero() : "00000000");
             request.setClienteNombre(evento.getNombrePasajero() != null ? evento.getNombrePasajero() : "Cliente TransSync");
-             brequest.setTotal(evento.getTotalPagar() != null && evento.getTotalPagar() > 0 ? evento.getTotalPagar() : 45.00);
+             request.setTotal(evento.getTotalPagar() != null && evento.getTotalPagar() > 0 ? evento.getTotalPagar() : 45.00);
 
             Comprobante emitido = facturacionService.emitirComprobante(request);
             log.info(">>> [FACTURACION S8 ASINCRONA] Comprobante {} emitido exitosamente para Pasajero: {} (Total: S/ {})",
