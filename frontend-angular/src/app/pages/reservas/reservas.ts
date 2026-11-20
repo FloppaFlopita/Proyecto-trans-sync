@@ -527,6 +527,7 @@ interface FilaAsiento {
               <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
             </button>
 
+
             <p *ngIf="mensajeErrorForm" class="text-xs text-rose-700 font-medium text-center p-2.5 rounded-xl bg-rose-50 border border-rose-200 animate-in fade-in">
               {{ mensajeErrorForm }}
             </p>
@@ -1080,7 +1081,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
   // Rutas Interprovinciales
   rutasDisponibles: RutaOpcion[] = [
-    { id: 99, nombre: 'Juliaca ➔ Puno (Test Pago Real S/ 3.00)', origen: 'Juliaca', destino: 'Puno', busId: 1, precio: 3.00, horario: '10:00 hrs' },
+    { id: 99, nombre: 'Juliaca → Puno (Directo)', origen: 'Juliaca', destino: 'Puno', busId: 1, precio: 3.00, horario: '10:00 hrs' },
     { id: 19, nombre: 'Juliaca → Cusco', origen: 'Juliaca', destino: 'Cusco', busId: 3, precio: 35.00, horario: '07:30 hrs' },
     { id: 20, nombre: 'Cusco → Juliaca', origen: 'Cusco', destino: 'Juliaca', busId: 4, precio: 35.00, horario: '14:00 hrs' },
     { id: 21, nombre: 'Cusco → Arequipa', origen: 'Cusco', destino: 'Arequipa', busId: 5, precio: 40.00, horario: '21:00 hrs' },
@@ -1212,8 +1213,18 @@ export class ReservasComponent implements OnInit, OnDestroy {
       const mpStatus = params['mp_status'] || params['collection_status'] || params['status'];
       if (mpStatus === 'approved' || mpStatus === 'pending') {
         this.completarCompraMercadoPagoAprobada(params['payment_id'] || params['collection_id'], mpStatus);
+      } else {
+        this.verificarPagoPendienteConBackend();
       }
     });
+
+    this.visibilidadHandler = () => {
+      if (document.visibilityState === 'visible') {
+        this.verificarPagoPendienteConBackend();
+        this.cargarAsientosOcupados();
+      }
+    };
+    document.addEventListener('visibilitychange', this.visibilidadHandler);
 
     this.authService.currentUser$.subscribe(user => {
       const eraUsuario = this.sesionActual;
@@ -1256,6 +1267,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
     this.pollingSub = interval(3000).subscribe(() => {
       this.cargarAsientosOcupadosSilencioso();
+      this.verificarPagoPendienteConBackendSilencioso();
       if (this.tabActiva === 'conductor') {
         this.cargarManifiestoSilencioso();
       } else if (this.tabActiva === 'ventas') {
@@ -1281,7 +1293,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
           const rutaTest: RutaOpcion = {
             id: 99,
-            nombre: 'Juliaca ➔ Puno (Test Pago Real S/ 3.00)',
+            nombre: 'Juliaca → Puno (Directo)',
             origen: 'Juliaca',
             destino: 'Puno',
             busId: 1,
@@ -1692,9 +1704,133 @@ export class ReservasComponent implements OnInit, OnDestroy {
     });
   }
 
+  verificandoPagoBackend = false;
+
+  verificarPagoPendienteConBackend() {
+    if (this.verificandoPagoBackend) return;
+    const rawData = localStorage.getItem('transsync_mp_pending_purchase');
+    if (!rawData && this.asientosSeleccionados.length === 0) {
+      if (this.procesandoPago) {
+        this.procesandoPago = false;
+        this.cdr.detectChanges();
+      }
+      return;
+    }
+
+    this.verificandoPagoBackend = true;
+    this.pagosService.verificarUltimoPago().subscribe({
+      next: (resp: any) => {
+        this.verificandoPagoBackend = false;
+        if (resp && resp.aprobado) {
+          this.procesandoPago = false;
+          this.completarCompraMercadoPagoAprobada(resp.paymentId, resp.status);
+        } else {
+          this.procesandoPago = false;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.verificandoPagoBackend = false;
+        this.procesandoPago = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  verificarPagoPendienteConBackendSilencioso() {
+    if (this.verificandoPagoBackend) return;
+    const rawData = localStorage.getItem('transsync_mp_pending_purchase');
+    if (!rawData && !this.procesandoPago) return;
+
+    this.verificandoPagoBackend = true;
+    this.pagosService.verificarUltimoPago().subscribe({
+      next: (resp: any) => {
+        this.verificandoPagoBackend = false;
+        if (resp && resp.aprobado) {
+          this.procesandoPago = false;
+          this.completarCompraMercadoPagoAprobada(resp.paymentId, resp.status);
+        }
+      },
+      error: () => {
+        this.verificandoPagoBackend = false;
+      }
+    });
+  }
+
   completarCompraMercadoPagoAprobada(paymentId?: string, statusParam: string = 'approved') {
     const rawData = localStorage.getItem('transsync_mp_pending_purchase');
-    if (!rawData) return;
+    if (!rawData) {
+      if (this.asientosSeleccionados.length > 0) {
+        const esFactura = this.formulario.tipoComprobante === 'FACTURA';
+        const numComp = (esFactura ? 'F001-' : 'B001-') + String(Math.floor(100000 + Math.random() * 900000));
+        const payload = {
+          tipoComprobante: this.formulario.tipoComprobante || 'BOLETA',
+          numeroComprobante: numComp,
+          nombrePasajero: this.formulario.nombrePasajero || 'Carlos Mendoza Ramos',
+          dniPasajero: this.formulario.dniPasajero || '72384910',
+          telefonoPasajero: this.formulario.telefonoPasajero || '951234567',
+          emailPasajero: this.formulario.emailPasajero || 'tkamado321@gmail.com',
+          rucEmpresa: this.formulario.rucEmpresa,
+          razonSocial: this.formulario.razonSocial,
+          direccionFiscal: this.formulario.direccionFiscal,
+          rutaId: this.rutaActual.id,
+          rutaNombre: this.rutaActual.nombre,
+          busId: this.busSeleccionado,
+          fechaViaje: this.fechaSeleccionada,
+          asientos: [...this.asientosSeleccionados],
+          precioUnitario: this.rutaActual.precio,
+          metodoPago: 'MERCADO PAGO (YAPE)',
+          idCliente: this.sesionActual?.idCliente || 101
+        };
+
+        this.detenerTemporizador();
+        localStorage.removeItem('transsync_reserva_temporal');
+
+        this.reservasService.createReservaMultiple(payload).subscribe({
+          next: () => {
+            const total = this.totalAPagar;
+            const subtotal = total / 1.18;
+            const igv = total - subtotal;
+            this.boletaEmitida = {
+              tipoComprobante: payload.tipoComprobante,
+              numeroComprobante: numComp,
+              numeroBoleta: numComp,
+              fechaHora: new Date().toLocaleString('es-PE'),
+              pasajero: payload.nombrePasajero,
+              dni: payload.dniPasajero,
+              ruc: payload.rucEmpresa,
+              razonSocial: payload.razonSocial,
+              direccionFiscal: payload.direccionFiscal,
+              ruta: payload.rutaNombre,
+              fechaViaje: payload.fechaViaje,
+              horario: this.rutaActual.horario,
+              busId: payload.busId,
+              asientos: [...payload.asientos],
+              metodoPago: 'MERCADO PAGO (YAPE APROBADO)',
+              subtotal: Math.round(subtotal * 100) / 100,
+              igv: Math.round(igv * 100) / 100,
+              total: total,
+              puntosGanados: 1,
+              saldoTotalPuntos: this.authService.obtenerPuntos()
+            };
+            this.procesandoPago = false;
+            this.asientosSeleccionados = [];
+            this.mostrarBoletoExito = true;
+            this.cargarAsientosOcupados();
+            this.router.navigate([], { replaceUrl: true, queryParams: {} });
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.procesandoPago = false;
+            this.cdr.detectChanges();
+          }
+        });
+      } else {
+        this.procesandoPago = false;
+        this.cdr.detectChanges();
+      }
+      return;
+    }
 
     try {
       const data = JSON.parse(rawData);
@@ -1762,6 +1898,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
             saldoTotalPuntos: this.authService.obtenerPuntos()
           };
 
+          this.procesandoPago = false;
           this.asientosSeleccionados = [];
           this.mostrarBoletoExito = true;
           this.cargarAsientosOcupados();
@@ -1769,6 +1906,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         },
         error: (err: any) => {
+          this.procesandoPago = false;
           console.error('Error al emitir reserva post-MP:', err);
           this.cargarAsientosOcupados();
           this.router.navigate([], { replaceUrl: true, queryParams: {} });

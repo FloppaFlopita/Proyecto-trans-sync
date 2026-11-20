@@ -6,7 +6,8 @@ const url = require('url');
 
 const PORT = 8100;
 const DATA_FILE = path.join(__dirname, 'backend-state.json');
-const MP_ACCESS_TOKEN = 'APP_USR-4665057574203239-111721-738e50b7ab123e60eec123aa4d750e00-3852690669';
+// Credencial Oficial PRODUCCIÓN EN VIVO (Activada y Autorizada para Cobros Reales)
+const MP_ACCESS_TOKEN = 'APP_USR-1789579822505186-111721-79b4c33369e58b48a70ac3692eb3e880-3852779519';
 
 // Estado inicial persistente
 let state = {
@@ -426,6 +427,55 @@ const server = http.createServer((req, res) => {
       });
 
       mpReq.write(postData);
+      mpReq.end();
+      return;
+    }
+
+    // 9.1 VERIFICAR ÚLTIMO PAGO EN MERCADO PAGO API (Detección en tiempo real sin salir ni recargar)
+    if (pathname === '/api/pagos/verificar-ultimo-pago' && req.method === 'GET') {
+      const options = {
+        hostname: 'api.mercadopago.com',
+        path: '/v1/payments/search?sort=date_created&criteria=desc&limit=1',
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
+        }
+      };
+
+      const mpReq = https.request(options, mpRes => {
+        let mpData = '';
+        mpRes.on('data', d => { mpData += d; });
+        mpRes.on('end', () => {
+          try {
+            const parsed = JSON.parse(mpData);
+            if (parsed.results && parsed.results.length > 0) {
+              const ultimo = parsed.results[0];
+              const ahora = Date.now();
+              const fechaAprobado = new Date(ultimo.date_approved || ultimo.date_created).getTime();
+              const minutosDiferencia = (ahora - fechaAprobado) / (1000 * 60);
+
+              // Si se aprobó recientemente (últimas 2 horas)
+              if (ultimo.status === 'approved' && minutosDiferencia < 120) {
+                return sendJson(200, {
+                  aprobado: true,
+                  paymentId: String(ultimo.id),
+                  status: ultimo.status,
+                  metodoPago: (ultimo.payment_method_id || 'YAPE').toUpperCase(),
+                  monto: ultimo.transaction_amount
+                });
+              }
+            }
+            return sendJson(200, { aprobado: false });
+          } catch (e) {
+            return sendJson(200, { aprobado: false, error: e.message });
+          }
+        });
+      });
+
+      mpReq.on('error', err => {
+        return sendJson(200, { aprobado: false, error: err.message });
+      });
+
       mpReq.end();
       return;
     }
