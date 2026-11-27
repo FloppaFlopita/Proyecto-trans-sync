@@ -34,7 +34,7 @@ public class PagoService {
         }
 
         if (pago.getEstado() == null || pago.getEstado().isBlank()) {
-            pago.setEstado("PENDIENTE");
+            pago.setEstado("COMPLETADO");
         }
         if (pago.getFechaPago() == null) {
             pago.setFechaPago(LocalDateTime.now());

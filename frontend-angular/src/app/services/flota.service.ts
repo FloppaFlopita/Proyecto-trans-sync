@@ -40,6 +40,10 @@ export class FlotaService {
     return this.http.get(`${this.apiUrl}/estadisticas`);
   }
 
+  getHistorialFlota(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/historial`);
+  }
+
   createBus(bus: any): Observable<any> {
     return this.http.post(this.apiUrl, bus);
   }

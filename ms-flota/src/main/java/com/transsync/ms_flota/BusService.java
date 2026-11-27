@@ -18,9 +18,19 @@ public class BusService {
     @Autowired
     private MantenimientoRepository mantenimientoRepository;
 
+    @Autowired
+    private FlotaAuditoriaRepository flotaAuditoriaRepository;
+
+    private final org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+
     @Transactional(readOnly = true)
     public List<Bus> listarBuses() {
         return busRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<FlotaAuditoria> listarHistorial() {
+        return flotaAuditoriaRepository.findAllByOrderByFechaOperacionDesc();
     }
 
     @Transactional(readOnly = true)
@@ -28,7 +38,14 @@ public class BusService {
         return busRepository.findById(id);
     }
 
-    @Transactional
+    private void registrarAuditoria(Long busId, String placa, String tipoOperacion,
+                                    Integer antes, Integer despues, String detalles) {
+        if (flotaAuditoriaRepository != null) {
+            flotaAuditoriaRepository.save(new FlotaAuditoria(busId, placa, tipoOperacion, antes, despues, detalles));
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public Bus registrarBus(Bus bus) {
         if (bus.getPlaca() == null || bus.getPlaca().isBlank()) {
             throw new IllegalArgumentException("La placa es obligatoria");
@@ -53,10 +70,14 @@ public class BusService {
             throw new IllegalArgumentException("Los asientos disponibles deben estar entre 0 y la capacidad máxima (" + bus.getCapacidad() + ")");
         }
 
-        return busRepository.save(bus);
+        Bus guardado = busRepository.save(bus);
+        registrarAuditoria(guardado.getId(), guardado.getPlaca(), "REGISTRO_BUS",
+                0, guardado.getAsientosDisponibles(),
+                "Unidad registrada: " + guardado.getModelo() + " (" + guardado.getCapacidad() + " asientos)");
+        return guardado;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Bus descontarAsiento(Long id) {
         // Bloqueo pesimista: SELECT ... FOR UPDATE a nivel de fila en base de datos
         Bus bus = busRepository.findByIdForUpdate(id)
@@ -71,11 +92,16 @@ public class BusService {
             throw new IllegalStateException("No hay asientos disponibles para descontar en el bus: " + bus.getPlaca());
         }
 
-        bus.setAsientosDisponibles(bus.getAsientosDisponibles() - 1);
-        return busRepository.save(bus);
+        int antes = bus.getAsientosDisponibles();
+        bus.setAsientosDisponibles(antes - 1);
+        Bus guardado = busRepository.save(bus);
+        registrarAuditoria(guardado.getId(), guardado.getPlaca(), "VENTA_ASIENTO",
+                antes, guardado.getAsientosDisponibles(),
+                "Descuento transaccional de 1 asiento por venta/reserva");
+        return guardado;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Bus liberarAsiento(Long id) {
         // Bloqueo pesimista: garantiza lectura exclusiva para validar capacidad sin sobrepasar el límite
         Bus bus = busRepository.findByIdForUpdate(id)
@@ -85,27 +111,39 @@ public class BusService {
         int disponibles = (bus.getAsientosDisponibles() != null) ? bus.getAsientosDisponibles() : 0;
 
         if (disponibles >= capacidad) {
-            throw new IllegalStateException("No se puede liberar asiento: el bus " + bus.getPlaca() + 
+            throw new IllegalStateException("No se puede liberar asiento: el bus " + bus.getPlaca() +
                     " ya tiene la capacidad máxima completa (" + capacidad + ")");
         }
 
         bus.setAsientosDisponibles(disponibles + 1);
-        return busRepository.save(bus);
+        Bus guardado = busRepository.save(bus);
+        registrarAuditoria(guardado.getId(), guardado.getPlaca(), "LIBERACION_ASIENTO",
+                disponibles, guardado.getAsientosDisponibles(),
+                "Liberación transaccional de 1 asiento");
+        return guardado;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Bus reiniciarBus(Long id) {
         Bus bus = busRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new IllegalArgumentException("Bus no encontrado con ID: " + id));
 
+        int antes = bus.getAsientosDisponibles() != null ? bus.getAsientosDisponibles() : 0;
         bus.setAsientosDisponibles(bus.getCapacidad());
-        return busRepository.save(bus);
+        Bus guardado = busRepository.save(bus);
+        registrarAuditoria(guardado.getId(), guardado.getPlaca(), "REINICIO_CAPACIDAD",
+                antes, guardado.getAsientosDisponibles(),
+                "Capacidad restablecida al 100% (" + guardado.getCapacidad() + " asientos)");
+        return guardado;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Bus actualizarBus(Long id, Bus datosActualizados) {
-        Bus bus = busRepository.findById(id)
+        // Bloqueo pesimista SELECT ... FOR UPDATE para evitar condiciones de carrera con ventas simultáneas
+        Bus bus = busRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new IllegalArgumentException("Bus no encontrado con ID: " + id));
+
+        int antes = bus.getAsientosDisponibles() != null ? bus.getAsientosDisponibles() : 0;
 
         if (datosActualizados.getPlaca() != null && !datosActualizados.getPlaca().isBlank()) {
             String nuevaPlaca = datosActualizados.getPlaca().toUpperCase().trim();
@@ -123,6 +161,15 @@ public class BusService {
             if (datosActualizados.getCapacidad() < 10 || datosActualizados.getCapacidad() > 80) {
                 throw new IllegalArgumentException("La capacidad del autobús debe estar entre 10 y 80 asientos");
             }
+            int ocupados = (bus.getCapacidad() != null && bus.getAsientosDisponibles() != null)
+                    ? Math.max(0, bus.getCapacidad() - bus.getAsientosDisponibles()) : 0;
+            if (datosActualizados.getCapacidad() < ocupados) {
+                throw new IllegalStateException("No se puede reducir la capacidad a " + datosActualizados.getCapacidad()
+                        + " porque ya existen " + ocupados + " asientos ocupados.");
+            }
+            if (datosActualizados.getAsientosDisponibles() == null) {
+                bus.setAsientosDisponibles(datosActualizados.getCapacidad() - ocupados);
+            }
             bus.setCapacidad(datosActualizados.getCapacidad());
         }
 
@@ -136,17 +183,53 @@ public class BusService {
             bus.setAsientosDisponibles(datosActualizados.getAsientosDisponibles());
         }
 
-        return busRepository.save(bus);
+        Bus guardado = busRepository.save(bus);
+        registrarAuditoria(guardado.getId(), guardado.getPlaca(), "ACTUALIZACION_BUS",
+                antes, guardado.getAsientosDisponibles(),
+                "Datos actualizados: " + guardado.getModelo() + " (" + guardado.getCapacidad() + " ast.)");
+        return guardado;
     }
 
-    @Transactional
-    public boolean eliminarBus(Long id) {
-        if (busRepository.existsById(id)) {
-            // Verificar si tiene mantenimientos activos
-            if (mantenimientoRepository != null && mantenimientoRepository.existsByBusIdAndEstado(id, EstadoMantenimiento.EN_MANTENIMIENTO)) {
-                throw new IllegalStateException("No se puede eliminar un autobús que está actualmente en mantenimiento activo");
+    private void validarBusSinRutasAsignadas(Long busId, String placa) {
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> resp = restTemplate.getForObject("http://localhost:8101/rutas", Map.class);
+            if (resp != null && resp.get("datos") instanceof List<?> rutas) {
+                for (Object item : rutas) {
+                    if (item instanceof Map<?, ?> r && r.get("busId") != null) {
+                        long assignedBusId = Long.parseLong(String.valueOf(r.get("busId")));
+                        if (assignedBusId == busId) {
+                            throw new IllegalStateException("No se puede eliminar el autobús " + placa
+                                    + " porque está asignado a la ruta " + r.get("origen") + " -> " + r.get("destino")
+                                    + " (" + r.get("horario") + ").");
+                        }
+                    }
+                }
             }
-            busRepository.deleteById(id);
+        } catch (IllegalStateException e) {
+            throw e;
+        } catch (Exception ignored) {
+            // Si ms-rutas no responde, no bloqueamos el borrado local
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean eliminarBus(Long id) {
+        Optional<Bus> opcional = busRepository.findByIdForUpdate(id);
+        if (opcional.isPresent()) {
+            Bus bus = opcional.get();
+            validarBusSinRutasAsignadas(id, bus.getPlaca());
+            if (mantenimientoRepository != null) {
+                if (mantenimientoRepository.existsByBusIdAndEstadoIn(id, List.of(EstadoMantenimiento.EN_MANTENIMIENTO, EstadoMantenimiento.PROGRAMADO))) {
+                    throw new IllegalStateException("No se puede eliminar un autobús que tiene mantenimiento activo o programado");
+                }
+                // Limpiar historial de mantenimientos finalizados/cancelados dentro de la misma transacción ACID
+                mantenimientoRepository.deleteByBusId(id);
+            }
+            busRepository.delete(bus);
+            registrarAuditoria(bus.getId(), bus.getPlaca(), "ELIMINACION_BUS",
+                    bus.getAsientosDisponibles(), 0,
+                    "Unidad dada de baja: " + bus.getModelo());
             return true;
         }
         return false;

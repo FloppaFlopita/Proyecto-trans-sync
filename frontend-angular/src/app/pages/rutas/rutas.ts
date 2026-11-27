@@ -45,48 +45,35 @@ interface BusFlotaItem {
       <!-- ENCABEZADO LIMPIO CON SELECTOR DE PESTAÑAS (RUTAS VS FLOTA) -->
       <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-100 text-teal-800">
-              TransSync Interprovincial
-            </span>
-            <span class="text-xs text-slate-400 font-medium">Viajes Confortables & Seguros</span>
-          </div>
-          <h1 class="text-2xl font-black text-slate-900 tracking-tight">
-            {{ pestanaActiva === 'rutas' ? 'Rutas y Salidas Programadas' : 'Nuestra Flota de Autobuses' }}
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            {{ pestanaActiva === 'rutas' ? 'Rutas y Horarios de Salida' : 'Nuestros Autobuses' }}
           </h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-            {{ pestanaActiva === 'rutas' 
-               ? 'Encuentra tu próximo destino con tarifas oficiales garantizadas y salidas puntuales.' 
-               : 'Conoce nuestras modernas unidades vehiculares, equipamiento y comodidad a bordo.' }}
+          <p class="text-sm text-slate-600 mt-1">
+            {{ pestanaActiva === 'rutas'
+               ? 'Elija su ciudad de origen y destino para ver horarios, autobús asignado y comprar su pasaje.'
+               : 'Consulte las unidades disponibles, su capacidad de asientos y asigne un autobús a una ruta.' }}
           </p>
         </div>
 
-        <div class="flex items-center gap-2.5">
-          <!-- PESTAÑAS MODERNAS Y LIMPIAS -->
-          <div class="flex items-center bg-slate-100 p-1 rounded-xl">
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex items-center bg-slate-100 p-1.5 rounded-xl">
             <button (click)="pestanaActiva = 'rutas'"
-                    [class]="pestanaActiva === 'rutas' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                    class="px-4 py-2 text-xs rounded-lg transition-all flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-              </svg>
+                    [class]="pestanaActiva === 'rutas' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'"
+                    class="px-4 py-2.5 text-sm rounded-lg transition-all flex items-center gap-2">
               Rutas y Salidas
             </button>
             <button (click)="pestanaActiva = 'flota'"
-                    [class]="pestanaActiva === 'flota' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                    class="px-4 py-2 text-xs rounded-lg transition-all flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-              </svg>
-              Nuestra Flota ({{ busesFlota.length }})
+                    [class]="pestanaActiva === 'flota' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'"
+                    class="px-4 py-2.5 text-sm rounded-lg transition-all flex items-center gap-2">
+              Autobuses ({{ busesFlota.length }})
             </button>
           </div>
 
           <!-- Botón Nueva Ruta (Exclusivo Administrador) -->
           <button *ngIf="modoVista === 'admin' && pestanaActiva === 'rutas'"
                   (click)="abrirModalCrear()"
-                  class="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition-all shadow-md shadow-teal-600/20">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  class="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition-all shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             Nueva Ruta
@@ -99,65 +86,27 @@ interface BusFlotaItem {
       <!-- ========================================== -->
       <ng-container *ngIf="pestanaActiva === 'rutas'">
 
-        <!-- BANNER COMERCIAL ESTÉTICO Y ELEGANTE DE RUTAS (AL ESTILO DE FLOTA) -->
-        <div class="bg-gradient-to-r from-teal-700 via-teal-800 to-slate-900 rounded-2xl p-6 text-white shadow-md flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-          <div class="space-y-2 max-w-xl">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-500/20 text-teal-200 border border-teal-400/30">
-              Salidas Diarias Garantizadas
-            </span>
-            <h2 class="text-2xl font-black tracking-tight">Conectando los Mejores Destinos del Sur</h2>
-            <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">
-              Viajes directos con puntualidad garantizada, tarifas oficiales sin comisiones ocultas y equipaje de bodega incluido en tu boleto.
-            </p>
-          </div>
+        <!-- BUSCADOR CLARO Y ACCESIBLE -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-end">
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 shrink-0">
-            <div class="bg-white/10 backdrop-blur-md px-3 py-2.5 rounded-xl border border-white/15 text-center min-w-[5.2rem]">
-              <span class="text-lg">🛡️</span>
-              <p class="text-[11px] font-bold text-white mt-0.5 whitespace-nowrap">SOAT Activo</p>
-              <p class="text-[10px] text-teal-200 whitespace-nowrap">100% Cobertura</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-md px-3 py-2.5 rounded-xl border border-white/15 text-center min-w-[5.2rem]">
-              <span class="text-lg">⏱️</span>
-              <p class="text-[11px] font-bold text-white mt-0.5 whitespace-nowrap">Puntualidad</p>
-              <p class="text-[10px] text-teal-200 whitespace-nowrap">Salidas fijas</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-md px-3 py-2.5 rounded-xl border border-white/15 text-center min-w-[5.2rem]">
-              <span class="text-lg">🎟️</span>
-              <p class="text-[11px] font-bold text-white mt-0.5 whitespace-nowrap">Pase Digital</p>
-              <p class="text-[10px] text-teal-200 whitespace-nowrap">Embarque DNI</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-md px-3 py-2.5 rounded-xl border border-white/15 text-center min-w-[5.2rem]">
-              <span class="text-lg">🧳</span>
-              <p class="text-[11px] font-bold text-white mt-0.5 whitespace-nowrap">Equipaje</p>
-              <p class="text-[10px] text-teal-200 whitespace-nowrap">20 kg incluido</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- BUSCADOR MINIMALISTA Y LIMPIO -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-          <div class="grid grid-cols-1 md:grid-cols-11 gap-3 items-center">
-            
             <!-- Origen -->
             <div class="md:col-span-4">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Ciudad de Origen</label>
-              <div class="relative">
-                <select [(ngModel)]="filtroOrigen"
-                        class="w-full py-2.5 px-3 text-xs font-bold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800 bg-slate-50/50">
-                  <option value="">Todos los Orígenes</option>
-                  <option *ngFor="let o of listaOrigenes" [value]="o">{{ o }}</option>
-                </select>
-              </div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">¿Desde dónde viaja?</label>
+              <select [(ngModel)]="filtroOrigen"
+                      class="w-full py-3 px-3.5 text-sm font-bold rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 bg-white">
+                <option value="">Todas las ciudades de origen</option>
+                <option *ngFor="let o of listaOrigenes" [value]="o">{{ o }}</option>
+              </select>
             </div>
 
-            <!-- Botón Invertir Trayecto (Origen ⇄ Destino) -->
-            <div class="md:col-span-1 flex justify-center pt-4 md:pt-5">
+            <!-- Botón Invertir Trayecto -->
+            <div class="md:col-span-1 flex justify-center">
               <button (click)="invertirTrayecto()"
                       type="button"
-                      title="Invertir origen y destino"
-                      class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-600 hover:text-teal-700 transition-colors shadow-sm flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      title="Intercambiar origen y destino"
+                      class="w-full md:w-auto p-3 rounded-xl border border-slate-300 bg-slate-50 hover:bg-teal-50 hover:border-teal-400 text-slate-700 hover:text-teal-800 transition-colors flex items-center justify-center gap-1.5 text-xs font-bold">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                 </svg>
               </button>
@@ -165,23 +114,21 @@ interface BusFlotaItem {
 
             <!-- Destino -->
             <div class="md:col-span-4">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Ciudad de Destino</label>
-              <div class="relative">
-                <select [(ngModel)]="filtroDestino"
-                        class="w-full py-2.5 px-3 text-xs font-bold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800 bg-slate-50/50">
-                  <option value="">Todos los Destinos</option>
-                  <option *ngFor="let d of listaDestinos" [value]="d">{{ d }}</option>
-                </select>
-              </div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">¿Hacia dónde viaja?</label>
+              <select [(ngModel)]="filtroDestino"
+                      class="w-full py-3 px-3.5 text-sm font-bold rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 bg-white">
+                <option value="">Todas las ciudades de destino</option>
+                <option *ngFor="let d of listaDestinos" [value]="d">{{ d }}</option>
+              </select>
             </div>
 
             <!-- Ordenar por -->
             <div class="md:col-span-2">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Ordenar</label>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Ordenar</label>
               <select [(ngModel)]="criterioOrden"
-                      class="w-full py-2.5 px-3 text-xs font-semibold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-700 bg-slate-50/50">
-                <option value="precio_asc">Menor Tarifa</option>
-                <option value="precio_desc">Mayor Tarifa</option>
+                      class="w-full py-3 px-3.5 text-sm font-semibold rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800 bg-white">
+                <option value="precio_asc">Menor precio</option>
+                <option value="precio_desc">Mayor precio</option>
                 <option value="origen_asc">Origen (A-Z)</option>
                 <option value="destino_asc">Destino (A-Z)</option>
               </select>
@@ -191,11 +138,11 @@ interface BusFlotaItem {
 
           <!-- Indicador y Limpiar -->
           <div *ngIf="filtroOrigen || filtroDestino || criterioOrden !== 'precio_asc'"
-               class="flex items-center justify-between text-xs text-slate-500 pt-3 mt-3 border-t border-slate-100">
-            <span>Filtro activo: <strong>{{ rutasFiltradas.length }}</strong> salidas encontradas</span>
+               class="flex items-center justify-between text-sm text-slate-600 pt-3.5 mt-3.5 border-t border-slate-100">
+            <span>Mostrando <strong>{{ rutasFiltradas.length }}</strong> rutas disponibles</span>
             <button (click)="limpiarFiltros()"
-                    class="text-xs text-teal-700 hover:text-teal-900 font-bold">
-              Restablecer filtros
+                    class="px-3 py-1.5 rounded-lg bg-teal-50 text-sm text-teal-800 hover:bg-teal-100 font-bold">
+              Mostrar todas las rutas
             </button>
           </div>
         </div>
@@ -221,106 +168,68 @@ interface BusFlotaItem {
           <div *ngFor="let r of rutasFiltradas"
                class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-teal-300 transition-all flex flex-col justify-between">
             <div>
-              <!-- Recuadro superior estilizado con gradiente (estilo similar a la tarjeta de flota) -->
-              <div class="h-28 rounded-xl bg-gradient-to-br from-slate-50 to-teal-50/50 border border-slate-100 p-4 mb-4 flex items-center justify-between relative overflow-hidden">
-                <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-600/30 flex-shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <span class="text-[10px] font-bold text-teal-700 uppercase tracking-wide">Corredor Directo</span>
-                    <p class="text-lg font-black text-slate-900 leading-tight">
-                      {{ formatearCiudad(r.origen) }} ➔ {{ formatearCiudad(r.destino) }}
-                    </p>
-                    <p class="text-[11px] text-slate-500 mt-0.5">{{ estimarDuracion(r.origen, r.destino) }} aprox.</p>
-                  </div>
+              <!-- Cabecera clara y de alto contraste -->
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <span class="text-xs font-bold text-teal-700 uppercase tracking-wide">{{ obtenerTipoHorario(r.horario) }}</span>
+                  <p class="text-xl font-black text-slate-900 leading-tight mt-0.5">
+                    {{ formatearCiudad(r.origen) }} ➔ {{ formatearCiudad(r.destino) }}
+                  </p>
+                  <p class="text-xs text-slate-600 mt-1 font-medium">Duración estimada: {{ estimarDuracion(r.origen, r.destino) }}</p>
                 </div>
-
-                <div class="absolute top-2 right-2 flex flex-col items-end gap-1">
-                  <span *ngIf="esMejorTarifa(r) && rutasFiltradas.length > 1"
-                        class="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
-                    ★ Mejor Tarifa
-                  </span>
-                  <span class="text-[9px] font-bold text-teal-800 bg-teal-100/70 px-2 py-0.5 rounded-full">
-                    {{ obtenerTipoHorario(r.horario) }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Amenidades y Confort Incluido -->
-              <div class="flex items-center gap-1.5 mb-3.5 flex-wrap">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium">
-                  <span>💺</span> Semi-Cama
-                </span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium">
-                  <span>🧳</span> 20kg Bodega
-                </span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 text-[11px] font-semibold border border-teal-100">
-                  <span>🛡️</span> Seguro SOAT
+                <span *ngIf="esMejorTarifa(r) && rutasFiltradas.length > 1"
+                      class="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-200 shrink-0">
+                  Mejor Precio
                 </span>
               </div>
 
-              <!-- Ficha de Horario y Tarifa -->
-              <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 space-y-1.5 mb-4">
-                <div class="flex items-center justify-between text-xs">
-                  <span class="text-slate-500 font-medium">Salida Programada</span>
-                  <span class="font-bold text-slate-900 font-mono">{{ r.horario }}</span>
+              <!-- Ficha de Horario, Unidad y Tarifa -->
+              <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2.5 mb-4">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-600 font-medium">Hora de Salida</span>
+                  <span class="font-bold text-slate-900">{{ r.horario }}</span>
                 </div>
-                <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">
-                  <span class="text-slate-600 text-xs font-semibold">Tarifa Oficial</span>
-                  <div class="text-right">
-                    <span class="font-black text-teal-700 text-2xl">S/. {{ (r.precio || 0).toFixed(2) }}</span>
-                    <span class="block text-[10px] text-slate-400">por pasajero</span>
-                  </div>
+                <div class="flex items-center justify-between text-sm gap-2">
+                  <span class="text-slate-600 font-medium">Autobús</span>
+                  <span *ngIf="obtenerBusAsignado(r) as bus; else sinBus"
+                        class="font-bold text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-lg border border-teal-200 text-xs">
+                    {{ bus.placa }} · {{ bus.modelo }} ({{ bus.capacidad }} ast.)
+                  </span>
+                  <ng-template #sinBus>
+                    <span class="text-xs font-medium text-slate-500">Por asignar</span>
+                  </ng-template>
+                </div>
+                <div class="flex items-center justify-between pt-2.5 border-t border-slate-200">
+                  <span class="text-slate-700 text-sm font-bold">Precio por Pasaje</span>
+                  <span class="font-black text-teal-700 text-2xl">S/. {{ (r.precio || 0).toFixed(2) }}</span>
                 </div>
               </div>
             </div>
 
-            <!-- Botones de Acción -->
-            <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
-              <button (click)="comprarEnRuta(r)"
-                      class="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold py-2.5 px-3 rounded-xl bg-teal-600 text-white hover:bg-teal-700 transition-colors shadow-sm shadow-teal-600/20">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
-                </svg>
-                Elegir Asiento
-              </button>
-
-              <button (click)="verDetalles(r)"
-                      title="Ver detalles del viaje"
-                      class="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-              </button>
-
-              <!-- Acciones de Administrador -->
-              <ng-container *ngIf="modoVista === 'admin'">
-                <button (click)="duplicarRuta(r)"
-                        title="Duplicar salida"
-                        class="p-2.5 rounded-xl text-teal-600 hover:bg-teal-50 border border-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                  </svg>
+            <!-- Botones de Acción Claros y Fáciles de Presionar -->
+            <div class="pt-3 border-t border-slate-100 space-y-2">
+              <div class="flex items-center gap-2">
+                <button (click)="comprarEnRuta(r)"
+                        class="flex-1 flex items-center justify-center gap-2 text-sm font-bold py-3 px-4 rounded-xl bg-teal-600 text-white hover:bg-teal-700 transition-colors shadow-sm">
+                  Elegir Asiento
                 </button>
+                <button (click)="verDetalles(r)"
+                        class="py-3 px-3.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 border border-slate-300 transition-colors">
+                  Detalles
+                </button>
+              </div>
+
+              <!-- Acciones de Administrador con texto claro -->
+              <div *ngIf="modoVista === 'admin'" class="grid grid-cols-2 gap-2">
                 <button (click)="abrirModalEditar(r)"
-                        title="Editar Ruta"
-                        class="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                  </svg>
+                        class="py-2 px-3 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">
+                  Editar Ruta
                 </button>
                 <button (click)="eliminarRuta(r.id)"
-                        title="Eliminar Ruta"
-                        class="p-2.5 rounded-xl text-red-500 hover:bg-red-50 border border-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                  </svg>
+                        class="py-2 px-3 rounded-lg text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 transition-colors">
+                  Eliminar
                 </button>
-              </ng-container>
+              </div>
             </div>
           </div>
         </div>
@@ -344,11 +253,11 @@ interface BusFlotaItem {
         <div *ngIf="modoVista === 'admin'" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-6">
           <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
             <div>
-              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Historial de Auditoría Transaccional</h3>
-              <p class="text-[11px] text-slate-500">Registro inmutable sincronizado con PostgreSQL.</p>
+              <h3 class="text-sm font-bold text-slate-900">Historial de Cambios en Rutas</h3>
+              <p class="text-xs text-slate-500">Registro de rutas creadas, modificadas o eliminadas.</p>
             </div>
-            <button (click)="cargarHistorialAuditoria()" class="text-xs text-teal-700 font-bold hover:underline">
-              Actualizar Auditoría
+            <button (click)="cargarHistorialAuditoria()" class="text-xs px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-teal-700 font-bold hover:bg-slate-100">
+              Actualizar
             </button>
           </div>
           <div class="overflow-x-auto max-h-52 overflow-y-auto">
@@ -378,102 +287,63 @@ interface BusFlotaItem {
       </ng-container>
 
       <!-- ========================================== -->
-      <!-- PESTAÑA 2: NUESTRA FLOTA (VISUAL, CREATIVO Y BONITO) -->
+      <!-- PESTAÑA 2: NUESTRA FLOTA -->
       <!-- ========================================== -->
       <ng-container *ngIf="pestanaActiva === 'flota'">
-        
-        <!-- Tarjeta de Presentación Creativa de la Flota -->
-        <div class="bg-gradient-to-r from-teal-700 via-teal-800 to-slate-900 rounded-2xl p-6 text-white shadow-md flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-          <div class="space-y-2 max-w-xl">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-500/20 text-teal-200 border border-teal-400/30">
-              Flota Certificada SUTRAN
-            </span>
-            <h2 class="text-2xl font-black tracking-tight">Viaja en la Flota Más Moderna del Sur</h2>
-            <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">
-              Unidades de última generación equipadas con suspensión neumática para máxima suavidad, climatización ecológica y monitoreo satelital GPS 24/7.
-            </p>
-          </div>
-
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 shrink-0">
-            <div class="bg-white/10 backdrop-blur-md px-3 py-2.5 rounded-xl border border-white/15 text-center min-w-[5.2rem]">
-              <span class="text-lg">💺</span>
-              <p class="text-[11px] font-bold text-white mt-0.5 whitespace-nowrap">Semi-Cama</p>
-              <p class="text-[10px] text-teal-200 whitespace-nowrap">140° a 160°</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-md px-3 py-2.5 rounded-xl border border-white/15 text-center min-w-[5.2rem]">
-              <span class="text-lg">❄️</span>
-              <p class="text-[11px] font-bold text-white mt-0.5 whitespace-nowrap">Clima A/C</p>
-              <p class="text-[10px] text-teal-200 whitespace-nowrap">Purificado</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-md px-3 py-2.5 rounded-xl border border-white/15 text-center min-w-[5.2rem]">
-              <span class="text-lg">🔌</span>
-              <p class="text-[11px] font-bold text-white mt-0.5 whitespace-nowrap">Carga USB</p>
-              <p class="text-[10px] text-teal-200 whitespace-nowrap">Individual</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-md px-3 py-2.5 rounded-xl border border-white/15 text-center min-w-[5.2rem]">
-              <span class="text-lg">🛰️</span>
-              <p class="text-[11px] font-bold text-white mt-0.5 whitespace-nowrap">GPS SUTRAN</p>
-              <p class="text-[10px] text-teal-200 whitespace-nowrap">Monitoreado</p>
-            </div>
-          </div>
-        </div>
 
         <!-- Grilla Visual de Autobuses Disponibles -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <div *ngFor="let b of busesFlota"
                class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
             <div>
-              <!-- Ilustración Vectorial Estilizada del Autobús -->
-              <div class="h-28 rounded-xl bg-gradient-to-br from-slate-50 to-teal-50/50 border border-slate-100 flex items-center justify-center p-4 mb-4 relative overflow-hidden">
-                <div class="absolute top-2 right-2">
-                  <span [class]="b.enMantenimiento ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'"
-                        class="text-[10px] font-bold px-2 py-0.5 rounded-full border">
-                    {{ b.enMantenimiento ? 'En Revisión Preventiva' : 'Apto para Viajar' }}
-                  </span>
+              <!-- Cabecera clara del autobús -->
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-2xl font-black text-slate-900 font-mono tracking-tight">{{ b.placa }}</p>
+                  <p class="text-sm text-slate-700 font-semibold mt-0.5">{{ b.modelo }}</p>
                 </div>
-
-                <!-- Icono estilizado grande de Bus -->
-                <div class="flex items-center gap-3">
-                  <div class="w-14 h-14 rounded-2xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-600/30">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <span class="text-[10px] font-mono font-bold text-slate-400">PLACA OFICIAL</span>
-                    <p class="text-xl font-black text-slate-900 font-mono tracking-tight">{{ b.placa }}</p>
-                  </div>
-                </div>
+                <span [class]="b.enMantenimiento ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'"
+                      class="text-xs font-bold px-3 py-1 rounded-full border shrink-0">
+                  {{ b.enMantenimiento ? 'En Taller' : 'Disponible' }}
+                </span>
               </div>
 
-              <!-- Modelo y Confort -->
-              <div>
-                <h3 class="text-base font-bold text-slate-900">{{ b.modelo }}</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Categoría Premium Interprovincial · {{ b.capacidad }} asientos</p>
+              <!-- Rutas asignadas a este bus -->
+              <div class="mb-3.5 text-xs">
+                <p class="font-bold text-slate-600 mb-1">Rutas Asignadas:</p>
+                <p *ngIf="obtenerResumenRutasBus(b.id) as resumen; else sinRutaBus"
+                   class="font-bold text-teal-800 bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200">
+                  {{ resumen }}
+                </p>
+                <ng-template #sinRutaBus>
+                  <p class="text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">Sin ruta asignada aún</p>
+                </ng-template>
               </div>
 
               <!-- Disponibilidad en Tiempo Real -->
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 my-3.5 space-y-1.5">
-                <div class="flex items-center justify-between text-xs">
-                  <span class="text-slate-600 font-medium">Asientos Disponibles</span>
-                  <span class="font-bold text-teal-700">{{ b.asientosDisponibles }} Libres</span>
+              <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2 mb-4">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-600 font-medium">Capacidad</span>
+                  <span class="font-black text-slate-900">{{ b.asientosDisponibles }} de {{ b.capacidad }} asientos libres</span>
                 </div>
-                <div class="h-2 rounded-full bg-slate-200 overflow-hidden">
+                <div class="h-2.5 rounded-full bg-slate-200 overflow-hidden">
                   <div class="h-full bg-teal-600 rounded-full"
                        [style.width.%]="calcularOcupacion(b)"></div>
                 </div>
               </div>
             </div>
 
-            <!-- Botón para ver salidas con este bus -->
-            <div class="pt-3 border-t border-slate-100">
+            <!-- Botón para ver salidas o asignar a nueva ruta -->
+            <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
               <button (click)="pestanaActiva = 'rutas'"
                       [disabled]="b.enMantenimiento"
-                      class="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 disabled:bg-slate-200 disabled:text-slate-400 transition-colors shadow-sm shadow-teal-600/20 flex items-center justify-center gap-1.5">
-                <span>{{ b.enMantenimiento ? 'Unidad en Taller Preventivo' : 'Ver Salidas y Horarios' }}</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
+                      class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 disabled:bg-slate-200 disabled:text-slate-400 transition-colors">
+                {{ b.enMantenimiento ? 'En Taller' : 'Ver Rutas' }}
+              </button>
+              <button *ngIf="modoVista === 'admin' && !b.enMantenimiento"
+                      (click)="asignarBusANuevaRuta(b)"
+                      class="py-2.5 px-3 rounded-xl text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition-colors">
+                + Asignar a Ruta
               </button>
             </div>
           </div>
@@ -510,6 +380,15 @@ interface BusFlotaItem {
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
               <p class="text-slate-500 font-medium">Tarifa Oficial</p>
               <p class="text-sm font-black text-teal-700 mt-0.5">S/. {{ (rutaDetalle.precio || 0).toFixed(2) }}</p>
+            </div>
+            <div class="col-span-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <p class="text-slate-500 font-medium">Unidad de Flota Asignada</p>
+              <p class="text-sm font-bold text-slate-900 mt-0.5" *ngIf="obtenerBusAsignado(rutaDetalle) as busDet; else sinBusDet">
+                🚌 {{ busDet.placa }} — {{ busDet.modelo }} ({{ busDet.capacidad }} asientos)
+              </p>
+              <ng-template #sinBusDet>
+                <p class="text-xs font-medium text-slate-500 mt-0.5">Asignación automática de flota operativa</p>
+              </ng-template>
             </div>
           </div>
 
@@ -578,6 +457,25 @@ interface BusFlotaItem {
                        class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500">
               </div>
             </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Unidad de Flota Asignada</label>
+              <select [(ngModel)]="rutaFormulario.busId"
+                      class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option [ngValue]="null">Asignación automática (según disponibilidad)</option>
+                <option *ngFor="let b of busesFlota" [ngValue]="b.id" [disabled]="b.enMantenimiento">
+                  🚌 {{ b.placa }} · {{ b.modelo }} ({{ b.capacidad }} asientos){{ b.enMantenimiento ? ' [EN TALLER]' : '' }}
+                </option>
+              </select>
+              <p class="text-[11px] text-slate-400 mt-1">Selecciona el bus específico de la flota que cubrirá esta ruta.</p>
+            </div>
+          </div>
+
+          <!-- Alerta de error visible dentro del modal -->
+          <div *ngIf="errorModal"
+               class="mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs font-semibold flex items-start gap-2">
+            <span class="shrink-0">⚠️</span>
+            <span>{{ errorModal }}</span>
           </div>
 
           <div class="mt-6 flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
@@ -620,7 +518,8 @@ export class RutasComponent implements OnInit {
   mostrarModal = false;
   modoEdicion = false;
   guardando = false;
-  rutaFormulario: any = { id: null, origen: '', destino: '', horario: '08:00 hrs', precio: 50.0 };
+  errorModal = '';
+  rutaFormulario: any = { id: null, origen: '', destino: '', horario: '08:00 hrs', precio: 50.0, busId: null };
 
   // Feedback Toast
   mensajeToast: { texto: string; tipo: 'exito' | 'error' } = { texto: '', tipo: 'exito' };
@@ -834,20 +733,43 @@ export class RutasComponent implements OnInit {
     this.rutaDetalle = null;
   }
 
+  obtenerBusAsignado(ruta: RutaItem): BusFlotaItem | undefined {
+    if (!ruta?.busId) return undefined;
+    return this.busesFlota.find(b => Number(b.id) === Number(ruta.busId));
+  }
+
+  obtenerResumenRutasBus(busId: number): string {
+    const asignadas = this.rutas.filter(r => Number(r.busId) === Number(busId));
+    if (asignadas.length === 0) return '';
+    return asignadas.map(r => `${this.formatearCiudad(r.origen)} ➔ ${this.formatearCiudad(r.destino)} (${r.horario})`).join(' · ');
+  }
+
+  asignarBusANuevaRuta(bus: BusFlotaItem) {
+    this.modoEdicion = false;
+    this.errorModal = '';
+    this.rutaFormulario = { id: null, origen: '', destino: '', horario: '08:00 hrs', precio: 50.0, busId: bus.id };
+    this.mostrarModal = true;
+  }
+
   abrirModalCrear() {
     this.modoEdicion = false;
-    this.rutaFormulario = { id: null, origen: '', destino: '', horario: '08:00 hrs', precio: 50.0 };
+    this.errorModal = '';
+    this.cargarBusesFlota();
+    this.rutaFormulario = { id: null, origen: '', destino: '', horario: '08:00 hrs', precio: 50.0, busId: null };
     this.mostrarModal = true;
   }
 
   abrirModalEditar(ruta: RutaItem) {
     this.modoEdicion = true;
-    this.rutaFormulario = { ...ruta };
+    this.errorModal = '';
+    this.cargarBusesFlota();
+    this.rutaFormulario = { ...ruta, busId: ruta.busId ?? null };
     this.mostrarModal = true;
   }
 
   cerrarModal() {
     this.mostrarModal = false;
+    this.errorModal = '';
   }
 
   formularioValido(): boolean {
@@ -873,9 +795,18 @@ export class RutasComponent implements OnInit {
   guardarRuta() {
     if (!this.formularioValido()) return;
     this.guardando = true;
+    this.errorModal = '';
+
+    const dto = {
+      origen: this.rutaFormulario.origen?.trim(),
+      destino: this.rutaFormulario.destino?.trim(),
+      horario: this.rutaFormulario.horario?.trim(),
+      precio: Number(this.rutaFormulario.precio),
+      busId: this.rutaFormulario.busId ? Number(this.rutaFormulario.busId) : null
+    };
 
     if (this.modoEdicion && this.rutaFormulario.id) {
-      this.rutasService.updateRuta(this.rutaFormulario.id, this.rutaFormulario).subscribe({
+      this.rutasService.updateRuta(this.rutaFormulario.id, dto).subscribe({
         next: () => {
           this.guardando = false;
           this.cerrarModal();
@@ -885,21 +816,26 @@ export class RutasComponent implements OnInit {
         error: (err: any) => {
           this.guardando = false;
           const msg = err.error?.mensaje || (err.error?.errores ? Object.values(err.error.errores).join(', ') : err.message);
+          this.errorModal = msg;
           this.mostrarNotificacion('Error: ' + msg, 'error');
+          this.cdr.detectChanges();
         }
       });
     } else {
-      this.rutasService.createRuta(this.rutaFormulario).subscribe({
+      this.rutasService.createRuta(dto).subscribe({
         next: () => {
           this.guardando = false;
           this.cerrarModal();
           this.mostrarNotificacion('Nueva ruta registrada exitosamente.', 'exito');
+          this.limpiarFiltros();
           this.recargarTodo();
         },
         error: (err: any) => {
           this.guardando = false;
           const msg = err.error?.mensaje || (err.error?.errores ? Object.values(err.error.errores).join(', ') : err.message);
+          this.errorModal = msg;
           this.mostrarNotificacion('Error: ' + msg, 'error');
+          this.cdr.detectChanges();
         }
       });
     }

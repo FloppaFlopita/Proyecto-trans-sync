@@ -27,4 +27,6 @@ public interface MantenimientoRepository extends JpaRepository<Mantenimiento, Lo
 
     @Query("SELECT m FROM Mantenimiento m WHERE m.bus.id = :busId AND m.estado IN ('PROGRAMADO', 'EN_MANTENIMIENTO')")
     List<Mantenimiento> findActivosOProgramadosPorBus(@Param("busId") Long busId);
+
+    void deleteByBusId(Long busId);
 }

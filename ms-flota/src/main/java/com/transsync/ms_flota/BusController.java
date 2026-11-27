@@ -39,6 +39,16 @@ public class BusController {
         return ResponseEntity.ok(respuesta);
     }
 
+    @GetMapping("/historial")
+    public ResponseEntity<Map<String, Object>> listarHistorial() {
+        List<FlotaAuditoria> historial = busService.listarHistorial();
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("exito", true);
+        respuesta.put("mensaje", "Historial de auditoría transaccional de flota obtenido");
+        respuesta.put("datos", historial);
+        return ResponseEntity.ok(respuesta);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> obtenerBus(@PathVariable Long id) {
         Map<String, Object> respuesta = new HashMap<>();

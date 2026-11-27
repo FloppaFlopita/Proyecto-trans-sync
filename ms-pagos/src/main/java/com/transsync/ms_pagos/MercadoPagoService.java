@@ -56,11 +56,39 @@ public class MercadoPagoService {
         body.put("items", items);
         body.put("payer", payer);
         body.put("back_urls", backUrls);
-        body.put("auto_return", "approved");
+        if (frontendUrl.startsWith("https://")) {
+            body.put("auto_return", "approved");
+        }
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
         return response.getBody();
+    }
+
+    public Map<String, Object> verificarUltimoPago() {
+        Map<String, Object> resultado = new HashMap<>();
+        resultado.put("aprobado", false);
+        try {
+            String url = "https://api.mercadopago.com/v1/payments/search?sort=date_created&criteria=desc&limit=1";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+            ResponseEntity<Map> response = restTemplate.exchange(url, org.springframework.http.HttpMethod.GET, entity, Map.class);
+            Map body = response.getBody();
+            if (body != null && body.get("results") instanceof List<?> results && !results.isEmpty()) {
+                Object first = results.get(0);
+                if (first instanceof Map<?, ?> ultimo && "approved".equals(String.valueOf(ultimo.get("status")))) {
+                    resultado.put("aprobado", true);
+                    resultado.put("paymentId", String.valueOf(ultimo.get("id")));
+                    resultado.put("status", "approved");
+                    resultado.put("metodoPago", String.valueOf(ultimo.get("payment_method_id")).toUpperCase());
+                    resultado.put("monto", ultimo.get("transaction_amount"));
+                }
+            }
+        } catch (Exception e) {
+            resultado.put("error", e.getMessage());
+        }
+        return resultado;
     }
 }

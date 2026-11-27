@@ -19,6 +19,8 @@ public class RutaService {
     @Autowired
     private RutaAuditoriaRepository rutaAuditoriaRepository;
 
+    private final org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+
     @Transactional(readOnly = true)
     public List<Ruta> listarTodas() {
         return rutaRepository.findAll();
@@ -30,7 +32,27 @@ public class RutaService {
                 .orElseThrow(() -> new NoSuchElementException("Ruta no encontrada con ID: " + id));
     }
 
-    @Transactional
+    private void validarBusDisponibleEnFlota(Long busId) {
+        if (busId == null) return;
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> resp = restTemplate.getForObject(
+                    "http://localhost:8102/buses/" + busId + "/disponibilidad", Map.class);
+            if (resp != null && Boolean.TRUE.equals(resp.get("exito")) && resp.get("datos") instanceof Map<?, ?> datos) {
+                if (Boolean.TRUE.equals(datos.get("enMantenimiento"))) {
+                    throw new IllegalStateException("No se puede asignar el autobús #" + busId + " porque se encuentra EN MANTENIMIENTO.");
+                }
+            }
+        } catch (IllegalStateException e) {
+            throw e;
+        } catch (org.springframework.web.client.HttpClientErrorException.NotFound e) {
+            throw new IllegalArgumentException("El autobús seleccionado (ID #" + busId + ") no existe en la flota.");
+        } catch (Exception ignored) {
+            // Si ms-flota no está accesible en este instante, no bloqueamos la operación local
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public Ruta crearRuta(RutaRequestDTO dto) {
         validarReglasDeNegocio(dto.getOrigen(), dto.getDestino(), dto.getPrecio(), dto.getHorario());
 
@@ -46,15 +68,25 @@ public class RutaService {
                     + " en el horario " + dto.getHorario().trim());
         }
 
+        if (dto.getBusId() != null) {
+            validarBusDisponibleEnFlota(dto.getBusId());
+            if (rutaRepository.existsByBusIdAndHorarioIgnoreCase(dto.getBusId(), dto.getHorario().trim())) {
+                throw new IllegalStateException("Conflicto de flota: El autobús #" + dto.getBusId()
+                        + " ya tiene otra ruta programada en el horario " + dto.getHorario().trim());
+            }
+        }
+
         Ruta ruta = new Ruta();
         ruta.setOrigen(dto.getOrigen().trim());
         ruta.setDestino(dto.getDestino().trim());
         ruta.setHorario(dto.getHorario().trim());
         ruta.setPrecio(dto.getPrecio());
+        ruta.setBusId(dto.getBusId());
 
         Ruta rutaGuardada = rutaRepository.save(ruta);
 
         // Auditoría transaccional dentro del mismo límite ACID
+        String busInfo = rutaGuardada.getBusId() != null ? " | Bus #" + rutaGuardada.getBusId() : "";
         RutaAuditoria auditoria = new RutaAuditoria(
                 rutaGuardada.getId(),
                 "CREACION",
@@ -63,24 +95,28 @@ public class RutaService {
                 rutaGuardada.getHorario(),
                 rutaGuardada.getPrecio(),
                 null,
-                "Ruta creada inicialmente: " + rutaGuardada.getOrigen() + " -> " + rutaGuardada.getDestino() + " a S/." + rutaGuardada.getPrecio()
+                "Ruta creada: " + rutaGuardada.getOrigen() + " -> " + rutaGuardada.getDestino() + " a S/." + rutaGuardada.getPrecio() + busInfo
         );
         rutaAuditoriaRepository.save(auditoria);
 
         return rutaGuardada;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Ruta actualizarRuta(Long id, RutaRequestDTO dto) {
-        Ruta rutaExistente = obtenerPorId(id);
+        // Bloqueo pesimista SELECT ... FOR UPDATE para evitar actualizaciones concurrentes perdidas
+        Ruta rutaExistente = rutaRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new NoSuchElementException("Ruta no encontrada con ID: " + id));
 
-        String detallesAnteriores = "Origen: " + rutaExistente.getOrigen() + ", Destino: " + rutaExistente.getDestino() 
-                + ", Horario: " + rutaExistente.getHorario() + ", Precio: S/." + rutaExistente.getPrecio();
+        String detallesAnteriores = "Origen: " + rutaExistente.getOrigen() + ", Destino: " + rutaExistente.getDestino()
+                + ", Horario: " + rutaExistente.getHorario() + ", Precio: S/." + rutaExistente.getPrecio()
+                + (rutaExistente.getBusId() != null ? ", Bus #" + rutaExistente.getBusId() : "");
 
         String nuevoOrigen = dto.getOrigen() != null ? dto.getOrigen().trim() : rutaExistente.getOrigen();
         String nuevoDestino = dto.getDestino() != null ? dto.getDestino().trim() : rutaExistente.getDestino();
         String nuevoHorario = dto.getHorario() != null ? dto.getHorario().trim() : rutaExistente.getHorario();
         Double nuevoPrecio = dto.getPrecio() != null ? dto.getPrecio() : rutaExistente.getPrecio();
+        Long nuevoBusId = dto.getBusId() != null ? dto.getBusId() : rutaExistente.getBusId();
 
         validarReglasDeNegocio(nuevoOrigen, nuevoDestino, nuevoPrecio, nuevoHorario);
 
@@ -92,15 +128,25 @@ public class RutaService {
                     + nuevoOrigen + " -> " + nuevoDestino + " en el horario " + nuevoHorario);
         }
 
+        if (nuevoBusId != null) {
+            validarBusDisponibleEnFlota(nuevoBusId);
+            if (rutaRepository.existsByBusIdAndHorarioIgnoreCaseAndIdNot(nuevoBusId, nuevoHorario, id)) {
+                throw new IllegalStateException("Conflicto de flota: El autobús #" + nuevoBusId
+                        + " ya tiene otra ruta programada en el horario " + nuevoHorario);
+            }
+        }
+
         rutaExistente.setOrigen(nuevoOrigen);
         rutaExistente.setDestino(nuevoDestino);
         rutaExistente.setHorario(nuevoHorario);
         rutaExistente.setPrecio(nuevoPrecio);
+        rutaExistente.setBusId(nuevoBusId);
 
         Ruta rutaActualizada = rutaRepository.save(rutaExistente);
 
-        String detallesNuevos = "Origen: " + rutaActualizada.getOrigen() + ", Destino: " + rutaActualizada.getDestino() 
-                + ", Horario: " + rutaActualizada.getHorario() + ", Precio: S/." + rutaActualizada.getPrecio();
+        String detallesNuevos = "Origen: " + rutaActualizada.getOrigen() + ", Destino: " + rutaActualizada.getDestino()
+                + ", Horario: " + rutaActualizada.getHorario() + ", Precio: S/." + rutaActualizada.getPrecio()
+                + (rutaActualizada.getBusId() != null ? ", Bus #" + rutaActualizada.getBusId() : "");
 
         // Auditoría transaccional dentro del mismo límite ACID
         RutaAuditoria auditoria = new RutaAuditoria(
@@ -118,11 +164,13 @@ public class RutaService {
         return rutaActualizada;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void eliminarRuta(Long id) {
-        Ruta ruta = obtenerPorId(id);
-        String detallesAnteriores = "Origen: " + ruta.getOrigen() + ", Destino: " + ruta.getDestino() 
-                + ", Horario: " + ruta.getHorario() + ", Precio: S/." + ruta.getPrecio();
+        Ruta ruta = rutaRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new NoSuchElementException("Ruta no encontrada con ID: " + id));
+        String detallesAnteriores = "Origen: " + ruta.getOrigen() + ", Destino: " + ruta.getDestino()
+                + ", Horario: " + ruta.getHorario() + ", Precio: S/." + ruta.getPrecio()
+                + (ruta.getBusId() != null ? ", Bus #" + ruta.getBusId() : "");
 
         rutaRepository.delete(ruta);
 

@@ -7,6 +7,7 @@ public class RutaResponseDTO {
     private String destino;
     private String horario;
     private Double precio;
+    private Long busId;
 
     public RutaResponseDTO() {}
 
@@ -32,4 +33,7 @@ public class RutaResponseDTO {
 
     public Double getPrecio() { return precio; }
     public void setPrecio(Double precio) { this.precio = precio; }
+
+    public Long getBusId() { return busId; }
+    public void setBusId(Long busId) { this.busId = busId; }
 }

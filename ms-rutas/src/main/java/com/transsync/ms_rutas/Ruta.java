@@ -12,6 +12,7 @@ public class Ruta {
     private String destino;
     private String horario;
     private Double precio;
+    private Long busId;
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -24,4 +25,6 @@ public class Ruta {
     public void setHorario(String horario) { this.horario = horario; }
     public Double getPrecio() { return precio; }
     public void setPrecio(Double precio) { this.precio = precio; }
+    public Long getBusId() { return busId; }
+    public void setBusId(Long busId) { this.busId = busId; }
 }
