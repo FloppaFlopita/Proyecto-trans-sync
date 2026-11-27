@@ -38,6 +38,12 @@ public class PagoController {
         }
     }
 
+    // GET /pagos/verificar-ultimo-pago - Verificar último pago aprobado en Mercado Pago
+    @GetMapping("/verificar-ultimo-pago")
+    public ResponseEntity<Map<String, Object>> verificarUltimoPago() {
+        return ResponseEntity.ok(mercadoPagoService.verificarUltimoPago());
+    }
+
     // GET /pagos - Listar todos los pagos
     @GetMapping
     public ResponseEntity<Map<String, Object>> listarPagos() {

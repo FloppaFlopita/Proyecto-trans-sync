@@ -8,6 +8,7 @@ export interface RutaItem {
   destino: string;
   horario: string;
   precio: number;
+  busId?: number | null;
 }
 
 export interface RutaEstadisticas {

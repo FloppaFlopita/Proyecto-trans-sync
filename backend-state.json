@@ -56,5 +56,148 @@
       "fechaHora": "17/11/2026, 9:29:12 p. m.",
       "abordado": false
     }
+  ],
+  "rutas": [
+    {
+      "id": 99,
+      "origen": "Juliaca",
+      "destino": "Puno",
+      "precio": 1,
+      "horario": "10:00 hrs"
+    },
+    {
+      "id": 1,
+      "origen": "Juliaca",
+      "destino": "Arequipa",
+      "precio": 35,
+      "horario": "08:00 hrs"
+    },
+    {
+      "id": 2,
+      "origen": "Puno",
+      "destino": "Cusco",
+      "precio": 45,
+      "horario": "14:30 hrs"
+    },
+    {
+      "id": 3,
+      "origen": "Arequipa",
+      "destino": "Lima",
+      "precio": 80,
+      "horario": "20:00 hrs"
+    },
+    {
+      "id": 4,
+      "origen": "Cusco",
+      "destino": "Arequipa",
+      "precio": 50,
+      "horario": "21:00 hrs"
+    },
+    {
+      "id": 5,
+      "origen": "Lima",
+      "destino": "Huancayo",
+      "precio": 40,
+      "horario": "07:00 hrs"
+    },
+    {
+      "id": 100,
+      "origen": "Tacna",
+      "destino": "Arequipa",
+      "horario": "15:00 hrs",
+      "precio": 45
+    }
+  ],
+  "historialAuditoriaRutas": [
+    {
+      "id": 1795743081360,
+      "rutaId": 100,
+      "tipoOperacion": "CREACION",
+      "origen": "Tacna",
+      "destino": "Arequipa",
+      "horario": "15:00 hrs",
+      "precio": 45,
+      "detallesNuevos": "Ruta creada: Tacna -> Arequipa a S/.45.00 (15:00 hrs)",
+      "fechaOperacion": "2026-11-27T01:31:21.360Z"
+    },
+    {
+      "id": 1,
+      "rutaId": 99,
+      "tipoOperacion": "CREACION",
+      "origen": "Juliaca",
+      "destino": "Puno",
+      "horario": "10:00 hrs",
+      "precio": 3,
+      "detallesNuevos": "Ruta creada inicialmente: Juliaca -> Puno a S/.3.00",
+      "fechaOperacion": "2026-11-27T01:31:20.177Z"
+    }
+  ],
+  "buses": [
+    {
+      "id": 1,
+      "placa": "BUS-TS-01",
+      "modelo": "Scania Touring HD",
+      "capacidad": 48,
+      "asientosDisponibles": 45,
+      "estado": "OPERATIVO"
+    },
+    {
+      "id": 2,
+      "placa": "BUS-TS-02",
+      "modelo": "Volvo B430R",
+      "capacidad": 48,
+      "asientosDisponibles": 46,
+      "estado": "OPERATIVO"
+    },
+    {
+      "id": 3,
+      "placa": "BUS-TS-03",
+      "modelo": "Mercedes Travego",
+      "capacidad": 48,
+      "asientosDisponibles": 48,
+      "estado": "MANTENIMIENTO"
+    },
+    {
+      "id": 4,
+      "placa": "BUS-TS-04",
+      "modelo": "Marcopolo G8",
+      "capacidad": 48,
+      "asientosDisponibles": 48,
+      "estado": "OPERATIVO"
+    },
+    {
+      "id": 5,
+      "placa": "T3C-104",
+      "modelo": "Volvo 9700 Grand",
+      "capacidad": 48,
+      "asientosDisponibles": 46,
+      "estado": "OPERATIVO"
+    },
+    {
+      "id": 6,
+      "placa": "BUS-TS-06",
+      "modelo": "Scania Irizar i6S",
+      "capacidad": 48,
+      "asientosDisponibles": 48,
+      "estado": "OPERATIVO"
+    }
+  ],
+  "mantenimientos": [
+    {
+      "id": 1,
+      "busId": 3,
+      "busPlaca": "BUS-TS-03",
+      "busModelo": "Mercedes Travego",
+      "tipoMantenimiento": "PREVENTIVO",
+      "estado": "EN_MANTENIMIENTO",
+      "descripcion": "Revisión técnica de frenos y cambio de aceite de motor",
+      "tallerAsignado": "Taller Central TransSync",
+      "taller": "Taller Central TransSync",
+      "costoEstimado": 850,
+      "costo": 850,
+      "fechaProgramada": "2026-11-19",
+      "fechaInicio": "2026-11-19",
+      "bloqueaOperacion": true
+    }
   ]
 }

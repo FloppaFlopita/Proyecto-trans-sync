@@ -24,50 +24,50 @@ spring:
         - id: ms-auth
           uri: http://localhost:8107
           predicates:
-            - Path=/api/auth/**
+            - Path=/api/auth, /api/auth/**
 
         - id: ms-rutas
           uri: http://localhost:8101
           predicates:
-            - Path=/api/rutas/**
+            - Path=/api/rutas, /api/rutas/**
           filters:
             - StripPrefix=1
 
         - id: ms-flota
           uri: http://localhost:8102
           predicates:
-            - Path=/api/buses/**
+            - Path=/api/buses, /api/buses/**
           filters:
             - StripPrefix=1
 
         - id: ms-reservas
           uri: http://localhost:8103
           predicates:
-            - Path=/api/reservas/**
+            - Path=/api/reservas, /api/reservas/**
           filters:
             - StripPrefix=1
 
         - id: ms-pagos
           uri: http://localhost:8104
           predicates:
-            - Path=/api/pagos/**
+            - Path=/api/pagos, /api/pagos/**
           filters:
             - StripPrefix=1
 
         - id: ms-promociones
           uri: http://localhost:8105
           predicates:
-            - Path=/api/promociones/**
+            - Path=/api/promociones, /api/promociones/**
 
         - id: ms-fidelizacion
           uri: http://localhost:8106
           predicates:
-            - Path=/api/fidelizacion/**
+            - Path=/api/fidelizacion, /api/fidelizacion/**
 
         - id: ms-facturacion
           uri: http://localhost:8108
           predicates:
-            - Path=/api/facturacion/**
+            - Path=/api/facturacion, /api/facturacion/**
 
         # Enrutamiento de OpenAPI / Swagger Docs para el Swagger General
         - id: ms-auth-docs

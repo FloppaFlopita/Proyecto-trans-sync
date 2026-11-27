@@ -41,53 +41,38 @@ interface BusItem {
         </button>
       </div>
 
-      <!-- ENCABEZADO LIMPIO CON SELECTOR DE PESTAÑAS (PARQUE DE BUSES VS MANTENIMIENTO) -->
+      <!-- ENCABEZADO LIMPIO CON SELECTOR DE PESTAÑAS -->
       <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-100 text-teal-800">
-              TransSync Interprovincial
-            </span>
-            <span class="text-xs text-slate-400 font-medium">{{ modoVista === 'admin' ? 'Gestión y Capacidad Vehicular' : 'Flota Oficial Certificada' }}</span>
-          </div>
-          <h1 class="text-2xl font-black text-slate-900 tracking-tight">
-            {{ pestanaActiva === 'buses' ? 'Control de Flota y Autobuses' : 'Centro de Mantenimiento Preventivo' }}
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            {{ pestanaActiva === 'buses' ? 'Gestión de Flota' : 'Taller y Mantenimiento' }}
           </h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-            {{ pestanaActiva === 'buses' 
-               ? 'Supervise la disponibilidad de asientos en tiempo real, registro de unidades y capacidad operativa.' 
-               : 'Gestión de revisiones mecánicas, estados de taller oficial y protección contra sobreventa.' }}
+          <p class="text-sm text-slate-600 mt-1">
+            {{ pestanaActiva === 'buses'
+               ? 'Agregue autobuses, revise asientos disponibles o envíe unidades a taller.'
+               : 'Supervise las unidades en revisión mecánica y libérelas cuando estén listas.' }}
           </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2.5">
-          <!-- PESTAÑAS MODERNAS Y LIMPIAS -->
-          <div *ngIf="modoVista === 'admin'" class="flex items-center bg-slate-100 p-1 rounded-xl">
+        <div class="flex flex-wrap items-center gap-3">
+          <div *ngIf="modoVista === 'admin'" class="flex items-center bg-slate-100 p-1.5 rounded-xl">
             <button (click)="pestanaActiva = 'buses'"
-                    [class]="pestanaActiva === 'buses' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                    class="px-4 py-2 text-xs rounded-lg transition-all flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-              </svg>
-              Parque de Autobuses ({{ buses.length }})
+                    [class]="pestanaActiva === 'buses' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'"
+                    class="px-4 py-2.5 text-sm rounded-lg transition-all">
+              Autobuses ({{ buses.length }})
             </button>
             <button (click)="pestanaActiva = 'mantenimiento'"
-                    [class]="pestanaActiva === 'mantenimiento' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                    class="px-4 py-2 text-xs rounded-lg transition-all flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
+                    [class]="pestanaActiva === 'mantenimiento' ? 'bg-white text-slate-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'"
+                    class="px-4 py-2.5 text-sm rounded-lg transition-all">
               Mantenimiento ({{ mantenimientos.length }})
             </button>
           </div>
 
-          <!-- Botones de Acción Admin -->
           <ng-container *ngIf="modoVista === 'admin'">
             <button *ngIf="pestanaActiva === 'buses'"
                     (click)="abrirModalCrear()"
-                    class="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition-all shadow-md shadow-teal-600/20">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition-all shadow-sm">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
               </svg>
               Nuevo Autobús
@@ -95,21 +80,20 @@ interface BusItem {
 
             <button *ngIf="pestanaActiva === 'mantenimiento'"
                     (click)="abrirModalProgramarMantenimiento()"
-                    class="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white transition-all shadow-md shadow-amber-500/20">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white transition-all shadow-sm">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
               </svg>
               Programar Taller
             </button>
           </ng-container>
 
-          <!-- Botón Imprimir -->
           <button (click)="imprimirFlota()"
-                  title="Imprimir reporte oficial de flota"
-                  class="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-colors shadow-sm">
+                  class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
             </svg>
+            Imprimir
           </button>
         </div>
       </div>
@@ -119,169 +103,81 @@ interface BusItem {
       <!-- ========================================== -->
       <ng-container *ngIf="pestanaActiva === 'buses'">
 
-        <!-- PANEL: ANÁLISIS OPERATIVO DE LA FLOTA (CAPA DE NEGOCIO MS-FLOTA) -->
-        <div *ngIf="modoVista === 'admin'" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold shadow-sm">
-                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                </svg>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h2 class="text-base font-black text-slate-900 tracking-tight">Análisis Operativo de la Flota (Capa de Negocio ms-flota)</h2>
-                </div>
-                <p class="text-xs text-slate-500">Distribución de unidades, disponibilidad de asientos y estado del parque automotor.</p>
-              </div>
-            </div>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Reglas de Negocio Activas
-            </span>
+        <!-- RESUMEN COMPACTO Y CLARO (4 INDICADORES) -->
+        <div *ngIf="modoVista === 'admin'" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold text-slate-500 uppercase">Total de Buses</p>
+            <p class="text-3xl font-black text-slate-900 mt-1">{{ stats?.totalBuses ?? buses.length }}</p>
           </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-            <!-- Box 1: Distribución Operativa del Parque -->
-            <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-100">
-              <p class="text-xs font-bold text-slate-700 mb-2.5">Distribución Operativa del Parque</p>
-              <div class="grid grid-cols-3 gap-2 text-center">
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">🚍</span>
-                  <p class="text-xl font-black text-slate-900 mt-0.5">{{ stats?.totalBuses ?? buses.length }}</p>
-                  <p class="text-[10px] text-slate-400 font-medium">Flota Total</p>
-                </div>
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">🟢</span>
-                  <p class="text-xl font-black text-emerald-600 mt-0.5">{{ stats?.busesOperativos ?? contarOperativos() }}</p>
-                  <p class="text-[10px] text-emerald-700 font-medium">Operativos</p>
-                </div>
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">🔧</span>
-                  <p class="text-xl font-black text-amber-600 mt-0.5">{{ stats?.busesEnMantenimiento ?? contarEnMantenimiento() }}</p>
-                  <p class="text-[10px] text-amber-700 font-medium">En Taller</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Box 2: Capacidad y Ocupación en Tiempo Real -->
-            <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-100">
-              <p class="text-xs font-bold text-slate-700 mb-2.5">Capacidad y Asientos Disponibles</p>
-              <div class="grid grid-cols-2 gap-2 text-center">
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">💺</span>
-                  <p class="text-xl font-black text-teal-700 mt-0.5">{{ stats?.asientosLibres ?? calcularAsientosLibres() }}</p>
-                  <p class="text-[10px] text-slate-400 font-medium">Libres de {{ stats?.capacidadTotal ?? calcularCapacidadTotal() }}</p>
-                </div>
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">📊</span>
-                  <p class="text-xl font-black text-indigo-600 mt-0.5">{{ stats?.porcentajeOcupacion ?? calcularPorcentajeOcupacion() }}%</p>
-                  <p class="text-[10px] text-indigo-700 font-medium">Tasa Ocupación</p>
-                </div>
-              </div>
-            </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold text-emerald-700 uppercase">Disponibles</p>
+            <p class="text-3xl font-black text-emerald-600 mt-1">{{ stats?.busesOperativos ?? contarOperativos() }}</p>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold text-amber-700 uppercase">En Taller</p>
+            <p class="text-3xl font-black text-amber-600 mt-1">{{ stats?.busesEnMantenimiento ?? contarEnMantenimiento() }}</p>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold text-teal-700 uppercase">Asientos Libres</p>
+            <p class="text-3xl font-black text-teal-700 mt-1">{{ stats?.asientosLibres ?? calcularAsientosLibres() }} <span class="text-sm font-semibold text-slate-400">/ {{ stats?.capacidadTotal ?? calcularCapacidadTotal() }}</span></p>
           </div>
         </div>
 
-        <!-- BUSCADOR Y FILTROS ESTILO ADMIN/RUTAS -->
+        <!-- BUSCADOR Y FILTROS CLAROS -->
         <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
-          <!-- Cabecera del buscador -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold shadow-sm">
-                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-              </div>
-              <div>
-                <h2 class="text-sm font-black text-slate-900 tracking-tight">Buscar y Supervisar Flota</h2>
-                <p class="text-xs text-slate-500">Seleccione una placa, modelo o estado operativo para supervisar la disponibilidad en tiempo real.</p>
-              </div>
-            </div>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 self-start sm:self-auto">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              Monitoreo satelital GPS SUTRAN activo
-            </span>
-          </div>
-
-          <!-- Controles de filtrado -->
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-            <!-- Input texto -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <div class="md:col-span-5">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Buscar por Placa o Modelo</label>
-              <div class="relative">
-                <input [(ngModel)]="filtroTexto"
-                       type="text"
-                       placeholder="Ej. ABC-123, Scania, Volvo, Irizar..."
-                       class="w-full py-2.5 px-3 text-xs font-semibold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800 bg-slate-50/50">
-              </div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Buscar por Placa o Modelo</label>
+              <input [(ngModel)]="filtroTexto"
+                     type="text"
+                     placeholder="Ej. ABC-123, Volvo, Scania..."
+                     class="w-full py-3 px-3.5 text-sm font-semibold rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 bg-white">
             </div>
 
-            <!-- Estado Operativo -->
             <div class="md:col-span-4">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estado de Disponibilidad</label>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Estado del Autobús</label>
               <select [(ngModel)]="filtroDisponibilidad"
-                      class="w-full py-2.5 px-3 text-xs font-semibold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800 bg-slate-50/50">
-                <option value="todos">Todos los Estados ({{ buses.length }})</option>
-                <option value="disponibles">🟢 Operativos / Disponibles</option>
-                <option value="en_taller">🔧 En Taller ({{ contarEnMantenimiento() }})</option>
-                <option value="llenos">🔴 Capacidad Completa (Llenos)</option>
+                      class="w-full py-3 px-3.5 text-sm font-semibold rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 bg-white">
+                <option value="todos">Todos ({{ buses.length }})</option>
+                <option value="disponibles">Disponibles para viajar</option>
+                <option value="en_taller">En Taller ({{ contarEnMantenimiento() }})</option>
+                <option value="llenos">Sin asientos libres</option>
               </select>
             </div>
 
-            <!-- Ordenamiento -->
             <div class="md:col-span-3">
-              <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Ordenar por</label>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Ordenar por</label>
               <select [(ngModel)]="criterioOrden"
-                      class="w-full py-2.5 px-3 text-xs font-semibold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800 bg-slate-50/50">
-                <option value="id_asc">Orden Oficial (ID)</option>
+                      class="w-full py-3 px-3.5 text-sm font-semibold rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 bg-white">
+                <option value="id_asc">Orden de registro</option>
                 <option value="placa_asc">Placa (A-Z)</option>
-                <option value="capacidad_desc">Mayor Capacidad</option>
-                <option value="ocupacion_desc">Mayor Ocupación</option>
-                <option value="libres_desc">Más Asientos Libres</option>
+                <option value="capacidad_desc">Mayor capacidad</option>
+                <option value="libres_desc">Más asientos libres</option>
               </select>
             </div>
           </div>
 
-          <!-- Píldoras de Filtros Rápidos -->
-          <div class="flex items-center gap-2 flex-wrap pt-1">
-            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros Rápidos:</span>
+          <!-- Filtros Rápidos Grandes -->
+          <div class="flex items-center gap-2 flex-wrap pt-2 border-t border-slate-100">
             <button (click)="filtroDisponibilidad = 'todos'; filtroTexto = ''"
-                    [class]="filtroDisponibilidad === 'todos' && !filtroTexto ? 'bg-teal-100 text-teal-800 border-teal-300 font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'"
-                    class="px-2.5 py-1 text-xs rounded-lg border transition-colors">
+                    [class]="filtroDisponibilidad === 'todos' && !filtroTexto ? 'bg-teal-600 text-white border-teal-600 font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 font-semibold'"
+                    class="px-3.5 py-2 text-xs rounded-xl border transition-colors">
               Todos ({{ buses.length }})
             </button>
             <button (click)="filtroDisponibilidad = 'disponibles'; filtroTexto = ''"
-                    [class]="filtroDisponibilidad === 'disponibles' ? 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'"
-                    class="px-2.5 py-1 text-xs rounded-lg border transition-colors">
-              🟢 Operativos ({{ contarOperativos() }})
+                    [class]="filtroDisponibilidad === 'disponibles' ? 'bg-emerald-600 text-white border-emerald-600 font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 font-semibold'"
+                    class="px-3.5 py-2 text-xs rounded-xl border transition-colors">
+              Disponibles ({{ contarOperativos() }})
             </button>
             <button (click)="filtroDisponibilidad = 'en_taller'; filtroTexto = ''"
-                    [class]="filtroDisponibilidad === 'en_taller' ? 'bg-amber-100 text-amber-800 border-amber-300 font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'"
-                    class="px-2.5 py-1 text-xs rounded-lg border transition-colors">
-              🔧 En Taller ({{ contarEnMantenimiento() }})
+                    [class]="filtroDisponibilidad === 'en_taller' ? 'bg-amber-500 text-white border-amber-500 font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 font-semibold'"
+                    class="px-3.5 py-2 text-xs rounded-xl border transition-colors">
+              En Taller ({{ contarEnMantenimiento() }})
             </button>
-            <button (click)="filtroTexto = 'Scania'"
-                    [class]="filtroTexto === 'Scania' ? 'bg-teal-100 text-teal-800 border-teal-300 font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'"
-                    class="px-2.5 py-1 text-xs rounded-lg border transition-colors">
-              Scania
-            </button>
-            <button (click)="filtroTexto = 'Volvo'"
-                    [class]="filtroTexto === 'Volvo' ? 'bg-teal-100 text-teal-800 border-teal-300 font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'"
-                    class="px-2.5 py-1 text-xs rounded-lg border transition-colors">
-              Volvo
-            </button>
-          </div>
-
-          <!-- Contador y reset -->
-          <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100">
-            <span>Mostrando <strong>{{ busesFiltrados.length }}</strong> de <strong>{{ buses.length }}</strong> unidades disponibles</span>
             <button *ngIf="filtroTexto || filtroDisponibilidad !== 'todos' || criterioOrden !== 'id_asc'"
                     (click)="limpiarFiltros()"
-                    class="text-xs text-teal-700 hover:text-teal-900 font-bold">
-              Restablecer filtros
+                    class="ml-auto px-3.5 py-2 text-xs font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-xl">
+              Limpiar filtros
             </button>
           </div>
         </div>
@@ -313,71 +209,35 @@ interface BusItem {
                class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-teal-300 transition-all flex flex-col justify-between"
                [class.border-amber-300]="b.enMantenimiento">
             <div>
-              <!-- Recuadro superior estilizado con gradiente -->
-              <div class="h-28 rounded-xl bg-gradient-to-br from-slate-50 to-teal-50/50 border border-slate-100 p-4 mb-4 flex items-center justify-between relative overflow-hidden">
-                <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-600/30 flex-shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <span class="text-[10px] font-mono font-bold text-slate-400">PLACA OFICIAL</span>
-                    <p class="text-xl font-black text-slate-900 font-mono tracking-tight">{{ b.placa }}</p>
-                    <p class="text-xs text-slate-600 font-semibold truncate max-w-[150px]">{{ b.modelo }}</p>
-                  </div>
+              <!-- Cabecera clara del autobús -->
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-2xl font-black text-slate-900 font-mono tracking-tight">{{ b.placa }}</p>
+                  <p class="text-sm text-slate-700 font-semibold mt-0.5">{{ b.modelo }}</p>
                 </div>
-
-                <div class="absolute top-2 right-2 flex flex-col items-end gap-1">
-                  <span *ngIf="b.capacidad >= 50"
-                        class="text-[9px] font-bold text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded-full border border-indigo-200">
-                    ★ Alta Capacidad
-                  </span>
-                  <span [class]="obtenerClaseBadge(b)"
-                        class="text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1">
-                    <span [class]="obtenerPuntoEstado(b)" class="w-1.5 h-1.5 rounded-full"></span>
-                    {{ obtenerTextoEstado(b) }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Amenidades y Confort Incluido -->
-              <div class="flex items-center gap-1.5 mb-3.5 flex-wrap">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium">
-                  <span>💺</span> {{ b.capacidad }} Asientos
-                </span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium">
-                  <span>❄️</span> Clima Purificado
-                </span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 text-[11px] font-semibold border border-teal-100">
-                  <span>🛰️</span> GPS SUTRAN
+                <span [class]="obtenerClaseBadge(b)"
+                      class="text-xs font-bold px-3 py-1 rounded-full border flex items-center gap-1.5 shrink-0">
+                  <span [class]="obtenerPuntoEstado(b)" class="w-2 h-2 rounded-full"></span>
+                  {{ obtenerTextoEstado(b) }}
                 </span>
               </div>
 
               <!-- Alerta si está en mantenimiento -->
-              <div *ngIf="b.enMantenimiento" class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-3 mb-3 text-xs flex items-center gap-2">
-                <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
-                <span *ngIf="modoVista === 'pasajero'">Este autobús no está disponible temporalmente. Consulta otras opciones.</span>
-                <span *ngIf="modoVista === 'admin'"><strong>En Taller:</strong> No apto para reservas (bloqueado por regla de negocio).</span>
+              <div *ngIf="b.enMantenimiento" class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-3 mb-3 text-xs font-semibold">
+                Unidad en taller: no disponible para venta de pasajes.
               </div>
 
               <!-- Disponibilidad en Tiempo Real -->
-              <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 space-y-2 mb-4">
-                <div class="flex items-center justify-between text-xs">
-                  <span class="text-slate-600 font-medium">Asientos Disponibles</span>
-                  <span class="font-black text-slate-900 text-sm">{{ b.asientosDisponibles ?? 0 }} / {{ b.capacidad ?? 0 }}</span>
+              <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2 mb-4">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-600 font-medium">Asientos Libres</span>
+                  <span class="font-black text-slate-900 text-base">{{ b.asientosDisponibles ?? 0 }} de {{ b.capacidad ?? 0 }}</span>
                 </div>
-                <div class="h-2 rounded-full overflow-hidden bg-slate-200">
+                <div class="h-2.5 rounded-full overflow-hidden bg-slate-200">
                   <div class="h-full rounded-full transition-all duration-300"
                        [style.width.%]="calcularOcupacionPorBus(b)"
                        [class]="obtenerClaseBarra(b)">
                   </div>
-                </div>
-                <div class="flex items-center justify-between text-xs">
-                  <span class="text-slate-500">{{ calcularOcupacionPorBus(b) }}% Ocupado</span>
-                  <span class="font-bold text-slate-800">{{ (b.asientosDisponibles ?? 0) }} Asientos Libres</span>
                 </div>
               </div>
             </div>
@@ -406,70 +266,39 @@ interface BusItem {
                 </button>
               </div>
 
-              <!-- Vista Administrador -->
-              <div *ngIf="modoVista === 'admin'" class="flex items-center gap-1.5">
-                <button *ngIf="!b.enMantenimiento"
-                        (click)="abrirModalProgramarParaBus(b)"
-                        title="Programar mantenimiento técnico para este bus"
-                        class="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white transition-colors shadow-sm">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  </svg>
-                  Taller
-                </button>
+              <!-- Vista Administrador con botones claros y legibles -->
+              <div *ngIf="modoVista === 'admin'" class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <button *ngIf="!b.enMantenimiento"
+                          (click)="abrirModalProgramarParaBus(b)"
+                          class="flex-1 py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors">
+                    Enviar a Taller
+                  </button>
+                  <button *ngIf="b.enMantenimiento"
+                          (click)="liberarBusDeMantenimiento(b)"
+                          class="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors">
+                    Liberar a Ruta
+                  </button>
+                  <button (click)="verDetalles(b)"
+                          class="py-2.5 px-3 rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200 text-xs font-bold transition-colors">
+                    Detalles
+                  </button>
+                </div>
 
-                <button *ngIf="b.enMantenimiento"
-                        (click)="liberarBusDeMantenimiento(b)"
-                        title="Liberar bus de taller y devolverlo al servicio operativo"
-                        class="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  Liberar a Ruta
-                </button>
-
-                <!-- Iconos secundarios de admin -->
-                <button (click)="abrirModalIncidencia(b)"
-                        title="Reportar novedad u observación mecánica"
-                        class="p-2.5 rounded-xl text-amber-700 hover:bg-amber-50 border border-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                  </svg>
-                </button>
-
-                <button (click)="reiniciarBus(b)"
-                        title="Reiniciar asientos al 100% de capacidad para pruebas"
-                        class="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                  </svg>
-                </button>
-
-                <button (click)="verDetalles(b)"
-                        title="Ver ficha técnica"
-                        class="p-2.5 rounded-xl text-teal-600 hover:bg-teal-50 border border-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                  </svg>
-                </button>
-
-                <button (click)="abrirModalEditar(b)"
-                        title="Editar Autobús"
-                        class="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                  </svg>
-                </button>
-
-                <button (click)="eliminarBus(b.id)"
-                        title="Eliminar Autobús"
-                        class="p-2.5 rounded-xl text-red-500 hover:bg-red-50 border border-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                  </svg>
-                </button>
+                <div class="grid grid-cols-3 gap-2">
+                  <button (click)="abrirModalEditar(b)"
+                          class="py-2 px-2 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">
+                    Editar
+                  </button>
+                  <button (click)="reiniciarBus(b)"
+                          class="py-2 px-2 rounded-lg text-xs font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 transition-colors">
+                    Reiniciar
+                  </button>
+                  <button (click)="eliminarBus(b.id)"
+                          class="py-2 px-2 rounded-lg text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 transition-colors">
+                    Eliminar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -490,110 +319,64 @@ interface BusItem {
           </button>
         </div>
 
-        <!-- RESUMEN DE MANTENIMIENTO TÉCNICO (PIE DE PÁGINA COMPACTO PARA ADMIN) -->
+        <!-- HISTORIAL DE MOVIMIENTOS DE FLOTA (SOLO ADMIN) -->
         <div *ngIf="modoVista === 'admin'" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-6">
           <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
             <div>
-              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Centro de Mantenimiento Preventivo (ms-flota)</h3>
-              <p class="text-[11px] text-slate-500">Supervisión técnica de unidades en taller y control de reservas protegidas.</p>
+              <h3 class="text-sm font-bold text-slate-900">Historial de Movimientos de Flota</h3>
+              <p class="text-xs text-slate-500">Registro transaccional de unidades, cambios y movimientos de asientos.</p>
             </div>
-            <button (click)="pestanaActiva = 'mantenimiento'" class="text-xs text-teal-700 font-bold hover:underline flex items-center gap-1">
-              <span>Ver Gestión Completa de Taller ({{ mantenimientos.length }})</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
+            <button (click)="cargarHistorialFlota()" class="text-xs px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-teal-700 font-bold hover:bg-slate-100">
+              Actualizar
             </button>
           </div>
-          <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white text-xs">
-            <div class="flex items-center gap-6 flex-wrap">
-              <div>
-                <span class="text-slate-400 font-medium">En Taller Activo:</span>
-                <span class="font-bold text-amber-700 ml-1.5">{{ contarMantenimientosPorEstado('EN_MANTENIMIENTO') }} unidades</span>
-              </div>
-              <div>
-                <span class="text-slate-400 font-medium">Programados Próximos:</span>
-                <span class="font-bold text-blue-700 ml-1.5">{{ contarMantenimientosPorEstado('PROGRAMADO') }} visitas</span>
-              </div>
-              <div>
-                <span class="text-slate-400 font-medium">Finalizados:</span>
-                <span class="font-bold text-emerald-700 ml-1.5">{{ contarMantenimientosPorEstado('FINALIZADO') }} inspecciones</span>
-              </div>
-            </div>
-            <button (click)="abrirModalProgramarMantenimiento()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-              + Programar Taller
-            </button>
+          <div class="overflow-x-auto max-h-56 overflow-y-auto">
+            <table class="w-full text-xs text-left text-slate-700">
+              <thead class="text-[11px] uppercase bg-slate-50 text-slate-700 font-bold border-b border-slate-200 sticky top-0">
+                <tr>
+                  <th class="px-4 py-2.5">Fecha</th>
+                  <th class="px-4 py-2.5">Operación</th>
+                  <th class="px-4 py-2.5">Placa</th>
+                  <th class="px-4 py-2.5">Asientos</th>
+                  <th class="px-4 py-2.5">Detalles</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr *ngIf="historialFlota.length === 0">
+                  <td colspan="5" class="px-4 py-6 text-center text-slate-400">Aún no hay movimientos registrados en esta sesión.</td>
+                </tr>
+                <tr *ngFor="let h of historialFlota" class="hover:bg-slate-50">
+                  <td class="px-4 py-2.5 font-mono text-slate-500 whitespace-nowrap">{{ formatearFechaHistorial(h.fechaOperacion) }}</td>
+                  <td class="px-4 py-2.5 font-bold text-slate-900">{{ h.tipoOperacion }}</td>
+                  <td class="px-4 py-2.5 font-mono font-bold text-teal-700">{{ h.placa || '-' }}</td>
+                  <td class="px-4 py-2.5 font-semibold">{{ h.asientosAntes ?? '-' }} ➔ {{ h.asientosDespues ?? '-' }}</td>
+                  <td class="px-4 py-2.5 text-slate-600">{{ h.detalles || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
       </ng-container>
 
       <!-- ========================================== -->
-      <!-- PESTAÑA 2: CENTRO DE MANTENIMIENTO TÉCNICO -->
+      <!-- PESTAÑA 2: TALLER Y MANTENIMIENTO -->
       <!-- ========================================== -->
       <ng-container *ngIf="pestanaActiva === 'mantenimiento'">
 
-        <!-- PANEL: ANÁLISIS OPERATIVO DE MANTENIMIENTO -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold shadow-sm">
-                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h2 class="text-base font-black text-slate-900 tracking-tight">Centro de Mantenimiento y Taller Oficial (ms-flota)</h2>
-                </div>
-                <p class="text-xs text-slate-500">Gestión de órdenes preventivas y correctivas con bloqueo de sobreventa garantizado.</p>
-              </div>
-            </div>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-              HTTP 409 Conflict Activo
-            </span>
+        <!-- RESUMEN COMPACTO DE MANTENIMIENTO (3 INDICADORES) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold text-blue-700 uppercase">Programados</p>
+            <p class="text-3xl font-black text-blue-600 mt-1">{{ contarMantenimientosPorEstado('PROGRAMADO') }}</p>
           </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-            <!-- Box 1: Estado de Intervenciones Técnicas -->
-            <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-100">
-              <p class="text-xs font-bold text-slate-700 mb-2.5">Estado de Intervenciones Técnicas</p>
-              <div class="grid grid-cols-3 gap-2 text-center">
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">📋</span>
-                  <p class="text-xl font-black text-blue-600 mt-0.5">{{ contarMantenimientosPorEstado('PROGRAMADO') }}</p>
-                  <p class="text-[10px] text-slate-400 font-medium">Programados</p>
-                </div>
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">🔧</span>
-                  <p class="text-xl font-black text-amber-600 mt-0.5">{{ contarMantenimientosPorEstado('EN_MANTENIMIENTO') }}</p>
-                  <p class="text-[10px] text-amber-700 font-medium">En Taller</p>
-                </div>
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">✅</span>
-                  <p class="text-xl font-black text-emerald-600 mt-0.5">{{ contarMantenimientosPorEstado('FINALIZADO') }}</p>
-                  <p class="text-[10px] text-emerald-700 font-medium">Finalizados</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Box 2: Taller y Protección de Reservas -->
-            <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-100">
-              <p class="text-xs font-bold text-slate-700 mb-2.5">Protocolo de Operatividad y Seguridad</p>
-              <div class="grid grid-cols-2 gap-2 text-center">
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">🛡️</span>
-                  <p class="text-xl font-black text-teal-700 mt-0.5">SUTRAN</p>
-                  <p class="text-[10px] text-slate-400 font-medium">Normativa MTC</p>
-                </div>
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                  <span class="text-base">🚫</span>
-                  <p class="text-xl font-black text-rose-600 mt-0.5">Bloqueo</p>
-                  <p class="text-[10px] text-rose-700 font-medium">Cero Sobreventas</p>
-                </div>
-              </div>
-            </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold text-amber-700 uppercase">En Taller</p>
+            <p class="text-3xl font-black text-amber-600 mt-1">{{ contarMantenimientosPorEstado('EN_MANTENIMIENTO') }}</p>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-bold text-emerald-700 uppercase">Finalizados</p>
+            <p class="text-3xl font-black text-emerald-600 mt-1">{{ contarMantenimientosPorEstado('FINALIZADO') }}</p>
           </div>
         </div>
 
@@ -948,6 +731,12 @@ interface BusItem {
             </div>
           </div>
 
+          <div *ngIf="errorModal"
+               class="mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs font-semibold flex items-start gap-2">
+            <span class="shrink-0">⚠️</span>
+            <span>{{ errorModal }}</span>
+          </div>
+
           <div class="mt-6 flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
             <button (click)="cerrarModal()"
                     class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
@@ -1168,6 +957,7 @@ interface BusItem {
 export class FlotaComponent implements OnInit {
   buses: BusItem[] = [];
   mantenimientos: MantenimientoItem[] = [];
+  historialFlota: any[] = [];
   stats: any = null;
   cargando = false;
   errorMensaje = '';
@@ -1196,6 +986,7 @@ export class FlotaComponent implements OnInit {
   mostrarModal = false;
   modoEdicion = false;
   guardando = false;
+  errorModal = '';
   busFormulario: any = { id: null, placa: '', modelo: '', capacidad: 40, asientosDisponibles: 40 };
   erroresFormulario: { placa?: string; modelo?: string; capacidad?: string } = {};
 
@@ -1255,6 +1046,24 @@ export class FlotaComponent implements OnInit {
     this.cargarBuses();
     this.cargarMantenimientos();
     this.cargarEstadisticas();
+    this.cargarHistorialFlota();
+  }
+
+  cargarHistorialFlota() {
+    this.flotaService.getHistorialFlota().subscribe({
+      next: (resp: any) => {
+        const datos = Array.isArray(resp) ? resp : (resp?.datos || []);
+        this.historialFlota = datos;
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
+
+  formatearFechaHistorial(fecha: string): string {
+    if (!fecha) return '-';
+    const d = new Date(fecha);
+    return isNaN(d.getTime()) ? fecha : d.toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
   }
 
   cargarBuses() {
@@ -1504,6 +1313,7 @@ export class FlotaComponent implements OnInit {
 
   abrirModalCrear() {
     this.modoEdicion = false;
+    this.errorModal = '';
     this.busFormulario = { id: null, placa: '', modelo: '', capacidad: 40 };
     this.erroresFormulario = {};
     this.mostrarModal = true;
@@ -1511,6 +1321,7 @@ export class FlotaComponent implements OnInit {
 
   abrirModalEditar(bus: BusItem) {
     this.modoEdicion = true;
+    this.errorModal = '';
     this.busFormulario = { ...bus };
     this.erroresFormulario = {};
     this.mostrarModal = true;
@@ -1518,6 +1329,7 @@ export class FlotaComponent implements OnInit {
 
   cerrarModal() {
     this.mostrarModal = false;
+    this.errorModal = '';
   }
 
   validarFormularioEnTiempoReal() {
@@ -1563,6 +1375,7 @@ export class FlotaComponent implements OnInit {
   guardarBus() {
     if (!this.formularioValido()) return;
     this.guardando = true;
+    this.errorModal = '';
 
     if (this.modoEdicion && this.busFormulario.id) {
       this.flotaService.updateBus(this.busFormulario.id, this.busFormulario).subscribe({
@@ -1574,7 +1387,10 @@ export class FlotaComponent implements OnInit {
         },
         error: (err: any) => {
           this.guardando = false;
-          this.mostrarNotificacion('Error al actualizar bus: ' + (err.error?.mensaje || err.message), 'error');
+          const msg = err.error?.mensaje || err.message;
+          this.errorModal = msg;
+          this.mostrarNotificacion('Error al actualizar bus: ' + msg, 'error');
+          this.cdr.detectChanges();
         }
       });
     } else {
@@ -1593,7 +1409,10 @@ export class FlotaComponent implements OnInit {
         },
         error: (err: any) => {
           this.guardando = false;
-          this.mostrarNotificacion('Error al registrar bus: ' + (err.error?.mensaje || err.message), 'error');
+          const msg = err.error?.mensaje || err.message;
+          this.errorModal = msg;
+          this.mostrarNotificacion('Error al registrar bus: ' + msg, 'error');
+          this.cdr.detectChanges();
         }
       });
     }

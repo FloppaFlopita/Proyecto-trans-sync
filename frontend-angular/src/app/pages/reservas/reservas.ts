@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { ReservasService } from '../../services/reservas.service';
 import { RutasService } from '../../services/rutas.service';
+import { FlotaService } from '../../services/flota.service';
 import { PagosService } from '../../services/pagos.service';
 import { AuthService, UserSession } from '../../services/auth.service';
 
@@ -14,16 +15,19 @@ interface RutaOpcion {
   origen: string;
   destino: string;
   busId: number;
+  busPlaca?: string;
+  busModelo?: string;
+  capacidad?: number;
   precio: number;
   horario: string;
 }
 
 interface FilaAsiento {
   numeroFila: number;
-  izqVentana: number;
-  izqPasillo: number;
-  derPasillo: number;
-  derVentana: number;
+  izqVentana: number | null;
+  izqPasillo: number | null;
+  derPasillo: number | null;
+  derVentana: number | null;
 }
 
 @Component({
@@ -110,8 +114,10 @@ interface FilaAsiento {
           </div>
 
           <!-- Información del Servicio Seleccionado -->
-          <div class="flex items-center justify-between text-xs mb-4 px-3 py-2 bg-teal-50/60 rounded-xl border border-teal-100">
-            <span class="font-bold text-teal-900">Unidad Asignada: Bus #{{ rutaActual.busId }}</span>
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs mb-4 px-3 py-2 bg-teal-50/60 rounded-xl border border-teal-100">
+            <span class="font-bold text-teal-900">
+              Unidad Asignada: {{ rutaActual.busPlaca ? (rutaActual.busPlaca + ' · ' + rutaActual.busModelo + ' (' + (rutaActual.capacidad || 48) + ' ast.)') : ('Bus #' + rutaActual.busId) }}
+            </span>
             <span class="text-slate-600">Tarifa por Pasaje: <strong class="text-slate-900 font-bold">S/ {{ rutaActual.precio.toFixed(2) }}</strong></span>
             <span class="text-slate-600">Salida: <strong class="text-slate-900 font-bold">{{ rutaActual.horario }}</strong></span>
           </div>
@@ -253,7 +259,8 @@ interface FilaAsiento {
 
                 <!-- Asientos Izquierda (Ventana / Pasillo) -->
                 <div class="flex items-center gap-2">
-                  <button (click)="toggleSeleccionAsiento(fila.izqVentana)"
+                  <button *ngIf="fila.izqVentana !== null; else spacerIzqV"
+                          (click)="toggleSeleccionAsiento(fila.izqVentana)"
                           [disabled]="esAsientoOcupado(fila.izqVentana) || esAsientoEnReserva(fila.izqVentana)"
                           [class]="obtenerClaseBotonAsiento(fila.izqVentana)"
                           class="w-11 h-11 rounded-lg transition-all flex flex-col items-center justify-center font-bold text-xs shadow-xs"
@@ -263,8 +270,10 @@ interface FilaAsiento {
                       {{ obtenerTextoEstadoAsiento(fila.izqVentana) }}
                     </span>
                   </button>
+                  <ng-template #spacerIzqV><div class="w-11 h-11"></div></ng-template>
 
-                  <button (click)="toggleSeleccionAsiento(fila.izqPasillo)"
+                  <button *ngIf="fila.izqPasillo !== null; else spacerIzqP"
+                          (click)="toggleSeleccionAsiento(fila.izqPasillo)"
                           [disabled]="esAsientoOcupado(fila.izqPasillo) || esAsientoEnReserva(fila.izqPasillo)"
                           [class]="obtenerClaseBotonAsiento(fila.izqPasillo)"
                           class="w-11 h-11 rounded-lg transition-all flex flex-col items-center justify-center font-bold text-xs shadow-xs"
@@ -274,6 +283,7 @@ interface FilaAsiento {
                       {{ obtenerTextoEstadoAsiento(fila.izqPasillo) }}
                     </span>
                   </button>
+                  <ng-template #spacerIzqP><div class="w-11 h-11"></div></ng-template>
                 </div>
 
                 <!-- Pasillo central -->
@@ -283,27 +293,31 @@ interface FilaAsiento {
 
                 <!-- Asientos Derecha (Pasillo / Ventana) -->
                 <div class="flex items-center gap-2">
-                  <button (click)="toggleSeleccionAsiento(fila.derPasillo)"
+                  <button *ngIf="fila.derPasillo !== null; else spacerDerP"
+                          (click)="toggleSeleccionAsiento(fila.derPasillo)"
                           [disabled]="esAsientoOcupado(fila.derPasillo) || esAsientoEnReserva(fila.derPasillo)"
                           [class]="obtenerClaseBotonAsiento(fila.derPasillo)"
                           class="w-11 h-11 rounded-lg transition-all flex flex-col items-center justify-center font-bold text-xs shadow-xs"
-                          title="{{ obtenerTooltipAsientoCliente(fila.izqPasillo) }}">
+                          title="{{ obtenerTooltipAsientoCliente(fila.derPasillo) }}">
                     <span>{{ fila.derPasillo }}</span>
                     <span class="text-[8px] font-semibold tracking-tighter opacity-75">
                       {{ obtenerTextoEstadoAsiento(fila.derPasillo) }}
                     </span>
                   </button>
+                  <ng-template #spacerDerP><div class="w-11 h-11"></div></ng-template>
 
-                  <button (click)="toggleSeleccionAsiento(fila.derVentana)"
+                  <button *ngIf="fila.derVentana !== null; else spacerDerV"
+                          (click)="toggleSeleccionAsiento(fila.derVentana)"
                           [disabled]="esAsientoOcupado(fila.derVentana) || esAsientoEnReserva(fila.derVentana)"
                           [class]="obtenerClaseBotonAsiento(fila.derVentana)"
                           class="w-11 h-11 rounded-lg transition-all flex flex-col items-center justify-center font-bold text-xs shadow-xs"
-                          title="{{ obtenerTooltipAsientoCliente(fila.izqVentana) }}">
+                          title="{{ obtenerTooltipAsientoCliente(fila.derVentana) }}">
                     <span>{{ fila.derVentana }}</span>
                     <span class="text-[8px] font-semibold tracking-tighter opacity-75">
                       {{ obtenerTextoEstadoAsiento(fila.derVentana) }}
                     </span>
                   </button>
+                  <ng-template #spacerDerV><div class="w-11 h-11"></div></ng-template>
                 </div>
 
               </div>
@@ -514,17 +528,27 @@ interface FilaAsiento {
               </button>
             </div>
 
-            <!-- Botón de Pago Directo -->
-          <div class="mt-6 space-y-2">
+            <!-- Botones de Pago (Online Mercado Pago + Efectivo en Ventanilla) -->
+          <div class="mt-6 space-y-2.5">
             <button (click)="iniciarPagoDirecto()"
                     [disabled]="asientosSeleccionados.length === 0 || procesandoPago"
                     type="button"
-                    class="w-full py-4 rounded-xl font-bold text-sm text-white transition-all shadow-md flex items-center justify-center gap-2"
+                    class="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all shadow-md flex items-center justify-center gap-2"
                     [class]="asientosSeleccionados.length > 0 && !procesandoPago
                       ? 'bg-teal-600 hover:bg-teal-700 shadow-teal-500/20 cursor-pointer active:scale-[0.98]'
                       : 'bg-slate-300 text-slate-500 cursor-not-allowed'">
-              <span *ngIf="!procesandoPago">Pagar S/ {{ (asientosSeleccionados.length * rutaActual.precio).toFixed(2) }}</span>
+              <span *ngIf="!procesandoPago">💳 Pagar Online (Mercado Pago · Yape / Tarjeta) · S/ {{ (asientosSeleccionados.length * rutaActual.precio).toFixed(2) }}</span>
               <span *ngIf="procesandoPago" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            </button>
+
+            <button (click)="iniciarPagoEfectivo()"
+                    [disabled]="asientosSeleccionados.length === 0 || procesandoPago"
+                    type="button"
+                    class="w-full py-3 rounded-xl font-bold text-xs transition-all border flex items-center justify-center gap-2"
+                    [class]="asientosSeleccionados.length > 0 && !procesandoPago
+                      ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300 cursor-pointer active:scale-[0.98]'
+                      : 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'">
+              <span>💵 Confirmar Pago en Efectivo (Ventanilla) · S/ {{ (asientosSeleccionados.length * rutaActual.precio).toFixed(2) }}</span>
             </button>
 
 
@@ -822,18 +846,22 @@ interface FilaAsiento {
                    class="flex items-center justify-between p-1 bg-white rounded-lg border border-slate-200 text-xs">
                 <!-- Izquierda -->
                 <div class="flex gap-1.5">
-                  <button (click)="filtrarPorAsientoConductor(fila.izqVentana)"
+                  <button *ngIf="fila.izqVentana !== null; else condSpIzqV"
+                          (click)="filtrarPorAsientoConductor(fila.izqVentana)"
                           [title]="obtenerTooltipPasajero(fila.izqVentana)"
                           [class]="obtenerClaseAsientoConductor(fila.izqVentana)"
                           class="w-8 h-8 rounded border flex items-center justify-center font-mono transition-transform hover:scale-105">
                     {{ fila.izqVentana }}
                   </button>
-                  <button (click)="filtrarPorAsientoConductor(fila.izqPasillo)"
+                  <ng-template #condSpIzqV><div class="w-8 h-8"></div></ng-template>
+                  <button *ngIf="fila.izqPasillo !== null; else condSpIzqP"
+                          (click)="filtrarPorAsientoConductor(fila.izqPasillo)"
                           [title]="obtenerTooltipPasajero(fila.izqPasillo)"
                           [class]="obtenerClaseAsientoConductor(fila.izqPasillo)"
                           class="w-8 h-8 rounded border flex items-center justify-center font-mono transition-transform hover:scale-105">
                     {{ fila.izqPasillo }}
                   </button>
+                  <ng-template #condSpIzqP><div class="w-8 h-8"></div></ng-template>
                 </div>
 
                 <!-- Pasillo Central -->
@@ -841,18 +869,22 @@ interface FilaAsiento {
 
                 <!-- Derecha -->
                 <div class="flex gap-1.5">
-                  <button (click)="filtrarPorAsientoConductor(fila.derPasillo)"
+                  <button *ngIf="fila.derPasillo !== null; else condSpDerP"
+                          (click)="filtrarPorAsientoConductor(fila.derPasillo)"
                           [title]="obtenerTooltipPasajero(fila.derPasillo)"
                           [class]="obtenerClaseAsientoConductor(fila.derPasillo)"
                           class="w-8 h-8 rounded border flex items-center justify-center font-mono transition-transform hover:scale-105">
                     {{ fila.derPasillo }}
                   </button>
-                  <button (click)="filtrarPorAsientoConductor(fila.derVentana)"
+                  <ng-template #condSpDerP><div class="w-8 h-8"></div></ng-template>
+                  <button *ngIf="fila.derVentana !== null; else condSpDerV"
+                          (click)="filtrarPorAsientoConductor(fila.derVentana)"
                           [title]="obtenerTooltipPasajero(fila.derVentana)"
                           [class]="obtenerClaseAsientoConductor(fila.derVentana)"
                           class="w-8 h-8 rounded border flex items-center justify-center font-mono transition-transform hover:scale-105">
                     {{ fila.derVentana }}
                   </button>
+                  <ng-template #condSpDerV><div class="w-8 h-8"></div></ng-template>
                 </div>
               </div>
             </div>
@@ -1081,7 +1113,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
   // Rutas Interprovinciales
   rutasDisponibles: RutaOpcion[] = [
-    { id: 99, nombre: 'Juliaca → Puno (Directo)', origen: 'Juliaca', destino: 'Puno', busId: 1, precio: 3.00, horario: '10:00 hrs' },
+    { id: 99, nombre: 'Juliaca → Puno (Directo)', origen: 'Juliaca', destino: 'Puno', busId: 1, precio: 1.00, horario: '10:00 hrs' },
     { id: 19, nombre: 'Juliaca → Cusco', origen: 'Juliaca', destino: 'Cusco', busId: 3, precio: 35.00, horario: '07:30 hrs' },
     { id: 20, nombre: 'Cusco → Juliaca', origen: 'Cusco', destino: 'Juliaca', busId: 4, precio: 35.00, horario: '14:00 hrs' },
     { id: 21, nombre: 'Cusco → Arequipa', origen: 'Cusco', destino: 'Arequipa', busId: 5, precio: 40.00, horario: '21:00 hrs' },
@@ -1195,6 +1227,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
   constructor(
     private reservasService: ReservasService,
     private rutasService: RutasService,
+    private flotaService: FlotaService,
     private authService: AuthService,
     private pagosService: PagosService,
     private route: ActivatedRoute,
@@ -1277,31 +1310,63 @@ export class ReservasComponent implements OnInit, OnDestroy {
   }
 
   cargarRutasDesdeServicio() {
+    this.flotaService.getBuses().subscribe({
+      next: (busesResp: any) => {
+        const busesLista = Array.isArray(busesResp) ? busesResp : (busesResp?.datos || []);
+        const busesOperativos: number[] = busesLista
+          .filter((b: any) => (b.estado || '').toUpperCase() !== 'MANTENIMIENTO' && !b.enMantenimiento)
+          .map((b: any) => Number(b.id));
+        const poolBuses = busesOperativos.length > 0 ? busesOperativos : [1, 2, 4, 5, 6];
+        this.obtenerYMapearRutas(poolBuses, busesLista);
+      },
+      error: () => {
+        this.obtenerYMapearRutas([1, 2, 4, 5, 6], []);
+      }
+    });
+  }
+
+  private obtenerYMapearRutas(poolBuses: number[], busesLista: any[] = []) {
     this.rutasService.getRutas().subscribe({
       next: (resp: any) => {
         const datos = Array.isArray(resp) ? resp : (resp?.datos || []);
         if (datos && datos.length > 0) {
-          const rutasMapeadas = datos.map((r: any, idx: number) => ({
-            id: r.id,
-            nombre: `${r.origen} ➔ ${r.destino}`,
-            origen: r.origen,
-            destino: r.destino,
-            busId: ((idx) % 6) + 1, // Distribuye entre los buses 1 a 6
-            precio: r.precio || 35.00,
-            horario: r.horario || '08:00 hrs'
-          }));
+          const rutasMapeadas = datos.map((r: any, idx: number) => {
+            const busId = r.busId ? Number(r.busId) : poolBuses[idx % poolBuses.length];
+            const busInfo = busesLista.find((b: any) => Number(b.id) === busId);
+            return {
+              id: r.id,
+              nombre: `${r.origen} ➔ ${r.destino}`,
+              origen: r.origen,
+              destino: r.destino,
+              busId,
+              busPlaca: busInfo?.placa,
+              busModelo: busInfo?.modelo,
+              capacidad: busInfo?.capacidad ? Number(busInfo.capacidad) : 48,
+              precio: r.precio || 35.00,
+              horario: r.horario || '08:00 hrs'
+            };
+          });
 
-          const rutaTest: RutaOpcion = {
-            id: 99,
-            nombre: 'Juliaca → Puno (Directo)',
-            origen: 'Juliaca',
-            destino: 'Puno',
-            busId: 1,
-            precio: 3.00,
-            horario: '10:00 hrs'
-          };
-
-          this.rutasDisponibles = [rutaTest, ...rutasMapeadas];
+          const tieneRuta99 = rutasMapeadas.some((r: any) => Number(r.id) === 99);
+          if (tieneRuta99) {
+            this.rutasDisponibles = rutasMapeadas;
+          } else {
+            const firstBusId = poolBuses[0] || 1;
+            const firstBusInfo = busesLista.find((b: any) => Number(b.id) === firstBusId);
+            const rutaTest: RutaOpcion = {
+              id: 99,
+              nombre: 'Juliaca → Puno (Directo)',
+              origen: 'Juliaca',
+              destino: 'Puno',
+              busId: firstBusId,
+              busPlaca: firstBusInfo?.placa,
+              busModelo: firstBusInfo?.modelo,
+              capacidad: firstBusInfo?.capacidad ? Number(firstBusInfo.capacidad) : 48,
+              precio: 1.00,
+              horario: '10:00 hrs'
+            };
+            this.rutasDisponibles = [rutaTest, ...rutasMapeadas];
+          }
 
           // Verificar si hay parametro de ruta desde el catalogo de rutas
           const rutaIdParam = this.route.snapshot.queryParamMap.get('rutaId');
@@ -1311,6 +1376,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
             this.rutaSeleccionadaId = this.rutasDisponibles[0].id;
           }
 
+          this.construirPlanoBus(this.rutaActual?.capacidad || 48);
           this.cargarAsientosOcupados();
           this.cdr.detectChanges();
         }
@@ -1337,16 +1403,18 @@ export class ReservasComponent implements OnInit, OnDestroy {
     this.detenerTemporizador();
   }
 
-  construirPlanoBus() {
+  construirPlanoBus(capacidad: number = 48) {
+    const cap = Math.max(4, Math.min(80, Number(capacidad) || 48));
+    const totalFilas = Math.ceil(cap / 4);
     const filas: FilaAsiento[] = [];
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < totalFilas; i++) {
       const base = i * 4;
       filas.push({
         numeroFila: i + 1,
-        izqVentana: base + 1,
-        izqPasillo: base + 2,
-        derPasillo: base + 3,
-        derVentana: base + 4
+        izqVentana: base + 1 <= cap ? base + 1 : null,
+        izqPasillo: base + 2 <= cap ? base + 2 : null,
+        derPasillo: base + 3 <= cap ? base + 3 : null,
+        derVentana: base + 4 <= cap ? base + 4 : null
       });
     }
     this.filasBus = filas;
@@ -1354,6 +1422,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
 
   alCambiarRuta() {
     this.cancelarReservaTemporal();
+    this.construirPlanoBus(this.rutaActual?.capacidad || 48);
     this.cargarAsientosOcupados();
   }
 
@@ -1615,33 +1684,44 @@ export class ReservasComponent implements OnInit, OnDestroy {
     return 'LIBRE';
   }
 
-  iniciarPagoDirecto() {
+  private validarFormularioPasajero(): boolean {
     this.mensajeErrorForm = '';
 
     if (this.asientosSeleccionados.length === 0) {
       this.mensajeErrorForm = 'Seleccione al menos un asiento disponible en el plano del bus.';
-      return;
+      return false;
     }
 
     if (this.formulario.tipoComprobante === 'FACTURA') {
       if (!this.formulario.rucEmpresa || !/^\d{11}$/.test(this.formulario.rucEmpresa.trim())) {
         this.mensajeErrorForm = 'El R.U.C. de la empresa debe tener exactamente 11 dígitos numéricos.';
-        return;
+        return false;
       }
       if (!this.formulario.razonSocial?.trim()) {
         this.mensajeErrorForm = 'Por favor ingrese la Razón Social de la empresa para la factura.';
-        return;
+        return false;
       }
       if (!this.formulario.direccionFiscal?.trim()) {
         this.mensajeErrorForm = 'Por favor ingrese la Dirección Fiscal de la empresa.';
-        return;
+        return false;
       }
     }
 
     if (!this.formulario.nombrePasajero?.trim() || !this.formulario.dniPasajero?.trim() || !this.formulario.telefonoPasajero?.trim()) {
       this.mensajeErrorForm = 'Por favor complete Nombre, DNI y Teléfono del pasajero titular.';
-      return;
+      return false;
     }
+
+    return true;
+  }
+
+  iniciarPagoEfectivo() {
+    if (!this.validarFormularioPasajero()) return;
+    this.procesarPagoConMetodo('EFECTIVO (Ventanilla)');
+  }
+
+  iniciarPagoDirecto() {
+    if (!this.validarFormularioPasajero()) return;
 
     this.procesandoPago = true;
 
@@ -1709,7 +1789,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
   verificarPagoPendienteConBackend() {
     if (this.verificandoPagoBackend) return;
     const rawData = localStorage.getItem('transsync_mp_pending_purchase');
-    if (!rawData && this.asientosSeleccionados.length === 0) {
+    if (!rawData) {
       if (this.procesandoPago) {
         this.procesandoPago = false;
         this.cdr.detectChanges();
@@ -1740,7 +1820,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
   verificarPagoPendienteConBackendSilencioso() {
     if (this.verificandoPagoBackend) return;
     const rawData = localStorage.getItem('transsync_mp_pending_purchase');
-    if (!rawData && !this.procesandoPago) return;
+    if (!rawData) return;
 
     this.verificandoPagoBackend = true;
     this.pagosService.verificarUltimoPago().subscribe({
@@ -1855,7 +1935,8 @@ export class ReservasComponent implements OnInit, OnDestroy {
         asientos: data.asientos,
         precioUnitario: data.precioUnitario,
         metodoPago: data.metodoMercadoPago || 'MERCADO PAGO',
-        idCliente: data.idCliente
+        idCliente: data.idCliente,
+        paymentId: paymentId
       };
 
       this.reservasService.createReservaMultiple(payload).subscribe({
@@ -1953,11 +2034,14 @@ export class ReservasComponent implements OnInit, OnDestroy {
         next: (resp: any) => {
           this.completarVentaExitosa(numComp, metodoNombre);
         },
-        error: () => {
-          this.completarVentaExitosa(numComp, metodoNombre);
+        error: (err: any) => {
+          this.procesandoPago = false;
+          this.mensajeErrorForm = err.error?.mensaje || 'Error al confirmar el pago. Verifique la disponibilidad del bus y los asientos.';
+          this.cargarAsientosOcupados();
+          this.cdr.detectChanges();
         }
       });
-    }, 1200);
+    }, 600);
   }
 
   private completarVentaExitosa(numComp: string, metodoNombre: string) {

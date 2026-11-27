@@ -56,7 +56,7 @@ public class MantenimientoService {
                 .toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MantenimientoResponseDTO programarMantenimiento(MantenimientoRequestDTO dto) {
         // Bloqueo pesimista sobre el bus para serializar programación y evitar condiciones de carrera
         Bus bus = busRepository.findByIdForUpdate(dto.getBusId())
@@ -92,7 +92,7 @@ public class MantenimientoService {
         return MantenimientoResponseDTO.fromEntity(guardado);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MantenimientoResponseDTO iniciarMantenimiento(Long id) {
         Mantenimiento m = mantenimientoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Mantenimiento no encontrado con ID: " + id));
@@ -115,7 +115,7 @@ public class MantenimientoService {
         return MantenimientoResponseDTO.fromEntity(guardado);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MantenimientoResponseDTO finalizarMantenimiento(Long id, Double costoReal, String observaciones) {
         Mantenimiento m = mantenimientoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Mantenimiento no encontrado con ID: " + id));
